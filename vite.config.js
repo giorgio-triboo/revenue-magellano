@@ -8,40 +8,25 @@ export default defineConfig({
             refresh: true,
         }),
     ],
-    server: {
-        host: '0.0.0.0',
-        hmr: {
-            host: 'localhost',
-        },
-        watch: {
-            usePolling: false, // Evita il polling continuo
-          interval: 300, // Aumenta l'intervallo tra le scansioni
+    build: {
+        outDir: 'public/build', // Output nella directory pubblica
+        emptyOutDir: true, // Pulisce la directory di output prima di ogni build
+        manifest: true, // Genera il file manifest.json per Laravel
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    alpine: ['alpinejs'], // Separazione dei moduli per l'ottimizzazione
+                },
+            },
         },
     },
     resolve: {
         alias: {
             '@': '/resources/js',
-            'alpine': 'alpinejs'
+            'alpine': 'alpinejs',
         },
     },
     optimizeDeps: {
-        include: ['alpinejs', 'lucide']
+        include: ['alpinejs', 'lucide'],
     },
-    build: {
-        rollupOptions: {
-            input: {
-                app: 'resources/views/layouts/app.blade.php',
-                robots: 'public/robots.txt', // Aggiungi il percorso
-            },
-            output: {
-                manualChunks: {
-                    alpine: ['alpinejs']
-                }
-            }
-        }
-    }
-    
 });
-
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
