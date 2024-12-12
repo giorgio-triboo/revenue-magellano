@@ -36,6 +36,7 @@ phases:
     commands:
       - composer install --no-dev
       - npm install
+      - npm run build
 #    finally:
 #      - command
 #      - command
