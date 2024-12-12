@@ -1,0 +1,43 @@
+/.phpunit.cache
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.env.production
+.env.testing
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.vscode
+.DS_Store
+.vite
+
+# Laravel specific
+/bootstrap/cache/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+/storage/app/public/*
+/storage/debugbar/*
+
+# Application specific
+/storage/app/private/exports/*
+/storage/app/private/uploads/*
+!storage/app/private/templates/
+*.log
+*.sqlite
+
+# Development tools
+/docker/*
+docker-compose.yml
+Dockerfile
