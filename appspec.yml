@@ -2,11 +2,11 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/revenue.magellano.it
+    destination: /var/www/revenue.magellano.ai
 
 file_exists_behavior: OVERWRITE
 
 permissions:
-  - object: /var/www/revenue.magellano.it
+  - object: /var/www/revenue.magellano.ai
     owner: apache
     group: apache
