@@ -1,0 +1,12 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/landing/revenue
+
+file_exists_behavior: OVERWRITE
+
+permissions:
+  - object: /var/www/landing/revenue
+    owner: apache
+    group: apache
