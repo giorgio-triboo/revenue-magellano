@@ -34,7 +34,7 @@
                 <!-- Database Management Section -->
                 <div class="mb-6">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Gestione Database</h3>
-                    <a href="{{ $adminerUrl }}" target="_blank"
+                    <a href="{{ route('settings.adminer') }}" target="_blank"
                         class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-md font-medium rounded-xl text-white bg-custom-activeItem hover:bg-custom-activeItem/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem">
                         <i data-lucide="database" class="w-5 h-5 mr-2"></i>
                         Apri Adminer

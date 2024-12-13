@@ -91,6 +91,7 @@ Route::middleware(['auth'])->group(function () {
         });
         Route::prefix('settings')->group(function () {
             Route::get('/', [SettingsController::class, 'index'])->name('settings.index');
+            Route::get('/adminer', [SettingsController::class, 'adminer'])->name('settings.adminer');
         });
 
 
