@@ -14,17 +14,21 @@ class SettingsController extends Controller
     }
 
     public function adminer()
-    {
-        $adminerPath = resource_path('views/settings/adminer/adminer.php');
+{
+    $adminerPath = resource_path('views/settings/adminer/adminer.php');
 
-        if (!file_exists($adminerPath)) {
-            abort(404, 'Adminer non trovato.');
-        }
-
-        // Includi il contenuto di Adminer come parte della risposta
-        require_once $adminerPath;
-        exit; // Termina l'esecuzione del framework dopo aver caricato Adminer
+    if (!file_exists($adminerPath)) {
+        abort(404, 'Adminer non trovato.');
     }
+
+    // Esegui Adminer in un contesto separato
+    ob_start();
+    include $adminerPath;
+    $content = ob_get_clean();
+
+    return response($content)->header('Content-Type', 'text/html');
+}
+
 
 
 
