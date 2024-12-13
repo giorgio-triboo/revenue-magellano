@@ -23,19 +23,6 @@ class PublisherSeeder extends Seeder
                 'website' => 'www.triboo.direct',
                 'is_active' => true,
             ],
-
-            [
-                'vat_number' => 'IT98765432109',
-                'company_name' => 'T-Mediahouse',
-                'legal_name' => 'T-Mediahouse Srl',
-                'county' => 'Milano',
-                'city' => 'Milano',
-                'postal_code' => '20126',
-                'iban' => 'IT60X0542811101000000123456',
-                'swift' => 'SWIFT12345',
-                'website' => 'www.triboo.direct',
-                'is_active' => true,
-            ],
         ];
 
         foreach ($fixedPublishers as $publisher) {
