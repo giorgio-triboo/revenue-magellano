@@ -10,8 +10,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleSeeder::class,          // RoleSeeder viene eseguito per primo
+            UserSeeder::class,
             // PublisherSeeder::class,
-            // UserSeeder::class,
             // SubPublisherSeeder::class,
         ]);
     }
