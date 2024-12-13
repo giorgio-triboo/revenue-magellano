@@ -20,7 +20,6 @@ class PublisherSeeder extends Seeder
                 'postal_code' => '20126',
                 'iban' => 'IT60X0542811101000000123456',
                 'swift' => 'SWIFT12345',
-                'website' => 'www.triboo.direct',
                 'is_active' => true,
             ],
         ];
