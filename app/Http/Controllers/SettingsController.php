@@ -15,9 +15,8 @@ class SettingsController extends Controller
 
     public function adminer()
 {
-    \Log::debug('Entrato nel metodo adminer.');
+    $path = resource_path('views/settings/adminer/adminer.php');
 
-    $path = base_path('adminer/adminer.php');
     \Log::debug("Percorso Adminer: $path");
 
     if (!file_exists($path)) {
@@ -27,6 +26,7 @@ class SettingsController extends Controller
 
     return response()->file($path);
 }
+
 
 
 }
