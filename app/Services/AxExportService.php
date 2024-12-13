@@ -47,7 +47,7 @@ class AxExportService
 
             // Raggruppa per PurchId
             $statements = $statements->groupBy(function ($statement) use ($upload) {
-                $period = $upload->process_date->format('Ym'); // Modificato da 'ym' a 'Ym'
+                $period = $upload->process_date->format('Ym');
                 return 'PUB' . $period . ($statement->publisher->axData->ax_vend_id ?? '');
             });
 
@@ -82,8 +82,11 @@ class AxExportService
                         // Imposta il periodo
                         $row[0] = $upload->process_date->format('ym');
 
-                        // Formatta i valori numerici
+                        // Formatta i valori numerici e gestisce i valori nulli
                         $formattedRow = array_map(function ($value) {
+                            if ($value === null) {
+                                return ' ';  // Sostituisce null con spazio vuoto
+                            }
                             if (is_numeric($value)) {
                                 // Converte il valore in float per il confronto
                                 $floatValue = (float)$value;
@@ -94,7 +97,7 @@ class AxExportService
                                 // Se ha decimali, mantiene due decimali
                                 return number_format($floatValue, 2, '.', '');
                             }
-                            return $value;
+                            return $value === '' ? ' ' : $value; // Sostituisce stringhe vuote con spazio
                         }, $row);
 
                         fwrite($handle, implode("\t", $formattedRow) . PHP_EOL);
@@ -161,39 +164,55 @@ class AxExportService
             Log::channel('ax_export')->debug('formatRow: Calcolato il periodo.', ['Period' => $period]);
 
             $formattedRow = [
-                $period,                             // Period
-                $axData->ax_vend_account,           // VendAccount
-                'PUB' . $period . ($axData->ax_vend_id ?? ''), // PurchId
-                $lineNumber,                        // LineNumber
-                $publisher->legal_name,             // VendName
-                $statement->subPublisher->ax_name,  // SiteUrl
-                null,                               // Address
-                null,                               // Street
-                null,                               // ZipCode
-                null,                               // City
-                null,                               // State
-                $axData->country_id,                // CountryRegionId
-                $axData->vend_group,                // VendGroup
-                $axData->party_type,                // PartyType
-                $publisher->vat_number,             // VATNum
-                null,                               // FiscalCode
-                null,                               // Payment
-                null,                               // PaymMode
-                $axData->tax_withhold_calculate,    // TaxWithholdCalculate
-                $axData->item_id,                   // ItemId
-                1,                                  // Qty
-                $statement->total_amount,           // PurchPrice
-                null,                               // BirthPlace
-                null,                               // BirthDate
-                null,                               // BirthCounty
-                null,                               // Gender
-                $axData->email,                     // Email
-                null,                               // Phone
-                $publisher->iban,                   // BankIBAN
-                null,                               // BankSWIFTCode
-                $axData->cost_profit_center,        // CostProfitCenter
-                $statement->subPublisher->channel_detail // ChannelDetail
+                $period,                            // Period (FIELD_TABLE_HEADER)
+                $axData->ax_vend_account,           // VendAccount (FIELD_TABLE_HEADER)
+                'PUB' . $period . ($axData->ax_vend_id ?? ''), // PurchId (FIELD_TABLE_HEADER_ADDITIONAL_HEADER_KEY_ROW)
+                $lineNumber,                        // LineNumber (FIELD_TABLE_ROW)
+                $publisher->legal_name,             // VendName (FIELD_TABLE_HEADER)
+                $statement->subPublisher->ax_name,  // SiteUrl (FIELD_TABLE_HEADER_ROW)
+                null,                               // Address (FIELD_TABLE_HEADER)
+                $axData->address_street,            // Street (FIELD_TABLE_HEADER)
+                $axData->address_city_zip,          // ZipCode (FIELD_TABLE_HEADER)
+                $axData->address_city,              // City (FIELD_TABLE_HEADER)
+                null,                               // State (FIELD_TABLE_HEADER)
+                $axData->address_country_id,        // CountryRegionId (FIELD_TABLE_HEADER)
+                $axData->vend_group,                // VendGroup (FIELD_TABLE_HEADER)
+                $axData->party_type,                // PartyType (FIELD_TABLE_HEADER)
+                $axData->ax_vat_number,             // VATNum (FIELD_TABLE_HEADER)
+                null,                               // FiscalCode (FIELD_TABLE_HEADER)
+                $axData->payment,                   // Payment (FIELD_TABLE_HEADER)
+                $axData->payment_mode,              // PaymMode (FIELD_TABLE_HEADER)
+                $axData->tax_withhold_calculate,    // TaxWithholdCalculate (FIELD_TABLE_HEADER)
+                $axData->item_id,                   // ItemId (FIELD_TABLE_ROW)
+                1,                                  // Qty (FIELD_TABLE_ROW)
+                $statement->total_amount,           // PurchPrice (FIELD_TABLE_ROW)
+                null,                               // BirthPlace (FIELD_TABLE_HEADER)
+                null,                               // BirthDate (FIELD_TABLE_HEADER)
+                null,                               // BirthCounty (FIELD_TABLE_HEADER)
+                null,                               // Gender (FIELD_TABLE_HEADER)
+                $axData->email,                     // Email (FIELD_TABLE_HEADER)
+                null,                               // Phone (FIELD_TABLE_HEADER)
+                $publisher->iban,                   // BankIBAN (FIELD_TABLE_HEADER)
+                $publisher->swift,                  // BankSWIFTCode (FIELD_TABLE_HEADER)
+                $axData->cost_profit_center,        // CostProfitCenter (FIELD_TABLE_HEADER_ROW)
+                $statement->subPublisher->channel_detail, // ChannelDetail (FIELD_TABLE_HEADER_ROW)
+                $axData->tax_item_group,            // TaxItemGroup (FIELD_TABLE_ROW)
+                null,                               // VendorOrderReference (FIELD_TABLE_HEADER)
+                $axData->sales_tax_group,           // SalesTaxGroupCode (FIELD_TABLE_HEADER)
+                $axData->number_sequence_group_id,  // NumberSequenceGroupId (FIELD_TABLE_HEADER)
+                $axData->currency_code,             // CurrencyCode (FIELD_TABLE_HEADER)
+                null,                               // Al6CompetenceDateFrom (FIELD_TABLE_HEADER)
+                null,                               // Al6CompetenceDateTo (FIELD_TABLE_HEADER)
+                null,                               // Al6Locked (FIELD_TABLE_HEADER)
+                null,                               // AccountingDate (FIELD_TABLE_ADDITIONAL_HEADER)
+                null,                               // VendorPostingProfileId (FIELD_TABLE_ADDITIONAL_HEADER)
+                null,                               // Al6EInvoiceNumber (FIELD_TABLE_ADDITIONAL_HEADER)
+                null,                               // Al6EInvoiceYear (FIELD_TABLE_ADDITIONAL_HEADER)
+                null,                               // CostProfitCenterCode (FIELD_TABLE_ROW)
+                null,                               // PartnerBrand (FIELD_TABLE_ROW)
+                null                                // Geography (FIELD_TABLE_ROW)
             ];
+            
 
             Log::channel('ax_export')->debug('formatRow: Righe formattate correttamente.', [
                 'Formatted Row' => $formattedRow

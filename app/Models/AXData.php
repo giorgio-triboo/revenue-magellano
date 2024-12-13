@@ -16,13 +16,25 @@ class AXData extends Model
         'publisher_id',
         'ax_vend_account',
         'ax_vend_id',
-        'country_id',
         'vend_group',
         'party_type',
         'tax_withhold_calculate',
         'item_id',
+        'ax_vat_number',
         'email',
-        'cost_profit_center'
+        'cost_profit_center',
+        'address_country',
+        'address_country_id',
+        'address_county',
+        'address_county_id',
+        'address_city',
+        'address_city_zip',
+        'address_street',
+        'payment',
+        'payment_mode',
+        'currency_code',
+        'SalesTaxGroupCode',
+        'NumberSequenceGroupId'
     ];
 
     // Relazione con Publisher

@@ -14,17 +14,18 @@
         </a>
         <!-- Menu Admin -->
         @if (auth()->user()->isAdmin())
-            <!-- Upload -->
-            <a href="{{ route('uploads.index') }}"
-                class="flex items-center gap-3 px-3 py-2.5 text-md font-medium rounded-xl group {{ request()->routeIs('uploads.*') ? 'bg-custom-activeItem text-custom-textSec' : 'text-custom-textMain hover:bg-white/5' }}">
-                <i data-lucide="upload" class="w-5 h-5"></i>
-                <span>Upload</span>
-            </a>
             <!-- Lista Editori -->
             <a href="{{ route('publishers.index') }}"
                 class="flex items-center gap-3 px-3 py-2.5 text-md font-medium rounded-xl group {{ request()->routeIs('publishers.*') ? 'bg-custom-activeItem text-custom-textSec' : 'text-custom-textMain hover:bg-white/5' }}">
                 <i data-lucide="book-open" class="w-5 h-5"></i>
                 <span>Lista Editori</span>
+            </a>
+
+            <!-- Upload -->
+            <a href="{{ route('uploads.index') }}"
+                class="flex items-center gap-3 px-3 py-2.5 text-md font-medium rounded-xl group {{ request()->routeIs('uploads.*') ? 'bg-custom-activeItem text-custom-textSec' : 'text-custom-textMain hover:bg-white/5' }}">
+                <i data-lucide="upload" class="w-5 h-5"></i>
+                <span>Upload</span>
             </a>
             <a href="{{ route('users.index') }}"
                 class="flex items-center gap-3 px-3 py-2.5 text-md font-medium rounded-xl group {{ request()->routeIs('users.*') ? 'bg-custom-activeItem text-custom-textSec' : 'text-custom-textMain hover:bg-white/5' }}">
@@ -32,34 +33,30 @@
                 <span>Gestione Profili</span>
             </a>
         @endif
+    </div>
 
-        @if (auth()->user()->isPublisher())
+    <!-- Profile and Logout Section -->
+    <div class="mt-auto border-t border-custom-textMain/30">
+        <div class="px-6 py-4 space-y-4">
             <!-- Assistenza -->
             <a href="{{ route('support.show') }}"
                 class="flex items-center gap-3 px-3 py-2.5 text-md font-medium rounded-xl group {{ request()->routeIs('support.*') ? 'bg-custom-activeItem text-custom-textSec' : 'text-custom-textMain hover:bg-white/5' }}">
                 <i data-lucide="help-circle" class="w-5 h-5"></i>
                 <span>Assistenza</span>
             </a>
-        @endif
-        @if (auth()->user()->isAdmin())
-            <!-- Lista Editori -->
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-2.5 text-md font-medium rounded-xl group {{ request()->routeIs('publishers.*') ? 'bg-custom-activeItem text-custom-textSec' : 'text-custom-textMain hover:bg-white/5' }}">
+
+            <!-- Settings -->
+            <a href="{{ route('settings.index') }}"
+                class="flex items-center gap-3 px-3 py-2.5 text-md font-medium rounded-xl group {{ request()->routeIs('settings.*') ? 'bg-custom-activeItem text-custom-textSec' : 'text-custom-textMain hover:bg-white/5' }}">
                 <i data-lucide="settings" class="w-5 h-5"></i>
                 <span>Impostazioni</span>
             </a>
-        @endif
 
-    </div>
-
-    <!-- Profile and Logout Section -->
-    <div class="mt-auto border-t border-custom-textMain/30">
-        <div class="px-6 py-4 space-y-4">
-
+            <!-- Link Profilo -->
             <a href="{{ route('profile.show') }}"
                 class="flex items-center gap-3 px-3 py-2.5 text-md font-medium rounded-xl group {{ request()->routeIs('profile.*') ? 'bg-custom-activeItem text-custom-textSec' : 'text-custom-textMain hover:bg-white/5' }}">
                 <i data-lucide="user" class="w-5 h-5"></i>
-                <span>Profilo Utente</span>
+                <span>Profilo</span>
             </a>
 
             <!-- Profile Info -->

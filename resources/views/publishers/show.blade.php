@@ -407,11 +407,6 @@
                         </div>
 
                         <div>
-                            <dt class="text-md font-medium text-gray-500">CountryRegionId</dt>
-                            <dd class="mt-1 text-md text-gray-900">{{ $axData->country_id ?? 'N/A' }}</dd>
-                        </div>
-
-                        <div>
                             <dt class="text-md font-medium text-gray-500">VendGroup</dt>
                             <dd class="mt-1 text-md text-gray-900">{{ $axData->vend_group ?? 'N/A' }}</dd>
                         </div>
@@ -432,6 +427,11 @@
                         </div>
 
                         <div>
+                            <dt class="text-md font-medium text-gray-500">VatNumber</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->ax_vat_number ?? 'N/A' }}</dd>
+                        </div>
+
+                        <div>
                             <dt class="text-md font-medium text-gray-500">Email</dt>
                             <dd class="mt-1 text-md text-gray-900">{{ $axData->email ?? 'N/A' }}</dd>
                         </div>
@@ -445,6 +445,60 @@
                             <dt class="text-md font-medium text-gray-500">ChannelDetail</dt>
                             <dd class="mt-1 text-md text-gray-900">{{ $subPublisher->channel_detail ?? 'N/A' }}</dd>
                         </div>
+
+
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">payment</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->payment ?? 'N/A' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">payment_mode</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->payment_mode ?? 'N/A' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">currency_code</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->currency_code ?? 'N/A' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">SalesTaxGroupCode</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->SalesTaxGroupCode ?? 'N/A' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">NumberSequenceGroupId</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->NumberSequenceGroupId ?? 'N/A' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">address_country</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->address_country ?? 'N/A' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">address_country_id</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->address_country_id ?? 'N/A' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">address_county</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->address_county ?? 'N/A' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">address_county_id</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->address_county_id ?? 'N/A' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">address_city</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->address_city ?? 'N/A' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">address_city_zip</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->address_city_zip ?? 'N/A' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">address_street</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->address_street ?? 'N/A' }}</dd>
+                        </div>
+                        
+
+
+
                     </dl>
                 </div>
             </div>
@@ -597,13 +651,6 @@
                                     </div>
 
                                     <div>
-                                        <label for="country_id"
-                                            class="block text-md font-medium text-gray-700">CountryRegionId</label>
-                                        <input type="text" x-model="editingAXData.country_id" id="country_id"
-                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
-                                    </div>
-
-                                    <div>
                                         <label for="vend_group"
                                             class="block text-md font-medium text-gray-700">VendGroup</label>
                                         <input type="text" x-model="editingAXData.vend_group" id="vend_group"
@@ -638,12 +685,104 @@
                                         <input type="text" x-model="editingAXData.email" id="email"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                     </div>
+                                    <div>
+                                        <label for="ax_vat_number"
+                                            class="block text-md font-medium text-gray-700">ax_vat_number</label>
+                                        <input type="text" x-model="editingAXData.ax_vat_number" id="ax_vat_number"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
 
                                     <div>
                                         <label for="cost_profit_center"
                                             class="block text-md font-medium text-gray-700">CostProfitCenter</label>
                                         <input type="text" x-model="editingAXData.cost_profit_center"
                                             id="cost_profit_center"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+
+
+                                    <div>
+                                        <label for="payment"
+                                            class="block text-md font-medium text-gray-700">payment</label>
+                                        <input type="text" x-model="editingAXData.payment"
+                                            id="payment"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+                                    <div>
+                                        <label for="cost_profit_center"
+                                            class="block text-md font-medium text-gray-700">payment_mode</label>
+                                        <input type="text" x-model="editingAXData.payment_mode"
+                                            id="cost_profit_center"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+                                    <div>
+                                        <label for="currency_code"
+                                            class="block text-md font-medium text-gray-700">currency_code</label>
+                                        <input type="text" x-model="editingAXData.currency_code"
+                                            id="currency_code"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+                                    <div>
+                                        <label for="SalesTaxGroupCode"
+                                            class="block text-md font-medium text-gray-700">SalesTaxGroupCode</label>
+                                        <input type="text" x-model="editingAXData.SalesTaxGroupCode"
+                                            id="SalesTaxGroupCode"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+                                    <div>
+                                        <label for="NumberSequenceGroupId"
+                                            class="block text-md font-medium text-gray-700">NumberSequenceGroupId</label>
+                                        <input type="text" x-model="editingAXData.NumberSequenceGroupId"
+                                            id="NumberSequenceGroupId"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+                                    <div>
+                                        <label for="address_country"
+                                            class="block text-md font-medium text-gray-700">address_country</label>
+                                        <input type="text" x-model="editingAXData.address_country"
+                                            id="address_country"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+                                    <div>
+                                        <label for="address_country_id"
+                                            class="block text-md font-medium text-gray-700">address_country_id</label>
+                                        <input type="text" x-model="editingAXData.address_country_id"
+                                            id="address_country_id"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+                                    <div>
+                                        <label for="address_county"
+                                            class="block text-md font-medium text-gray-700">address_county</label>
+                                        <input type="text" x-model="editingAXData.address_county"
+                                            id="address_county"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+                                    <div>
+                                        <label for="address_county_id"
+                                            class="block text-md font-medium text-gray-700">address_county_id</label>
+                                        <input type="text" x-model="editingAXData.address_county_id"
+                                            id="address_county_id"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+                                    <div>
+                                        <label for="address_city"
+                                            class="block text-md font-medium text-gray-700">address_city</label>
+                                        <input type="text" x-model="editingAXData.address_city"
+                                            id="address_city"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+                                    <div>
+                                        <label for="address_city_zip"
+                                            class="block text-md font-medium text-gray-700">address_city_zip</label>
+                                        <input type="text" x-model="editingAXData.address_city_zip"
+                                            id="address_city_zip"
+                                            class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    </div>
+                                    <div>
+                                        <label for="address_street"
+                                            class="block text-md font-medium text-gray-700">address_street</label>
+                                        <input type="text" x-model="editingAXData.address_street"
+                                            id="address_street"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                     </div>
 
