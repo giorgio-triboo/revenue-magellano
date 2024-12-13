@@ -38,19 +38,22 @@
     <!-- Profile and Logout Section -->
     <div class="mt-auto border-t border-custom-textMain/30">
         <div class="px-6 py-4 space-y-4">
+            @if (auth()->user()->isPublisher())
             <!-- Assistenza -->
             <a href="{{ route('support.show') }}"
                 class="flex items-center gap-3 px-3 py-2.5 text-md font-medium rounded-xl group {{ request()->routeIs('support.*') ? 'bg-custom-activeItem text-custom-textSec' : 'text-custom-textMain hover:bg-white/5' }}">
                 <i data-lucide="help-circle" class="w-5 h-5"></i>
                 <span>Assistenza</span>
             </a>
-
+            @endif
+            @if (auth()->user()->isAdmin())
             <!-- Settings -->
             <a href="{{ route('settings.index') }}"
                 class="flex items-center gap-3 px-3 py-2.5 text-md font-medium rounded-xl group {{ request()->routeIs('settings.*') ? 'bg-custom-activeItem text-custom-textSec' : 'text-custom-textMain hover:bg-white/5' }}">
                 <i data-lucide="settings" class="w-5 h-5"></i>
                 <span>Impostazioni</span>
             </a>
+            @endif
 
             <!-- Link Profilo -->
             <a href="{{ route('profile.show') }}"
