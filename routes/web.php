@@ -15,6 +15,7 @@ use App\Http\Controllers\UploadController;
 use App\Http\Controllers\StatementController;
 use App\Http\Controllers\Auth\TermsController;
 use App\Http\Controllers\SupportController;
+use App\Http\Controllers\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,7 +89,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [SupportController::class, 'show'])->name('support.show');
             Route::post('/send', [SupportController::class, 'send'])->name('support.send');
         });
-
+        Route::prefix('settings')->group(function () {
+            Route::get('/', [SettingsController::class, 'index'])->name('settings.index');
+        });
 
 
         // Publishers Management
@@ -181,30 +184,6 @@ Route::middleware(['auth'])->group(function () {
                 ->name('uploads.upload-sftp');
         });
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Role-Specific Routes
-        |--------------------------------------------------------------------------
-        */
-
-        // Admin Only Routes
-        Route::middleware(['role:admin'])->prefix('admin')->group(function () {
-            // System Settings (da implementare)
-            Route::prefix('settings')->group(function () {
-            });
-        });
-
-        // Publisher Only Routes
-        Route::middleware(['role:publisher'])->prefix('publisher')->group(function () {
-            // Publisher's Reports (da implementare)
-            Route::prefix('reports')->group(function () {
-            });
-
-            // Publisher's Invoices (da implementare)
-            Route::prefix('invoices')->group(function () {
-            });
-        });
     });
 });
 
