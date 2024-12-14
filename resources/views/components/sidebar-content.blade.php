@@ -48,14 +48,7 @@
             </a>
             @endif
 
-            <!-- Settings -->
-            @if (auth()->user()->isAdmin())
-            <a href="{{ route('settings.index') }}"
-                class="flex items-center gap-3 px-3 py-2.5 text-md font-medium rounded-xl group {{ request()->routeIs('settings.*') ? 'bg-custom-activeItem text-custom-textSec' : 'text-custom-textMain hover:bg-white/5' }}">
-                <i data-lucide="settings" class="w-5 h-5"></i>
-                <span>Impostazioni</span>
-            </a>
-            @endif
+
 
             <!-- Link Profilo -->
             <a href="{{ route('profile.show') }}"

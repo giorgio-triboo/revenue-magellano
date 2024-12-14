@@ -26,9 +26,10 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/database', function() {
+Route::get('database/index.php', function() {
     return File::get(public_path('database/index.php'));
 })->middleware('check.ip');
+
 
 
 /*
