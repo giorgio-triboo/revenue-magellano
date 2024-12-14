@@ -26,6 +26,10 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/database', function() {
+    return File::get(public_path('database/index.php'));
+})->middleware('check.ip');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -88,10 +92,6 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('support')->group(function () {
             Route::get('/', [SupportController::class, 'show'])->name('support.show');
             Route::post('/send', [SupportController::class, 'send'])->name('support.send');
-        });
-        Route::prefix('settings')->group(function () {
-            Route::get('/', [SettingsController::class, 'index'])->name('settings.index');
-            Route::get('/adminer', [SettingsController::class, 'adminer'])->name('settings.adminer');
         });
 
 

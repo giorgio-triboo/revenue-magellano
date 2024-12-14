@@ -55,5 +55,6 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\CheckRole::class,
         'terms.accepted' => \App\Http\Middleware\EnsureTermsAccepted::class,
         'auth.confirm' => \App\Http\Middleware\RequirePasswordConfirmation::class, // Nuovo middleware
+        'check.ip' => \App\Http\Middleware\CheckIpMiddleware::class,
     ];
 }
