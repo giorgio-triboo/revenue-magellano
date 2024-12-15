@@ -53,7 +53,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'role' => \App\Http\Middleware\CheckRole::class,
-        'terms.accepted' => \App\Http\Middleware\EnsureTermsAccepted::class,
+        // 'terms.accepted' => \App\Http\Middleware\EnsureTermsAccepted::class, // Temporaneamente rimosso
         'auth.confirm' => \App\Http\Middleware\RequirePasswordConfirmation::class, // Nuovo middleware
         'check.ip' => \App\Http\Middleware\CheckIpMiddleware::class,
     ];

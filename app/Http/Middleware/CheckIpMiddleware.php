@@ -20,7 +20,7 @@ class CheckIpMiddleware
         // Lista di IP autorizzati
         $allowedIps = [
             '127.0.0.1',    // localhost
-            'IL_TUO_IP',    // sostituisci con il tuo IP
+            '94.124.67.2',    // sostituisci con il tuo IP
             // aggiungi altri IP se necessario
         ];
 

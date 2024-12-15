@@ -66,17 +66,17 @@ class LoginController extends Controller
         }
 
         // Rate Limiting con protezione avanzata
-        $key = Str::lower($request->email).'|'.$request->ip();
-        
+        $key = Str::lower($request->email) . '|' . $request->ip();
+
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
-            
+
             Log::warning('Troppi tentativi di accesso IP limitato', [
                 'email' => hash('sha256', $request->email),
                 'ip' => $request->ip(),
                 'blocked_for_seconds' => $seconds
             ]);
-            
+
             return back()
                 ->with('error', "Troppi tentativi di accesso. Riprova tra " . ceil($seconds / 60) . " minuti.")
                 ->withInput($request->except('password'));
@@ -87,7 +87,7 @@ class LoginController extends Controller
 
         if (!$user) {
             RateLimiter::hit($key, 15 * 60); // 15 minuti di penalità
-            
+
             Log::warning('Tentativo di accesso con utente non esistente', [
                 'email' => hash('sha256', $request->email),
                 'ip' => $request->ip()
@@ -101,12 +101,12 @@ class LoginController extends Controller
         // Verifica se l'account è bloccato
         if ($user->isLockedOut()) {
             $minutesLeft = now()->diffInMinutes($user->locked_until);
-            
+
             Log::warning('Tentativo di accesso su account bloccato', [
                 'user_id' => $user->id,
                 'locked_until' => $user->locked_until
             ]);
-            
+
             return back()
                 ->with('error', "Account temporaneamente bloccato. Riprova tra {$minutesLeft} minuti.")
                 ->withInput($request->except('password'));
@@ -116,7 +116,7 @@ class LoginController extends Controller
         if (!Auth::attempt($credentials, $request->filled('remember'))) {
             RateLimiter::hit($key, 15 * 60); // 15 minuti di penalità
             $user->incrementLoginAttempts();
-            
+
             Log::warning('Tentativo di accesso fallito per credenziali errate', [
                 'user_id' => $user->id,
                 'ip' => $request->ip(),
@@ -135,7 +135,7 @@ class LoginController extends Controller
         // Verifica email validata
         if (!$user->email_verified) {
             Auth::logout();
-            
+
             Log::warning('Tentativo di accesso con email non verificata', [
                 'user_id' => $user->id
             ]);
@@ -148,7 +148,7 @@ class LoginController extends Controller
         // Verifica validazione admin
         if (!$user->is_validated) {
             Auth::logout();
-            
+
             Log::warning('Tentativo di accesso con account non validato', [
                 'user_id' => $user->id
             ]);
@@ -161,15 +161,17 @@ class LoginController extends Controller
         // Configurazione sicurezza sessione
         config(['session.secure' => true]);
         config(['session.same_site' => 'strict']);
-        
+
         // Login successful
         Auth::login($user, $request->filled('remember'));
         $request->session()->regenerate();
 
         // Verifica terms and conditions
+        /* Temporaneamente disabilitato
         if (!$user->hasAcceptedTerms()) {
             return redirect()->route('terms.show');
-        }
+        }   
+        */
 
         Log::info('Accesso effettuato con successo', [
             'user_id' => $user->id,
@@ -188,7 +190,7 @@ class LoginController extends Controller
             'auth.user_agent',
             'auth.last_active'
         ]);
-        
+
         $userId = Auth::id();
 
         Auth::logout();
