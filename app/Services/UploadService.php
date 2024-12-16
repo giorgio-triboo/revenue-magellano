@@ -93,134 +93,214 @@ class UploadService
     }
 
     protected function validateCsvFile(UploadedFile $file): void
-{
-    try {
-        $path = $file->getRealPath();
-        $content = file_get_contents($path);
-        $bom = pack('H*', 'EFBBBF');
-        $content = preg_replace("/^$bom/", '', $content);
+    {
+        $tmpPath = null;
 
-        $tmpPath = tempnam(sys_get_temp_dir(), 'csv_');
-        file_put_contents($tmpPath, $content);
+        try {
+            Log::channel('upload')->debug('Inizio validazione CSV', [
+                'original_name' => $file->getClientOriginalName(),
+                'mime_type' => $file->getMimeType(),
+                'size' => $file->getSize()
+            ]);
 
-        $csv = Reader::createFromPath($tmpPath, 'r');
-        $csv->setHeaderOffset(0);
-        $csv->setDelimiter(';');
+            if (!$file->isValid()) {
+                Log::channel('upload')->error('File non valido', [
+                    'error' => $file->getError(),
+                    'error_message' => $file->getErrorMessage()
+                ]);
+                throw new \Exception('Il file caricato non è valido: ' . $file->getErrorMessage());
+            }
 
-        $headers = array_map('trim', $csv->getHeader());
+            $path = $file->getRealPath();
+            if (!file_exists($path)) {
+                Log::channel('upload')->error('File non trovato', ['path' => $path]);
+                throw new \Exception('File non trovato nel percorso temporaneo');
+            }
 
-        $requiredHeaders = [
-            'anno_consuntivo',
-            'mese_consuntivo',
-            'anno_competenza',
-            'mese_competenza',
-            'nome_campagna_HO',
-            'publisher_id',
-            'sub_publisher_id',
-            'tipologia_revenue',
-            'pay',
-            'importo',
-            'note',
-            'data_invio'
-        ];
+            $content = file_get_contents($path);
+            if ($content === false) {
+                Log::channel('upload')->error('Impossibile leggere il contenuto del file');
+                throw new \Exception('Impossibile leggere il contenuto del file');
+            }
 
-        $hasValidatedQuantity = in_array('quantita_validata', $headers) ||
-            in_array('quantità_validata', $headers);
+            // Rimuovi BOM se presente
+            $bom = pack('H*', 'EFBBBF');
+            $content = preg_replace("/^$bom/", '', $content);
 
-        if (!$hasValidatedQuantity) {
-            throw new \Exception("Colonna 'quantita_validata' o 'quantità_validata' non trovata nel file");
-        }
+            // Crea file temporaneo
+            $tmpPath = tempnam(sys_get_temp_dir(), 'csv_');
+            if ($tmpPath === false) {
+                Log::channel('upload')->error('Impossibile creare file temporaneo');
+                throw new \Exception('Impossibile creare file temporaneo');
+            }
 
-        $missingHeaders = array_filter($requiredHeaders, function ($header) use ($headers) {
-            return !in_array($header, $headers);
-        });
+            if (file_put_contents($tmpPath, $content) === false) {
+                Log::channel('upload')->error('Impossibile scrivere sul file temporaneo');
+                throw new \Exception('Impossibile scrivere sul file temporaneo');
+            }
 
-        if (!empty($missingHeaders)) {
-            throw new \Exception('Headers mancanti: ' . implode(', ', $missingHeaders));
-        }
+            Log::channel('upload')->debug('File temporaneo creato', ['tmp_path' => $tmpPath]);
 
-        $duplicates = [];
-        $publisherErrors = [];
-        $records = $csv->getRecords();
+            // Inizializza il CSV reader
+            $csv = Reader::createFromPath($tmpPath, 'r');
+            $csv->setDelimiter(';');
+            $csv->setHeaderOffset(0);
 
-        foreach ($records as $offset => $record) {
-            $lineNumber = $offset + 2;
-            try {
-                $this->validateBasicRecord($record, $lineNumber);
-                
-                // Verifica coerenza publisher-subpublisher
-                $publisherId = (int)$record['publisher_id'];
-                $subPublisherId = (int)$record['sub_publisher_id'];
-                
-                $isValid = SubPublisher::where('id', $subPublisherId)
-                    ->where('publisher_id', $publisherId)
-                    ->exists();
-                
-                if (!$isValid) {
-                    $publisherErrors[] = [
+            // Verifica headers
+            $headers = array_map('trim', $csv->getHeader());
+            Log::channel('upload')->debug('Headers CSV trovati', ['headers' => $headers]);
+
+            $requiredHeaders = [
+                'anno_consuntivo',
+                'mese_consuntivo',
+                'anno_competenza',
+                'mese_competenza',
+                'nome_campagna_HO',
+                'publisher_id',
+                'sub_publisher_id',
+                'tipologia_revenue',
+                'pay',
+                'importo',
+                'note',
+                'data_invio'
+            ];
+
+            // Verifica presenza colonna quantita_validata
+            $hasValidatedQuantity = in_array('quantita_validata', $headers) ||
+                in_array('quantità_validata', $headers);
+
+            if (!$hasValidatedQuantity) {
+                Log::channel('upload')->error('Colonna quantita_validata mancante');
+                throw new \Exception("Colonna 'quantita_validata' o 'quantità_validata' non trovata nel file");
+            }
+
+            // Verifica headers mancanti
+            $missingHeaders = array_filter($requiredHeaders, function ($header) use ($headers) {
+                return !in_array($header, $headers);
+            });
+
+            if (!empty($missingHeaders)) {
+                Log::channel('upload')->error('Headers mancanti', ['missing' => $missingHeaders]);
+                throw new \Exception('Headers mancanti: ' . implode(', ', $missingHeaders));
+            }
+
+            // Verifica record
+            $duplicates = [];
+            $publisherErrors = [];
+            $records = $csv->getRecords();
+            $recordCount = 0;
+
+            foreach ($records as $offset => $record) {
+                $recordCount++;
+                $lineNumber = $offset + 2; // +2 perché l'offset parte da 0 e la prima riga è l'header
+
+                try {
+                    $this->validateBasicRecord($record, $lineNumber);
+
+                    // Verifica publisher-subpublisher
+                    $publisherId = (int) $record['publisher_id'];
+                    $subPublisherId = (int) $record['sub_publisher_id'];
+
+                    $isValid = SubPublisher::where('id', $subPublisherId)
+                        ->where('publisher_id', $publisherId)
+                        ->exists();
+
+                    if (!$isValid) {
+                        $publisherErrors[] = [
+                            'line' => $lineNumber,
+                            'publisher_id' => $publisherId,
+                            'sub_publisher_id' => $subPublisherId
+                        ];
+                    }
+
+                    // Verifica duplicati
+                    $duplicate = $this->checkDuplicate($record);
+                    if ($duplicate) {
+                        $duplicates[] = [
+                            'line' => $lineNumber,
+                            'status' => $duplicate['status']
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    Log::channel('upload')->error('Errore validazione record', [
                         'line' => $lineNumber,
-                        'publisher_id' => $publisherId,
-                        'sub_publisher_id' => $subPublisherId
-                    ];
+                        'error' => $e->getMessage()
+                    ]);
+                    throw new \Exception("Riga $lineNumber: " . $e->getMessage());
                 }
-                
-                $duplicate = $this->checkDuplicate($record);
-                if ($duplicate) {
-                    $duplicates[] = [
-                        'line' => $lineNumber,
-                        'status' => $duplicate['status']
-                    ];
-                }
-            } catch (\Exception $e) {
-                throw new \Exception($e->getMessage());
+            }
+
+            Log::channel('upload')->debug('Validazione record completata', [
+                'total_records' => $recordCount,
+                'publisher_errors' => count($publisherErrors),
+                'duplicates' => count($duplicates)
+            ]);
+
+            // Gestione errori publisher-subpublisher
+            if (!empty($publisherErrors)) {
+                throw new \Exception($this->formatPublisherErrors($publisherErrors));
+            }
+
+            // Gestione duplicati
+            if (!empty($duplicates)) {
+                throw new \Exception($this->formatDuplicateErrors($duplicates));
+            }
+
+        } catch (\Exception $e) {
+            Log::channel('upload')->error('Errore durante la validazione CSV', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        } finally {
+            // Pulizia file temporaneo
+            if ($tmpPath && file_exists($tmpPath)) {
+                unlink($tmpPath);
+                Log::channel('upload')->debug('File temporaneo rimosso', ['tmp_path' => $tmpPath]);
             }
         }
-
-        // Gestione errori di associazione publisher-subpublisher
-        if (!empty($publisherErrors)) {
-            $errorLines = array_slice($publisherErrors, 0, 3);
-            $message = 'Errore di associazione publisher-subpublisher nelle righe: ';
-            foreach ($errorLines as $error) {
-                $message .= sprintf(
-                    "riga %d (publisher_id: %d, sub_publisher_id: %d), ",
-                    $error['line'],
-                    $error['publisher_id'],
-                    $error['sub_publisher_id']
-                );
-            }
-            $message = rtrim($message, ', ');
-
-            if (count($publisherErrors) > 3) {
-                $message .= ' e altri ' . (count($publisherErrors) - 3) . ' errori';
-            }
-
-            throw new \Exception($message);
-        }
-
-        if (!empty($duplicates)) {
-            $lines = array_slice($duplicates, 0, 3);
-            $message = 'Record duplicati trovati: ';
-            foreach ($lines as $dup) {
-                $message .= "riga {$dup['line']} ({$dup['status']}), ";
-            }
-            $message = rtrim($message, ', ');
-
-            if (count($duplicates) > 3) {
-                $message .= ' e altri ' . (count($duplicates) - 3) . ' record';
-            }
-
-            throw new \Exception($message);
-        }
-
-        unlink($tmpPath);
-
-    } catch (\Exception $e) {
-        if (file_exists($tmpPath)) {
-            unlink($tmpPath);
-        }
-        throw new \Exception('Errore nella validazione del file CSV: ' . $e->getMessage());
     }
-}
+
+    private function formatPublisherErrors(array $errors): string
+    {
+        $errorLines = array_slice($errors, 0, 3);
+        $message = 'Errore di associazione publisher-subpublisher nelle righe: ';
+
+        foreach ($errorLines as $error) {
+            $message .= sprintf(
+                "riga %d (publisher_id: %d, sub_publisher_id: %d), ",
+                $error['line'],
+                $error['publisher_id'],
+                $error['sub_publisher_id']
+            );
+        }
+
+        $message = rtrim($message, ', ');
+
+        if (count($errors) > 3) {
+            $message .= ' e altri ' . (count($errors) - 3) . ' errori';
+        }
+
+        return $message;
+    }
+
+    private function formatDuplicateErrors(array $duplicates): string
+    {
+        $lines = array_slice($duplicates, 0, 3);
+        $message = 'Record duplicati trovati: ';
+
+        foreach ($lines as $dup) {
+            $message .= "riga {$dup['line']} ({$dup['status']}), ";
+        }
+
+        $message = rtrim($message, ', ');
+
+        if (count($duplicates) > 3) {
+            $message .= ' e altri ' . (count($duplicates) - 3) . ' record';
+        }
+
+        return $message;
+    }
 
     protected function validateBasicRecord(array $record, int $lineNumber): void
     {
