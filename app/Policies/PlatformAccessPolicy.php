@@ -26,9 +26,9 @@ class PlatformAccessPolicy
             return Response::deny('Il tuo account non è stato ancora verificato o attivato.');
         }
 
-        if (!$user->hasAcceptedTerms()) {
-            return Response::deny('Devi accettare i termini e le condizioni per continuare.');
-        }
+        // if (!$user->hasAcceptedTerms()) {
+        //     return Response::deny('Devi accettare i termini e le condizioni per continuare.');
+        // }
 
         return Response::allow();
     }

@@ -23,6 +23,7 @@ class Kernel extends HttpKernel
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
+            \App\Http\Middleware\LogRequests::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\SessionSecurityMiddleware::class,
             \App\Http\Middleware\ForceHttps::class, // Nuovo middleware per forzare HTTPS
@@ -35,7 +36,6 @@ class Kernel extends HttpKernel
 
         'platform' => [
             'auth',
-            'terms.accepted',
             'verified',
             'auth.session', // Aggiunto per sicurezza sessione aggiuntiva
         ],

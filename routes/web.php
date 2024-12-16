@@ -26,7 +26,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('database/index.php', function() {
+Route::get('database/index.php', function () {
     return File::get(public_path('database/index.php'));
 })->middleware('check.ip');
 
@@ -68,10 +68,8 @@ Route::middleware(['guest'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
-    // Logout e Terms routes rimangono come sono
+    // Logout 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/terms', [TermsController::class, 'show'])->name('terms.show');
-    Route::post('/terms/accept', [TermsController::class, 'accept'])->name('terms.accept');
 
     // Cambia questa parte
     Route::middleware(['can:access-platform'])->group(function () {
