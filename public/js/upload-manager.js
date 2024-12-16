@@ -140,25 +140,20 @@ function uploadManager() {
 
         async uploadFile() {
             if (!this.selectedFile || !this.form.year || !this.form.month) {
-                this.showNotification('error', 'Seleziona anno, mese e file prima di procedere', true);
-                return;
-            }
-        
-            // Verifica dimensione del file
-            const maxSize = 10 * 1024 * 1024; // 10MB
-            if (this.selectedFile.size > maxSize) {
-                this.showNotification('error', 'Il file supera la dimensione massima consentita di 10MB');
+                this.showNotification('error', 'Seleziona anno, mese e file prima di procedere');
                 return;
             }
         
             this.isUploading = true;
         
             try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-                console.log('File size:', this.selectedFile.size / 1024 / 1024, 'MB');
+                // Recupera il token CSRF dall'elemento meta o dal cookie
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
+                                 document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN'))?.split('=')[1];
         
                 if (!csrfToken) {
-                    throw new Error('Token di sicurezza non trovato. Ricarica la pagina.');
+                    window.location.reload(); // Ricarica la pagina se non trova il token
+                    return;
                 }
         
                 const formData = new FormData();
@@ -167,72 +162,46 @@ function uploadManager() {
                 formData.append('month', this.form.month);
                 formData.append('_token', csrfToken);
         
+                // Verifica che il token sia incluso nei dati
+                console.log('Sending request with CSRF token:', csrfToken);
+        
                 const response = await fetch('/uploads', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
                     },
-                    body: formData,
-                    credentials: 'same-origin',
-                    timeout: 300000 // 5 minuti di timeout
+                    credentials: 'include', // Importante: include i cookies nella richiesta
+                    body: formData
                 });
         
-                if (response.status === 413) {
-                    throw new Error('Il file è troppo grande. La dimensione massima consentita è 10MB.');
+                // Se riceviamo un 419 (CSRF token mismatch) o 401/403, ricarica la pagina
+                if (response.status === 419 || response.status === 401 || response.status === 403) {
+                    window.location.reload();
+                    return;
                 }
         
                 if (!response.ok) {
                     const contentType = response.headers.get('content-type');
-                    
-                    if (response.status === 403) {
-                        throw new Error('Non sei autorizzato ad effettuare questa operazione. Ricarica la pagina e riprova.');
-                    }
-        
-                    if (response.status === 419) {
-                        throw new Error('La sessione è scaduta. La pagina verrà ricaricata.');
-                    }
-        
-                    if (contentType && contentType.includes('text/html')) {
-                        const text = await response.text();
-                        console.error('Server returned HTML:', text.substring(0, 200));
-                        throw new Error('Errore durante l\'elaborazione del file. Riprova più tardi.');
-                    }
-        
                     if (contentType && contentType.includes('application/json')) {
                         const errorData = await response.json();
                         throw new Error(errorData.message || 'Errore durante il caricamento del file');
+                    } else {
+                        throw new Error('Errore durante il caricamento del file');
                     }
-        
-                    throw new Error('Si è verificato un errore imprevisto. Riprova più tardi.');
                 }
         
                 const data = await response.json();
-                console.log('Response data:', data);
         
                 this.selectedFile = null;
                 this.resetFileInput();
-                this.showNotification('success', data.message || 'File caricato con successo', true);
+                this.showNotification('success', 'File caricato con successo. Inizio validazione...');
                 this.startPolling();
         
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-        
             } catch (error) {
-                console.error('Upload error details:', {
-                    message: error.message,
-                    stack: error.stack,
-                    fileSize: this.selectedFile.size
-                });
-                this.showNotification('error', error.message || 'Si è verificato un errore durante il caricamento');
-                
-                if (error.message.includes('sessione è scaduta')) {
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
-                }
+                console.error('Upload error:', error);
+                this.showNotification('error', error.message);
             } finally {
                 this.isUploading = false;
             }
