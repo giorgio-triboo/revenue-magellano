@@ -1,8 +1,10 @@
+---
+
 version: 0.2
 
-#run-as: Linux-user-name
+# run-as: Linux-user-name
 
-#env:
+# env:
 #  shell: shell-tag
 #  variables:
 #    key1: "value"
@@ -17,66 +19,28 @@ version: 0.2
 #    key: secret-id:json-key:version-stage:version-id
 #  git-credential-helper: no | yes
 
-#proxy:
+# proxy:
 #  upload-artifacts: no | yes
 #  logs: no | yes
 
-#batch:
+# batch:
 #  fast-fail: false | true
-    # build-list:
-    # build-matrix:
-    # build-graph:
+# build-list:
+# build-matrix:
+# build-graph:
 
 phases:
   install:
-#    run-as: Linux-user-name
-#    on-failure: ABORT | CONTINUE
     runtime-versions:
       php: 8.2
     commands:
       - composer install --no-dev
       - npm install
-      - npm run build
-#    finally:
-#      - command
-#      - command
-#  pre_build:
-#    run-as: Linux-user-name
-#    on-failure: ABORT | CONTINUE
-#    commands:
-#      - command
-#      - command
-#    finally:
-#      - command
-#      - command
 
   build:
-#    run-as: Linux-user-name
-#    on-failure: ABORT | CONTINUE
     commands:
-#      - echo ""
-#    finally:
-#      - command
-#      - command
-
-#  post_build:
-#    run-as: Linux-user-name
-#    on-failure: ABORT | CONTINUE
-#    commands:
-#      - command
-#      - command
-#    finally:
-#      - command
-#      - command
-
-#reports:
-#  report-group-name-or-arn:
-#    files:
-#      - location
-#      - location
-#    base-directory: location
-#    discard-paths: no | yes
-#    file-format: report-format
+      - echo Build started on `date`
+      - npm run build
 
 artifacts:
   files:
@@ -95,8 +59,3 @@ artifacts:
 #      name: secondary-artifact-name
 #      discard-paths: no | yes
 #      base-directory: location
-
-#cache:
-#  paths:
-#    - path
-#    - path

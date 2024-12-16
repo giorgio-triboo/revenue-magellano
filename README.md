@@ -6,3 +6,10 @@ A Laravel-based platform for revenue management and statement processing.
 - PHP 8.2+
 - MySQL 8.0+
 - Node.js & NPM
+
+
+
+## TODO
+script afterInstall
+- generare .env
+- eliminare .git folder
