@@ -93,7 +93,7 @@ function uploadManager() {
                     throw new Error('Errore nell\'aggiornamento degli upload');
                 }
                 const processingUploads = await response.json();
-                
+
                 processingUploads.forEach(processingUpload => {
                     const uploadRow = document.querySelector(`tr[data-upload-id="${processingUpload.id}"]`);
                     if (uploadRow) {
@@ -143,28 +143,28 @@ function uploadManager() {
                 this.showNotification('error', 'Seleziona anno, mese e file prima di procedere');
                 return;
             }
-        
+
             this.isUploading = true;
-        
+
             try {
                 // Recupera il token CSRF dall'elemento meta o dal cookie
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
-                                 document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN'))?.split('=')[1];
-        
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ||
+                    document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN'))?.split('=')[1];
+
                 if (!csrfToken) {
                     window.location.reload(); // Ricarica la pagina se non trova il token
                     return;
                 }
-        
+
                 const formData = new FormData();
                 formData.append('file', this.selectedFile);
                 formData.append('year', this.form.year);
                 formData.append('month', this.form.month);
                 formData.append('_token', csrfToken);
-        
+
                 // Verifica che il token sia incluso nei dati
                 console.log('Sending request with CSRF token:', csrfToken);
-        
+
                 const response = await fetch('/uploads', {
                     method: 'POST',
                     headers: {
@@ -175,7 +175,7 @@ function uploadManager() {
                     credentials: 'include', // Importante: include i cookies nella richiesta
                     body: formData
                 });
-        
+
                 // Se riceviamo un 419 (CSRF token mismatch) o 401/403, ricarica la pagina
                 if (response.status === 419 || response.status === 401 || response.status === 403) {
                     console.error(`Errore HTTP ${response.status}: Accesso negato o token CSRF non valido.`);
@@ -185,8 +185,8 @@ function uploadManager() {
                     // window.location.reload();
                     return;
                 }
-                
-        
+
+
                 if (!response.ok) {
                     const contentType = response.headers.get('content-type');
                     if (contentType && contentType.includes('application/json')) {
@@ -196,14 +196,14 @@ function uploadManager() {
                         throw new Error('Errore durante il caricamento del file');
                     }
                 }
-        
+
                 const data = await response.json();
-        
+
                 this.selectedFile = null;
                 this.resetFileInput();
                 this.showNotification('success', 'File caricato con successo. Inizio validazione...');
                 this.startPolling();
-        
+
             } catch (error) {
                 console.error('Upload error:', error);
                 this.showNotification('error', error.message);
@@ -362,7 +362,11 @@ function uploadManager() {
 
         async uploadToSftp(uploadId) {
             if (!uploadId) return;
-
+        
+            const timeout = 10000; // Timeout di 10 secondi
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+        
             try {
                 const response = await fetch(`/uploads/${uploadId}/upload-sftp`, {
                     method: 'POST',
@@ -370,21 +374,36 @@ function uploadManager() {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    signal: controller.signal // Aggiunto il controller per gestire il timeout
                 });
-
+        
+                clearTimeout(id);
+        
+                if (!response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Errore durante l\'upload');
+                    } else {
+                        throw new Error('Errore durante l\'upload');
+                    }
+                }
+        
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.message);
-
-                this.showExportModal = false;
-                this.selectedUpload = null;
                 this.showNotification('success', data.message || 'File caricato su SFTP con successo');
                 window.location.reload();
             } catch (error) {
-                console.error('Errore nella richiesta SFTP', error);
-                this.showNotification('error', error.message);
+                if (error.name === 'AbortError') {
+                    console.error('Timeout: Nessuna risposta dal server entro il tempo previsto.');
+                    this.showNotification('error', 'Timeout: Nessuna risposta dal server.');
+                } else {
+                    console.error('Errore nella richiesta SFTP', error);
+                    this.showNotification('error', error.message);
+                }
             }
         },
+        
 
         async sendTestEmail() {
             if (!this.selectedUpload) return;
