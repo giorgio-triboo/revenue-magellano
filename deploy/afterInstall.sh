@@ -3,19 +3,19 @@
 RELEASE="/var/www/revenue.magellano.ai"
 
 # copy .env
-echo -e "Copying the ENV file"
-aws secretsmanager get-secret-value \
-	--secret-id "revenue/prod" \
-	--query SecretString \
-	--version-stage AWSCURRENT \
-	--region eu-west-1 \
-	--output text | \
-	jq -r 'to_entries|map("\(.key)=\"\(.value|tostring)\"")|.[]' > "${RELEASE}/.env" || {
-	    echo -e "ERROR creating .env from secret"
-	    exit 1
-	}
+# echo -e "Copying the ENV file"
+# aws secretsmanager get-secret-value \
+# 	--secret-id "revenue/prod" \
+# 	--query SecretString \
+# 	--version-stage AWSCURRENT \
+# 	--region eu-west-1 \
+# 	--output text | \
+# 	jq -r 'to_entries|map("\(.key)=\"\(.value|tostring)\"")|.[]' > "${RELEASE}/.env" || {
+# 	    echo -e "ERROR creating .env from secret"
+# 	    exit 1
+# 	}
 
-chown apache:apache "${RELEASE}/.env"
+# chown apache:apache "${RELEASE}/.env"
 
 #sudo -u apache mkdir "${RELEASE}/storage/logs" || true
 
