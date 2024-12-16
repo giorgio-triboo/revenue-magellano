@@ -121,38 +121,40 @@
                             </div>
 
                             <!-- Validation Toggle -->
-                            <div>
-                                <label for="validation_status" class="block text-md font-medium text-gray-700 mb-2">
-                                    Validazione Admin
-                                </label>
-                                <button type="button"
-                                    @click="updateValidationStatus('{{ $user->id }}', '{{ route('users.update-validation', $user) }}')"
-                                    :class="{ 'bg-green-600': user.is_validated, 'bg-gray-200': !user.is_validated }"
-                                    class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem">
-                                    <span class="sr-only">Validazione admin</span>
-                                    <span aria-hidden="true"
-                                        :class="{ 'translate-x-5': user.is_validated, 'translate-x-0': !user.is_validated }"
-                                        class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200">
-                                    </span>
-                                </button>
-                            </div>
+                            @if (auth()->id() !== $user->id)
+                                <div>
+                                    <label for="validation_status" class="block text-md font-medium text-gray-700 mb-2">
+                                        Validazione Admin
+                                    </label>
+                                    <button type="button"
+                                        @click="updateValidationStatus('{{ $user->id }}', '{{ route('users.update-validation', $user) }}')"
+                                        :class="{ 'bg-green-600': user.is_validated, 'bg-gray-200': !user.is_validated }"
+                                        class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem">
+                                        <span class="sr-only">Validazione admin</span>
+                                        <span aria-hidden="true"
+                                            :class="{ 'translate-x-5': user.is_validated, 'translate-x-0': !user.is_validated }"
+                                            class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200">
+                                        </span>
+                                    </button>
+                                </div>
 
-                            <!-- Active Status Toggle -->
-                            <div>
-                                <label for="active_status" class="block text-md font-medium text-gray-700 mb-2">
-                                    Stato Account
-                                </label>
-                                <button type="button"
-                                    @click="updateActiveStatus('{{ $user->id }}', '{{ route('users.update-active', $user) }}')"
-                                    :class="{ 'bg-green-600': user.is_active, 'bg-gray-200': !user.is_active }"
-                                    class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem">
-                                    <span class="sr-only">Stato account</span>
-                                    <span aria-hidden="true"
-                                        :class="{ 'translate-x-5': user.is_active, 'translate-x-0': !user.is_active }"
-                                        class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200">
-                                    </span>
-                                </button>
-                            </div>
+                                <!-- Active Status Toggle -->
+                                <div>
+                                    <label for="active_status" class="block text-md font-medium text-gray-700 mb-2">
+                                        Stato Account
+                                    </label>
+                                    <button type="button"
+                                        @click="updateActiveStatus('{{ $user->id }}', '{{ route('users.update-active', $user) }}')"
+                                        :class="{ 'bg-green-600': user.is_active, 'bg-gray-200': !user.is_active }"
+                                        class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem">
+                                        <span class="sr-only">Stato account</span>
+                                        <span aria-hidden="true"
+                                            :class="{ 'translate-x-5': user.is_active, 'translate-x-0': !user.is_active }"
+                                            class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200">
+                                        </span>
+                                    </button>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
