@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
-        Log::debug('AppServiceProvider: Registrazione observer FileUploadObserver.');
+        // Log::debug('AppServiceProvider: Registrazione observer FileUploadObserver.');
         FileUpload::observe(FileUploadObserver::class);
         Blade::withoutDoubleEncoding();
 

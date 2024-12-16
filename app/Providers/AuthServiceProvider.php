@@ -40,8 +40,8 @@ class AuthServiceProvider extends ServiceProvider
             ]);
 
             return $user->is_active && 
-                   $user->email_verified_at !== null && 
-                   $user->hasAcceptedTerms();
+                   $user->email_verified_at !== null;
+                //    $user->hasAcceptedTerms();
         });
 
         // Gate per gli upload
