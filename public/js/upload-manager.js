@@ -178,9 +178,14 @@ function uploadManager() {
         
                 // Se riceviamo un 419 (CSRF token mismatch) o 401/403, ricarica la pagina
                 if (response.status === 419 || response.status === 401 || response.status === 403) {
-                    window.location.reload();
+                    console.error(`Errore HTTP ${response.status}: Accesso negato o token CSRF non valido.`);
+                    const errorDetails = await response.text();
+                    console.error('Dettagli della risposta:', errorDetails);
+                    // Rimuovi il refresh automatico
+                    // window.location.reload();
                     return;
                 }
+                
         
                 if (!response.ok) {
                     const contentType = response.headers.get('content-type');
