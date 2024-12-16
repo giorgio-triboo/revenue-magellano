@@ -551,7 +551,7 @@
                         <button type="button" @click="uploadToSftp(selectedUpload.id)"
                             class="inline-flex w-full justify-center items-center rounded-xl bg-custom-activeItem px-3 py-2 text-md font-semibold text-white shadow-sm hover:bg-custom-activeItem/90">
                             <i data-lucide="upload" class="h-5 w-5 mr-2"></i>
-                            Carica su SFTP
+                            Carica su FTP
                         </button>
 
                         <button type="button" @click="showExportModal = false"
