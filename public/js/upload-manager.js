@@ -135,20 +135,29 @@ function uploadManager() {
                 this.showNotification('error', 'Seleziona anno, mese e file prima di procedere');
                 return;
             }
-        
+         
             this.isUploading = true;
-        
+         
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+                console.log('CSRF Token:', csrfToken);
+         
                 if (!csrfToken) {
                     throw new Error('Token di sicurezza non trovato. Ricarica la pagina.');
                 }
-        
+         
                 const formData = new FormData();
                 formData.append('file', this.selectedFile);
                 formData.append('year', this.form.year);
                 formData.append('month', this.form.month);
-        
+                formData.append('_token', csrfToken);
+         
+                console.log('Request data:', {
+                    file: this.selectedFile.name,
+                    year: this.form.year,
+                    month: this.form.month
+                });
+         
                 const response = await fetch('/uploads', {
                     method: 'POST',
                     headers: {
@@ -159,41 +168,54 @@ function uploadManager() {
                     body: formData,
                     credentials: 'same-origin'
                 });
-        
-                // Gestione specifica degli errori HTTP
+         
+                console.log('Response status:', response.status);
+                console.log('Response headers:', Object.fromEntries(response.headers));
+         
                 if (!response.ok) {
-                    if (response.status === 403) {
-                        // Ricarica la pagina per un nuovo token CSRF
-                        window.location.reload();
-                        throw new Error('Sessione scaduta. La pagina verrà ricaricata.');
-                    }
-        
                     const contentType = response.headers.get('content-type');
+                    
+                    if (response.status === 403) {
+                        throw new Error('Non sei autorizzato ad effettuare questa operazione. Ricarica la pagina e riprova.');
+                    }
+         
+                    if (contentType && contentType.includes('text/html')) {
+                        const text = await response.text();
+                        console.error('Server returned HTML:', text.substring(0, 200));
+                        throw new Error('Si è verificato un errore. Ricarica la pagina e riprova.');
+                    }
+         
                     if (contentType && contentType.includes('application/json')) {
                         const errorData = await response.json();
                         throw new Error(errorData.message || 'Errore durante il caricamento del file');
-                    } else {
-                        throw new Error('Errore di autorizzazione. Prova a ricaricare la pagina.');
                     }
+         
+                    throw new Error('Si è verificato un errore imprevisto. Riprova più tardi.');
                 }
-        
+         
                 const data = await response.json();
-        
+                console.log('Response data:', data);
+         
                 this.selectedFile = null;
                 this.resetFileInput();
-                this.showNotification('success', 'File caricato con successo');
+                this.showNotification('success', data.message || 'File caricato con successo');
                 this.startPolling();
-        
-                // Ricarica la pagina per mostrare il nuovo upload
-                window.location.reload();
-        
+         
+                // Aspetta un breve momento prima di ricaricare la pagina
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+         
             } catch (error) {
-                console.error('Upload error:', error);
-                this.showNotification('error', error.message);
+                console.error('Upload error details:', {
+                    message: error.message,
+                    stack: error.stack
+                });
+                this.showNotification('error', error.message || 'Si è verificato un errore durante il caricamento');
             } finally {
                 this.isUploading = false;
             }
-        },
+         },
 
         resetFileInput() {
             const fileInput = document.querySelector('input[type="file"]');

@@ -27,6 +27,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\SessionSecurityMiddleware::class,
             \App\Http\Middleware\ForceHttps::class, // Nuovo middleware per forzare HTTPS
+            \App\Http\Middleware\LogRequests::class,
         ],
 
         'api' => [
