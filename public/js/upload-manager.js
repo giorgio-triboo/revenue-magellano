@@ -360,10 +360,52 @@ function uploadManager() {
             }
         },
 
+        // async uploadToSftp(uploadId) {
+        //     if (!uploadId) return;
+        
+        //     const timeout = 60000; // Timeout di 60 secondi
+        //     const controller = new AbortController();
+        //     const id = setTimeout(() => controller.abort(), timeout);
+        
+        //     try {
+        //         const response = await fetch(`/uploads/${uploadId}/upload-sftp`, {
+        //             method: 'POST',
+        //             headers: {
+        //                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        //                 'Accept': 'application/json',
+        //                 'Content-Type': 'application/json'
+        //             },
+        //             signal: controller.signal // Aggiunto il controller per gestire il timeout
+        //         });
+        
+        //         clearTimeout(id);
+        
+        //         if (!response.ok) {
+        //             const contentType = response.headers.get('content-type');
+        //             if (contentType && contentType.includes('text/html')) {
+        //                 throw new Error('Risposta non valida dal server (HTML invece di JSON)');
+        //             }
+        //         }
+                
+        
+        //         const data = await response.json();
+        //         this.showNotification('success', data.message || 'File caricato su SFTP con successo');
+        //         window.location.reload();
+        //     } catch (error) {
+        //         if (error.name === 'AbortError') {
+        //             console.error('Timeout: Nessuna risposta dal server entro il tempo previsto.');
+        //             this.showNotification('error', 'Timeout: Nessuna risposta dal server.');
+        //         } else {
+        //             console.error('Errore nella richiesta SFTP', error);
+        //             this.showNotification('error', error.message);
+        //         }
+        //     }
+        // },
+        
         async uploadToSftp(uploadId) {
             if (!uploadId) return;
         
-            const timeout = 10000; // Timeout di 10 secondi
+            const timeout = 30000; // Timeout di 30 secondi
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), timeout);
         
@@ -382,7 +424,9 @@ function uploadManager() {
         
                 if (!response.ok) {
                     const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
+                    if (contentType && contentType.includes('text/html')) {
+                        throw new Error('Risposta non valida dal server (HTML invece di JSON)');
+                    } else if (contentType && contentType.includes('application/json')) {
                         const errorData = await response.json();
                         throw new Error(errorData.message || 'Errore durante l\'upload');
                     } else {
@@ -403,8 +447,7 @@ function uploadManager() {
                 }
             }
         },
-        
-
+                
         async sendTestEmail() {
             if (!this.selectedUpload) return;
 
