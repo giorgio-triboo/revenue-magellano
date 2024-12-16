@@ -18,7 +18,8 @@ function uploadManager() {
         notifications: {
             show: false,
             type: null,
-            message: ''
+            message: '',
+            timeout: null
         },
 
         // Form data
@@ -34,28 +35,44 @@ function uploadManager() {
             'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
         ],
 
+
         // Initialization
-        async init() {
+        init() {
             this.startPolling();
         },
 
-        showNotification(type, message) {
+        showNotification(type, message, autoDismiss = false) {
+            if (this.notifications.timeout) {
+                clearTimeout(this.notifications.timeout);
+                this.notifications.timeout = null;
+            }
+
             this.notifications = {
                 show: true,
                 type,
-                message
+                message,
+                timeout: null
             };
-            setTimeout(() => {
-                this.notifications.show = false;
-            }, 5000);
+
+            if (autoDismiss) {
+                this.notifications.timeout = setTimeout(() => {
+                    this.notifications.show = false;
+                }, 5000);
+            }
         },
+
+        handleFileChange(event) {
+            this.selectedFile = event.target.files[0];
+            this.notifications.show = false;
+        },
+
+
 
         // Polling per gli aggiornamenti di stato
         startPolling() {
             if (this.pollingInterval) {
                 clearInterval(this.pollingInterval);
             }
-
             this.pollingInterval = setInterval(async () => {
                 await this.updateProcessingUploads();
             }, 5000);
@@ -68,6 +85,7 @@ function uploadManager() {
             }
         },
 
+
         async updateProcessingUploads() {
             try {
                 const response = await fetch('/uploads/list');
@@ -76,19 +94,15 @@ function uploadManager() {
                 }
                 const processingUploads = await response.json();
                 
-                // Aggiorna solo gli upload in elaborazione
                 processingUploads.forEach(processingUpload => {
                     const uploadRow = document.querySelector(`tr[data-upload-id="${processingUpload.id}"]`);
                     if (uploadRow) {
-                        // Aggiorna lo stato
                         const statusCell = uploadRow.querySelector('.status-cell');
                         if (statusCell) {
                             const statusBadge = statusCell.querySelector('.status-badge');
                             if (statusBadge) {
                                 statusBadge.textContent = this.getStatusText(processingUpload.status);
-                                // Rimuovi tutte le classi di stato esistenti
                                 statusBadge.className = 'status-badge px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-xl';
-                                // Aggiungi le nuove classi di stato
                                 const newClasses = this.getStatusClass(processingUpload.status);
                                 Object.keys(newClasses).forEach(className => {
                                     if (newClasses[className]) {
@@ -98,7 +112,6 @@ function uploadManager() {
                             }
                         }
 
-                        // Aggiorna la barra di progresso se presente
                         if (processingUpload.status === 'processing') {
                             const progressBar = uploadRow.querySelector('.progress-bar');
                             const progressText = uploadRow.querySelector('.progress-text');
@@ -108,7 +121,6 @@ function uploadManager() {
                             }
                         }
 
-                        // Aggiorna i record processati
                         const recordsCell = uploadRow.querySelector('.records-cell');
                         if (recordsCell && processingUpload.status !== 'pending') {
                             recordsCell.textContent = `${processingUpload.processed_records} / ${processingUpload.total_records}`;
@@ -116,7 +128,6 @@ function uploadManager() {
                     }
                 });
 
-                // Se non ci sono più upload in elaborazione, ferma il polling
                 if (processingUploads.length === 0) {
                     this.stopPolling();
                 }
@@ -125,39 +136,36 @@ function uploadManager() {
             }
         },
 
-        handleFileChange(event) {
-            this.selectedFile = event.target.files[0];
-            this.notifications.show = false;
-        },
+
 
         async uploadFile() {
             if (!this.selectedFile || !this.form.year || !this.form.month) {
-                this.showNotification('error', 'Seleziona anno, mese e file prima di procedere');
+                this.showNotification('error', 'Seleziona anno, mese e file prima di procedere', true);
                 return;
             }
-         
+
             this.isUploading = true;
-         
+
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
                 console.log('CSRF Token:', csrfToken);
-         
+
                 if (!csrfToken) {
                     throw new Error('Token di sicurezza non trovato. Ricarica la pagina.');
                 }
-         
+
                 const formData = new FormData();
                 formData.append('file', this.selectedFile);
                 formData.append('year', this.form.year);
                 formData.append('month', this.form.month);
                 formData.append('_token', csrfToken);
-         
+
                 console.log('Request data:', {
                     file: this.selectedFile.name,
                     year: this.form.year,
                     month: this.form.month
                 });
-         
+
                 const response = await fetch('/uploads', {
                     method: 'POST',
                     headers: {
@@ -168,44 +176,43 @@ function uploadManager() {
                     body: formData,
                     credentials: 'same-origin'
                 });
-         
+
                 console.log('Response status:', response.status);
                 console.log('Response headers:', Object.fromEntries(response.headers));
-         
+
                 if (!response.ok) {
                     const contentType = response.headers.get('content-type');
-                    
+
                     if (response.status === 403) {
                         throw new Error('Non sei autorizzato ad effettuare questa operazione. Ricarica la pagina e riprova.');
                     }
-         
+
                     if (contentType && contentType.includes('text/html')) {
                         const text = await response.text();
                         console.error('Server returned HTML:', text.substring(0, 200));
                         throw new Error('Si è verificato un errore. Ricarica la pagina e riprova.');
                     }
-         
+
                     if (contentType && contentType.includes('application/json')) {
                         const errorData = await response.json();
                         throw new Error(errorData.message || 'Errore durante il caricamento del file');
                     }
-         
+
                     throw new Error('Si è verificato un errore imprevisto. Riprova più tardi.');
                 }
-         
+
                 const data = await response.json();
                 console.log('Response data:', data);
-         
+
                 this.selectedFile = null;
                 this.resetFileInput();
-                this.showNotification('success', data.message || 'File caricato con successo');
+                this.showNotification('success', data.message || 'File caricato con successo', true);
                 this.startPolling();
-         
-                // Aspetta un breve momento prima di ricaricare la pagina
+
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
-         
+
             } catch (error) {
                 console.error('Upload error details:', {
                     message: error.message,
@@ -215,7 +222,8 @@ function uploadManager() {
             } finally {
                 this.isUploading = false;
             }
-         },
+        },
+
 
         resetFileInput() {
             const fileInput = document.querySelector('input[type="file"]');
@@ -448,10 +456,11 @@ function uploadManager() {
             };
         },
 
+
         getAxExportStatusClass(upload) {
             if (!upload) return 'bg-gray-100 text-gray-800';
             if (!upload.ax_export_status) return 'bg-gray-100 text-gray-800';
-            
+
             if (upload.ax_export_status === 'processing') return 'bg-yellow-100 text-yellow-800';
             if (upload.ax_export_status === 'completed') return 'bg-green-100 text-green-800';
             if (upload.ax_export_status === 'error') return 'bg-red-100 text-red-800';
@@ -462,7 +471,7 @@ function uploadManager() {
         getSftpStatusClass(upload) {
             if (!upload) return 'bg-gray-100 text-gray-800';
             if (!upload.sftp_status) return 'bg-gray-100 text-gray-800';
-            
+
             switch (upload.sftp_status) {
                 case 'processing':
                     return 'bg-yellow-100 text-yellow-800';
@@ -478,18 +487,18 @@ function uploadManager() {
         getAxExportStatusText(upload) {
             if (!upload) return 'N/D';
             if (!upload.ax_export_status) return 'In attesa';
-            
+
             if (upload.ax_export_status === 'processing') return 'In elaborazione';
             if (upload.ax_export_path) return 'Completato';
             if (upload.ax_export_status === 'error') return 'Errore';
             if (upload.status === 'error') return 'Errore';
             return 'In attesa';
         },
-        
+
         getSftpStatusText(upload) {
             if (!upload) return 'N/D';
             if (!upload.sftp_status) return 'Non caricato';
-            
+
             const statusMap = {
                 'processing': 'In caricamento',
                 'completed': 'Caricato',
