@@ -135,37 +135,58 @@ function uploadManager() {
                 this.showNotification('error', 'Seleziona anno, mese e file prima di procedere');
                 return;
             }
-
+        
             this.isUploading = true;
-
+        
             try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+                if (!csrfToken) {
+                    throw new Error('Token di sicurezza non trovato. Ricarica la pagina.');
+                }
+        
                 const formData = new FormData();
                 formData.append('file', this.selectedFile);
                 formData.append('year', this.form.year);
                 formData.append('month', this.form.month);
-
+        
                 const response = await fetch('/uploads', {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: formData
+                    body: formData,
+                    credentials: 'same-origin'
                 });
-
-                const data = await response.json();
-
+        
+                // Gestione specifica degli errori HTTP
                 if (!response.ok) {
-                    throw new Error(data.message || 'Errore durante il caricamento del file');
+                    if (response.status === 403) {
+                        // Ricarica la pagina per un nuovo token CSRF
+                        window.location.reload();
+                        throw new Error('Sessione scaduta. La pagina verrà ricaricata.');
+                    }
+        
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Errore durante il caricamento del file');
+                    } else {
+                        throw new Error('Errore di autorizzazione. Prova a ricaricare la pagina.');
+                    }
                 }
-
+        
+                const data = await response.json();
+        
                 this.selectedFile = null;
                 this.resetFileInput();
                 this.showNotification('success', 'File caricato con successo');
                 this.startPolling();
-
+        
                 // Ricarica la pagina per mostrare il nuovo upload
                 window.location.reload();
-
+        
             } catch (error) {
                 console.error('Upload error:', error);
                 this.showNotification('error', error.message);

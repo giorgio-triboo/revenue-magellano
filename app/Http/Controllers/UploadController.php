@@ -86,49 +86,113 @@ class UploadController extends Controller
     }
 
     public function store(Request $request)
-    {
-        Log::channel('upload')->debug('UploadController: Avvio caricamento file.');
+{
+    Log::channel('upload')->debug('UploadController: Inizio richiesta store', [
+        'user_id' => auth()->id(),
+        'headers' => $request->headers->all(),
+        'has_file' => $request->hasFile('file'),
+        'content_type' => $request->header('Content-Type')
+    ]);
 
-        try {
-            $validated = $request->validate([
-                'file' => 'required|file|mimes:csv,txt|max:10240',
-                'year' => 'required|integer|min:2000|max:2100',
-                'month' => 'required|integer|min:1|max:12',
+    try {
+        // Verifica del token CSRF
+        if (!$request->hasValidSignature() && !$request->header('X-CSRF-TOKEN')) {
+            Log::channel('upload')->error('UploadController: CSRF token mancante o non valido');
+            return response()->json([
+                'message' => 'Token di sicurezza non valido'
+            ], 403);
+        }
+
+        // Verifica dei permessi
+        if (!Gate::allows('upload-files')) {
+            Log::channel('upload')->error('UploadController: Utente non autorizzato', [
+                'user_id' => auth()->id()
             ]);
+            return response()->json([
+                'message' => 'Non autorizzato ad effettuare upload'
+            ], 403);
+        }
 
-            Log::channel('upload')->debug('UploadController: Validazione file completata.', ['validated' => $validated]);
+        $validated = $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:10240',
+            'year' => 'required|integer|min:2000|max:2100',
+            'month' => 'required|integer|min:1|max:12',
+        ]);
 
-            $processDate = Carbon::createFromDate($validated['year'], $validated['month'], 1)->format('Y-m-d');
+        Log::channel('upload')->debug('UploadController: Validazione file completata.', [
+            'validated' => $validated
+        ]);
 
-            $upload = DB::transaction(function () use ($request, $processDate) {
-                Log::channel('upload')->debug('UploadController: Inizio transazione DB.');
+        $processDate = Carbon::createFromDate($validated['year'], $validated['month'], 1)->format('Y-m-d');
+
+        $upload = DB::transaction(function () use ($request, $processDate) {
+            Log::channel('upload')->debug('UploadController: Inizio transazione DB.');
+            
+            try {
                 $upload = $this->uploadService->handleFileUpload(
                     $request->file('file'),
                     auth()->id(),
                     $processDate
                 );
-                Log::channel('upload')->debug('UploadController: Upload completato.', ['upload_id' => $upload->id]);
+                
+                Log::channel('upload')->debug('UploadController: Upload completato.', [
+                    'upload_id' => $upload->id
+                ]);
+                
                 return $upload;
-            });
+            } catch (\Exception $e) {
+                Log::channel('upload')->error('UploadController: Errore durante la transazione DB', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e;
+            }
+        });
 
-            event(new FileUploadProcessed($upload));
+        event(new FileUploadProcessed($upload));
 
-            Log::channel('upload')->info('UploadController: File caricato con successo.', ['upload_id' => $upload->id]);
+        Log::channel('upload')->info('UploadController: File caricato con successo.', [
+            'upload_id' => $upload->id,
+            'user_id' => auth()->id(),
+            'filename' => $request->file('file')->getClientOriginalName(),
+            'process_date' => $processDate
+        ]);
 
-            return response()->json([
-                'message' => 'File caricato con successo',
-                'upload_id' => $upload->id
-            ]);
+        return response()->json([
+            'message' => 'File caricato con successo',
+            'upload_id' => $upload->id,
+            'status' => $upload->status,
+            'process_date' => $processDate
+        ]);
 
-        } catch (\Exception $e) {
-            Log::channel('upload')->error('UploadController: Errore durante il caricamento.', [
-                'error_message' => $e->getMessage()
-            ]);
-            return response()->json([
-                'message' => 'Errore nel caricamento del file: ' . $e->getMessage()
-            ], 500);
-        }
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        Log::channel('upload')->error('UploadController: Errore di validazione', [
+            'errors' => $e->errors(),
+            'user_id' => auth()->id()
+        ]);
+        
+        return response()->json([
+            'message' => 'Errore di validazione',
+            'errors' => $e->errors()
+        ], 422);
+        
+    } catch (\Exception $e) {
+        Log::channel('upload')->error('UploadController: Errore durante l\'upload', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'user_id' => auth()->id()
+        ]);
+
+        $errorMessage = app()->environment('local') 
+            ? $e->getMessage() 
+            : 'Si è verificato un errore durante il caricamento del file. Riprova più tardi.';
+
+        return response()->json([
+            'message' => $errorMessage,
+            'status' => 'error'
+        ], 500);
     }
+}
 
     public function publish($id)
     {
