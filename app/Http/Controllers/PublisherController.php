@@ -174,7 +174,7 @@ class PublisherController extends Controller
         $validated = $request->validate([
             'company_name' => 'required|string|max:255',
             'legal_name' => 'required|string|max:255',
-            'vat_number' => ['required', 'string', 'size:11'], // Modificata la size da 13 a 11
+            'vat_number' => ['required', 'string'],
             'county' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'postal_code' => 'required|string|size:5',
