@@ -157,7 +157,8 @@ Route::middleware(['auth'])->group(function () {
         // Upload Routes
         Route::prefix('uploads')->group(function () {
             Route::get('/', [UploadController::class, 'index'])->name('uploads.index');
-            Route::post('/', [UploadController::class, 'store'])->name('uploads.store');
+            Route::post('/', [UploadController::class, 'store'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
             Route::get('/list', [UploadController::class, 'list'])->name('uploads.list');
             Route::post('/{id}/unpublish', [UploadController::class, 'unpublish'])
                 ->name('uploads.unpublish')
