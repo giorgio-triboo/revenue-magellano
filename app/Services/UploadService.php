@@ -33,25 +33,34 @@ class UploadService
     ];
 
     public function handleFileUpload(UploadedFile $file, $userId, $processDate): FileUpload
-    {
-        try {
-            // Controlla se esiste già un file per lo stesso anno/mese
-            $this->checkExistingUpload($processDate);
+{
+    try {
+        // Controlla solo se esiste già un file per lo stesso anno/mese
+        $this->checkExistingUpload($processDate);
 
-            // Validazione del file CSV
-            $this->validateCsvFile($file);
+        Log::info('Starting file upload process', [
+            'user_id' => $userId,
+            'file_name' => $file->getClientOriginalName(),
+            'process_date' => $processDate
+        ]);
 
-            // Procedi con l'upload
-            return $this->storeFile($file, $userId, $processDate);
+        // Carica subito il file
+        $upload = $this->storeFile($file, $userId, $processDate);
 
-        } catch (\Exception $e) {
-            Log::error('Errore durante la validazione del file CSV', [
-                'error' => $e->getMessage(),
-                'file' => $file->getClientOriginalName()
-            ]);
-            throw $e;
-        }
+        // Dispatch del job di validazione e processing
+        ProcessCsvUpload::dispatch($upload)->onQueue('csv-processing');
+
+        return $upload;
+
+    } catch (\Exception $e) {
+        Log::error('Error in handleFileUpload', [
+            'error' => $e->getMessage(),
+            'file' => $file->getClientOriginalName()
+        ]);
+        throw $e;
     }
+}
+
 
     protected function checkExistingUpload($processDate): void
     {
@@ -393,59 +402,33 @@ class UploadService
     }
 
     protected function storeFile(UploadedFile $file, $userId, $processDate): FileUpload
-    {
-        Log::info('Starting file upload process', [
-            'user_id' => $userId,
-            'file_name' => $file->getClientOriginalName(),
-            'process_date' => $processDate
-        ]);
+{
+    $uploadPath = sprintf('uploads/%s/%s', now()->year, now()->month);
+    Storage::disk('private')->makeDirectory($uploadPath);
 
-        try {
-            $uploadPath = sprintf('uploads/%s/%s', now()->year, now()->month);
-            Storage::disk('private')->makeDirectory($uploadPath);
+    $storedFilename = $this->generateFileName($file);
+    $fullPath = Storage::disk('private')->putFileAs($uploadPath, $file, $storedFilename);
 
-            $storedFilename = $this->generateFileName($file);
-            $fullPath = Storage::disk('private')->putFileAs($uploadPath, $file, $storedFilename);
+    return FileUpload::create([
+        'user_id' => $userId,
+        'original_filename' => $file->getClientOriginalName(),
+        'stored_filename' => $fullPath,
+        'mime_type' => $file->getMimeType(),
+        'file_size' => $file->getSize(),
+        'process_date' => $processDate,
+        'status' => FileUpload::STATUS_PENDING,
+        'processed_records' => 0,
+        'progress_percentage' => 0,
+        'processing_stats' => [
+            'start_time' => now()->toDateTimeString(),
+            'success' => 0,
+            'errors' => 0,
+            'error_details' => []
+        ]
+    ]);
+}
 
-            Log::info('File stored successfully', ['path' => $fullPath]);
 
-            $upload = FileUpload::create([
-                'user_id' => $userId,
-                'original_filename' => $file->getClientOriginalName(),
-                'stored_filename' => $fullPath,
-                'mime_type' => $file->getMimeType(),
-                'file_size' => $file->getSize(),
-                'process_date' => $processDate,
-                'status' => FileUpload::STATUS_PENDING,
-                'processed_records' => 0,
-                'progress_percentage' => 0,
-                'processing_stats' => [
-                    'start_time' => now()->toDateTimeString(),
-                    'success' => 0,
-                    'errors' => 0,
-                    'error_details' => []
-                ]
-            ]);
-
-            Log::info('Upload record created', [
-                'upload_id' => $upload->id,
-                'stored_path' => $fullPath
-            ]);
-
-            // Dispatch del job di processing
-            ProcessCsvUpload::dispatch($upload)->onQueue('csv-processing');
-
-            return $upload;
-
-        } catch (\Exception $e) {
-            Log::error('Error in file upload process', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            throw $e;
-        }
-
-    }
 
     private function generateFileName(UploadedFile $file): string
     {
