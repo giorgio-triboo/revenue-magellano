@@ -177,8 +177,8 @@ class PublisherController extends Controller
             'vat_number' => ['required', 'string'],
             'county' => 'required|string|max:255',
             'city' => 'required|string|max:255',
-            'postal_code' => 'required|string|size:5',
-            'iban' => 'required|string|size:27',
+            'postal_code' => 'required|string|max:5',
+            'iban' => 'required|string|max:27',
             'swift' => 'required|string|between:8,11',
             'is_active' => 'required|in:0,1' // Modificata la validazione
         ]);
