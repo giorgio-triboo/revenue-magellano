@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class AXData extends Model
+class AxData extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -33,8 +33,8 @@ class AXData extends Model
         'payment',
         'payment_mode',
         'currency_code',
-        'SalesTaxGroupCode',
-        'NumberSequenceGroupId'
+        'sales_tax_group',
+        'number_sequence_group_id'
     ];
 
     // Relazione con Publisher
