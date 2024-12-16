@@ -17,7 +17,7 @@ aws secretsmanager get-secret-value \
 
 chown apache:apache "${RELEASE}/.env"
 
-sudo -u apache mkdir "${RELEASE}/storage/logs" || true
+#sudo -u apache mkdir "${RELEASE}/storage/logs" || true
 
 echo -e "Artisan: migrate"
 sudo -u apache /usr/bin/php ${RELEASE}/artisan migrate --force
