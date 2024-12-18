@@ -149,6 +149,41 @@
                         <!-- Address Group -->
                         <div class="grid grid-cols-2 gap-4">
                             <div>
+                                <label for="state" class="block text-md font-medium text-gray-700">
+                                    Stato <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1 relative rounded-xl shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i data-lucide="map-pin" class="h-5 w-5 text-gray-400"></i>
+                                    </div>
+                                    <input type="text" name="state" id="state"
+                                        class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md"
+                                        value="{{ old('state', $publisher->state) }}" required>
+                                </div>
+                                @error('state')
+                                    <p class="mt-1 text-md text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="state_id" class="block text-md font-medium text-gray-700">
+                                    Sigla Stato <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1 relative rounded-xl shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i data-lucide="map" class="h-5 w-5 text-gray-400"></i>
+                                    </div>
+                                    <input type="text" name="state_id" id="state_id"
+                                        class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md"
+                                        value="{{ old('state_id', $publisher->state_id) }}" required>
+                                </div>
+                                @error('state_id')
+                                    <p class="mt-1 text-md text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
                                 <label for="county" class="block text-md font-medium text-gray-700">
                                     Provincia <span class="text-red-500">*</span>
                                 </label>
@@ -166,12 +201,30 @@
                             </div>
 
                             <div>
+                                <label for="county_id" class="block text-md font-medium text-gray-700">
+                                    Sigla Provincia <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1 relative rounded-xl shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i data-lucide="map" class="h-5 w-5 text-gray-400"></i>
+                                    </div>
+                                    <input type="text" name="county_id" id="county_id"
+                                        class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md"
+                                        value="{{ old('county_id', $publisher->county_id) }}" required>
+                                </div>
+                                @error('county_id')
+                                    <p class="mt-1 text-md text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
                                 <label for="city" class="block text-md font-medium text-gray-700">
                                     Città <span class="text-red-500">*</span>
                                 </label>
                                 <div class="mt-1 relative rounded-xl shadow-sm">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i data-lucide="map" class="h-5 w-5 text-gray-400"></i>
+                                        <i data-lucide="map-pin" class="h-5 w-5 text-gray-400"></i>
                                     </div>
                                     <input type="text" name="city" id="city"
                                         class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md"
@@ -181,26 +234,41 @@
                                     <p class="mt-1 text-md text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
+
+                            <div>
+                                <label for="postal_code" class="block text-md font-medium text-gray-700">
+                                    CAP <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1 relative rounded-xl shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i data-lucide="mail" class="h-5 w-5 text-gray-400"></i>
+                                    </div>
+                                    <input type="text" name="postal_code" id="postal_code" maxlength="5"
+                                        class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md"
+                                        value="{{ old('postal_code', $publisher->postal_code) }}" required>
+                                </div>
+                                @error('postal_code')
+                                    <p class="mt-1 text-md text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
-                        <!-- Postal Code -->
                         <div>
-                            <label for="postal_code" class="block text-md font-medium text-gray-700">
-                                CAP <span class="text-red-500">*</span>
+                            <label for="address" class="block text-md font-medium text-gray-700">
+                                Indirizzo <span class="text-red-500">*</span>
                             </label>
                             <div class="mt-1 relative rounded-xl shadow-sm">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i data-lucide="mail" class="h-5 w-5 text-gray-400"></i>
+                                    <i data-lucide="credit-card" class="h-5 w-5 text-gray-400"></i>
                                 </div>
-                                <input type="text" name="postal_code" id="postal_code" maxlength="5"
-                                    class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md"
-                                    value="{{ old('postal_code', $publisher->postal_code) }}" required>
+                                <input type="text" name="address" id="address" maxlength="11"
+                                    class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md uppercase"
+                                    value="{{ old('address', $publisher->address) }}" required>
                             </div>
-                            @error('postal_code')
+                            @error('address')
                                 <p class="mt-1 text-md text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
-
                         <!-- SWIFT -->
                         <div>
                             <label for="swift" class="block text-md font-medium text-gray-700">
