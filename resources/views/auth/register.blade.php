@@ -225,6 +225,25 @@
                         x-transition:enter-start="opacity-0 translate-y-4"
                         x-transition:enter-end="opacity-100 translate-y-0">
                         <div class="space-y-6">
+                            <!-- Stato -->
+                            <div>
+                                <label for="state" class="block text-sm font-medium text-gray-700">
+                                    Stato <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1 relative rounded-xl shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i data-lucide="map-pin" class="h-5 w-5 text-gray-400"></i>
+                                    </div>
+                                    <input id="state" type="text" x-model="formData.state"
+                                        class="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-sm"
+                                        :class="{ 'border-red-300': errors.state }" placeholder="Es: Italia" />
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center" x-show="errors.state">
+                                        <i data-lucide="x-circle" class="h-5 w-5 text-red-400"></i>
+                                    </div>
+                                </div>
+                                <p x-show="errors.state" x-text="errors.state" class="mt-2 text-sm text-red-600"></p>
+                            </div>
+                            
                             <!-- Provincia -->
                             <div>
                                 <label for="county" class="block text-sm font-medium text-gray-700">
@@ -281,6 +300,27 @@
                                     </div>
                                 </div>
                                 <p x-show="errors.postal_code" x-text="errors.postal_code"
+                                    class="mt-2 text-sm text-red-600"></p>
+                            </div>
+
+                            <!-- Indirizzo -->
+                            <div>
+                                <label for="address" class="block text-sm font-medium text-gray-700">
+                                    Address <span class="text-red-500">*</span>
+                                </label>
+                                <div class="mt-1 relative rounded-xl shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i data-lucide="map" class="h-5 w-5 text-gray-400"></i>
+                                    </div>
+                                    <input id="address" type="text" x-model="formData.address" maxlength="5"
+                                        class="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-sm"
+                                        :class="{ 'border-red-300': errors.address }" placeholder="Es: 20100" />
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                        x-show="errors.address">
+                                        <i data-lucide="x-circle" class="h-5 w-5 text-red-400"></i>
+                                    </div>
+                                </div>
+                                <p x-show="errors.address" x-text="errors.address"
                                     class="mt-2 text-sm text-red-600"></p>
                             </div>
                         </div>
