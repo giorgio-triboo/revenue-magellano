@@ -14,16 +14,16 @@ class Publisher extends Model
         'vat_number',
         'company_name',
         'legal_name',
+        'state',
+        'state_id',
         'county',
+        'county_id',
         'city',
         'postal_code',
+        'address',
         'iban',
         'swift',
         'is_active',
-        'ax_vend_account',
-        'ax_vend_id',
-        'ax_email',
-        'ax_countryregion_Id'
     ];
 
     protected $casts = [
