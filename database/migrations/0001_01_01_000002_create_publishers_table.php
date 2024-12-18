@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('county_id')->nullable();                  
             $table->string('city')->nullable();                    
             $table->string('postal_code', 5)->nullable();         
-            $table->string('address', 5)->nullable();          
+            $table->string('address')->nullable();          
             $table->string('iban', 27)->nullable();      // IBAN
             $table->string('swift', 11)->nullable();     // SWIFT/BIC code
             $table->boolean('is_active')->default(true);
