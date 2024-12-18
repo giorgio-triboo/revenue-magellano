@@ -19,13 +19,6 @@ return new class extends Migration
             $table->string('item_id')->nullable();
             $table->string('email')->nullable();
             $table->string('cost_profit_center')->nullable();
-            $table->string('state')->nullable();
-            $table->string('state_id')->nullable();
-            $table->string('county')->nullable();
-            $table->string('county_id')->nullable();
-            $table->string('city')->nullable();
-            $table->string('postal_code')->nullable();
-            $table->string('address')->nullable();
             $table->string('payment')->nullable();
             $table->string('payment_mode')->nullable();
             $table->string('currency_code')->nullable();

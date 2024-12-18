@@ -13,13 +13,13 @@ return new class extends Migration
             $table->string('vat_number', 30)->unique();  // Aumentata lunghezza per supportare formato CC + numero
             $table->string('company_name');              // Nome azienda
             $table->string('legal_name');                // Ragione sociale
-            $table->string('state')->nullable();                    // Provincia (nome completo)
-            $table->string('state')->nullable();                    // Provincia (nome completo)
-            $table->string('county')->nullable();                    // Provincia (nome completo)
-            $table->string('county_id')->nullable();                    // Provincia (nome completo)
-            $table->string('city')->nullable();                      // Città
-            $table->string('postal_code', 5)->nullable();           // CAP
-            $table->string('address', 5)->nullable();            // CAP
+            $table->string('state')->nullable();                 
+            $table->string('state_id')->nullable();
+            $table->string('county')->nullable();          
+            $table->string('county_id')->nullable();                  
+            $table->string('city')->nullable();                    
+            $table->string('postal_code', 5)->nullable();         
+            $table->string('address', 5)->nullable();          
             $table->string('iban', 27)->nullable();      // IBAN
             $table->string('swift', 11)->nullable();     // SWIFT/BIC code
             $table->boolean('is_active')->default(true);
