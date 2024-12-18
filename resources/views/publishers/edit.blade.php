@@ -142,6 +142,23 @@
                                 <p class="mt-1 text-md text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
+                        <!-- SWIFT -->
+                        <div>
+                            <label for="swift" class="block text-md font-medium text-gray-700">
+                                SWIFT <span class="text-red-500">*</span>
+                            </label>
+                            <div class="mt-1 relative rounded-xl shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i data-lucide="credit-card" class="h-5 w-5 text-gray-400"></i>
+                                </div>
+                                <input type="text" name="swift" id="swift" maxlength="11"
+                                    class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md uppercase"
+                                    value="{{ old('swift', $publisher->swift) }}" required>
+                            </div>
+                            @error('swift')
+                                <p class="mt-1 text-md text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     <!-- Seconda colonna -->
@@ -269,23 +286,7 @@
                                 <p class="mt-1 text-md text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
-                        <!-- SWIFT -->
-                        <div>
-                            <label for="swift" class="block text-md font-medium text-gray-700">
-                                SWIFT <span class="text-red-500">*</span>
-                            </label>
-                            <div class="mt-1 relative rounded-xl shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i data-lucide="credit-card" class="h-5 w-5 text-gray-400"></i>
-                                </div>
-                                <input type="text" name="swift" id="swift" maxlength="11"
-                                    class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md uppercase"
-                                    value="{{ old('swift', $publisher->swift) }}" required>
-                            </div>
-                            @error('swift')
-                                <p class="mt-1 text-md text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+                        
                     </div>
                 </div>
 

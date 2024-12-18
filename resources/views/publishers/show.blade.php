@@ -123,7 +123,7 @@
 
                         <div>
                             <dt class="text-md font-medium text-gray-500">Provincia</dt>
-                            <dd class="mt-1 text-md text-gray-900">{{ $publisher->city }}</dd>
+                            <dd class="mt-1 text-md text-gray-900">{{ $publisher->county }}</dd>
                         </div>
                         <div>
                             <dt class="text-md font-medium text-gray-500">Città</dt>
