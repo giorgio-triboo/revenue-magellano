@@ -20,6 +20,15 @@ class FtpUploadService
             'remote_path' => config('ftp.remote_path', '/'),
             'port' => config('ftp.port', 21),
         ];
+
+        // Log della configurazione (mascherando la password)
+        Log::channel('sftp')->debug('FtpUploadService: Configurazione inizializzata', [
+            'host' => $this->config['host'],
+            'username' => $this->config['username'],
+            'port' => $this->config['port'],
+            'remote_path' => $this->config['remote_path'],
+            'has_password' => !empty($this->config['password'])
+        ]);
     }
 
     public function uploadFile(FileUpload $upload)
@@ -41,7 +50,8 @@ class FtpUploadService
             Log::channel('sftp')->debug('FtpUploadService: Verifica percorsi', [
                 'filename' => $filename,
                 'correct_path' => $correctPath,
-                'exists' => Storage::disk('private')->exists($correctPath)
+                'exists' => Storage::disk('private')->exists($correctPath),
+                'storage_path' => Storage::disk('private')->path($correctPath)
             ]);
 
             // Verifica esistenza file
@@ -54,6 +64,12 @@ class FtpUploadService
 
             // Verifica che il file sia leggibile
             if (!is_readable($localPath)) {
+                Log::channel('sftp')->error('FtpUploadService: File non leggibile', [
+                    'path' => $localPath,
+                    'permissions' => fileperms($localPath),
+                    'owner' => fileowner($localPath),
+                    'group' => filegroup($localPath)
+                ]);
                 throw new \Exception("File non leggibile: {$localPath}");
             }
 
@@ -61,38 +77,97 @@ class FtpUploadService
             $upload->sftp_status = 'processing';
             $upload->save();
 
-            // Inizializza la connessione FTP con la porta specificata
-            $this->connection = ftp_connect($this->config['host'], $this->config['port']);
+            // Test della risoluzione DNS
+            $dnsResult = gethostbyname($this->config['host']);
+            Log::channel('sftp')->debug('FtpUploadService: DNS lookup', [
+                'host' => $this->config['host'],
+                'resolved_ip' => $dnsResult,
+                'is_ip' => $dnsResult !== $this->config['host']
+            ]);
+
+            // Inizializza la connessione FTP con timeout
+            Log::channel('sftp')->debug('FtpUploadService: Tentativo di connessione FTP', [
+                'host' => $this->config['host'],
+                'port' => $this->config['port']
+            ]);
+
+            $this->connection = @ftp_connect($this->config['host'], $this->config['port'], 30);
+            
             if (!$this->connection) {
-                throw new \Exception('Impossibile connettersi al server FTP');
+                $error = error_get_last();
+                Log::channel('sftp')->error('FtpUploadService: Errore di connessione', [
+                    'error_message' => $error['message'] ?? 'Nessun messaggio di errore',
+                    'error_type' => $error['type'] ?? 'Tipo errore sconosciuto'
+                ]);
+                throw new \Exception('Impossibile connettersi al server FTP: ' . ($error['message'] ?? ''));
             }
 
-            // Login
-            if (!ftp_login($this->connection, $this->config['username'], $this->config['password'])) {
-                throw new \Exception('Impossibile autenticarsi al server FTP');
+            // Login con debug
+            Log::channel('sftp')->debug('FtpUploadService: Tentativo di login', [
+                'username' => $this->config['username']
+            ]);
+
+            if (!@ftp_login($this->connection, $this->config['username'], $this->config['password'])) {
+                $error = error_get_last();
+                Log::channel('sftp')->error('FtpUploadService: Errore di login', [
+                    'error_message' => $error['message'] ?? 'Nessun messaggio di errore'
+                ]);
+                throw new \Exception('Impossibile autenticarsi al server FTP: ' . ($error['message'] ?? ''));
             }
 
-            // Abilita la modalità passiva
-            ftp_pasv($this->connection, true);
+            // Abilita la modalità passiva e verifica
+            $pasv_result = ftp_pasv($this->connection, true);
+            Log::channel('sftp')->debug('FtpUploadService: Modalità passiva', [
+                'enabled' => $pasv_result
+            ]);
+
+            // Verifica dello spazio disponibile (se supportato)
+            if (function_exists('ftp_raw')) {
+                $raw = ftp_raw($this->connection, 'SITE QUOTA');
+                Log::channel('sftp')->debug('FtpUploadService: Informazioni quota', [
+                    'raw_response' => $raw
+                ]);
+            }
 
             // Costruisci il percorso remoto
             $remotePath = rtrim($this->config['remote_path'], '/') . '/' . $filename;
 
+            // Verifica esistenza directory remota
+            $pwd = ftp_pwd($this->connection);
+            Log::channel('sftp')->debug('FtpUploadService: Directory corrente', [
+                'current_dir' => $pwd,
+                'target_path' => $remotePath
+            ]);
+
             Log::channel('sftp')->debug('FtpUploadService: Tentativo di upload', [
                 'local_path' => $localPath,
                 'remote_path' => $remotePath,
-                'file_size' => filesize($localPath)
+                'file_size' => filesize($localPath),
+                'memory_limit' => ini_get('memory_limit'),
+                'max_execution_time' => ini_get('max_execution_time')
             ]);
 
-            // Upload del file
-            if (!ftp_put($this->connection, $remotePath, $localPath, FTP_BINARY)) {
-                throw new \Exception('Errore durante l\'upload del file su FTP');
+            // Upload del file con progress tracking
+            $upload_result = ftp_put($this->connection, $remotePath, $localPath, FTP_BINARY);
+            
+            if (!$upload_result) {
+                $error = error_get_last();
+                Log::channel('sftp')->error('FtpUploadService: Errore upload', [
+                    'error_message' => $error['message'] ?? 'Nessun messaggio di errore'
+                ]);
+                throw new \Exception('Errore durante l\'upload del file su FTP: ' . ($error['message'] ?? ''));
             }
 
             // Verifica che il file sia stato caricato
             $remoteSize = ftp_size($this->connection, $remotePath);
             $localSize = filesize($localPath);
             
+            Log::channel('sftp')->debug('FtpUploadService: Verifica dimensioni', [
+                'local_size' => $localSize,
+                'remote_size' => $remoteSize,
+                'match' => $remoteSize === $localSize
+            ]);
+
             if ($remoteSize !== $localSize) {
                 throw new \Exception("Errore di verifica dimensione file: locale {$localSize} bytes, remoto {$remoteSize} bytes");
             }
@@ -113,7 +188,8 @@ class FtpUploadService
         } catch (\Exception $e) {
             Log::channel('sftp')->error('FtpUploadService: Errore durante l\'upload', [
                 'upload_id' => $upload->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
 
             $upload->sftp_status = 'error';
@@ -125,6 +201,7 @@ class FtpUploadService
             // Chiudi la connessione FTP se è aperta
             if ($this->connection && is_resource($this->connection)) {
                 ftp_close($this->connection);
+                Log::channel('sftp')->debug('FtpUploadService: Connessione FTP chiusa');
             }
         }
     }

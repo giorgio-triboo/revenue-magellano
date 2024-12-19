@@ -583,210 +583,49 @@ class UploadController extends Controller
         }
     }
 
-    // In UploadController.php
-
-public function uploadToSftp(FileUpload $upload)
-{
-    Log::channel('sftp')->debug('UploadController: Inizio processo upload SFTP', [
-        'upload_id' => $upload->id,
-        'user_id' => auth()->id(),
-        'file_status' => $upload->status,
-        'sftp_status' => $upload->sftp_status,
-        'file_info' => [
-            'original_filename' => $upload->original_filename,
-            'stored_filename' => $upload->stored_filename,
-            'file_size' => $upload->file_size,
-            'mime_type' => $upload->mime_type
-        ]
-    ]);
-
-    if (!Gate::allows('upload-to-sftp')) {
-        Log::channel('sftp')->warning('UploadController: Accesso non autorizzato', [
-            'user_id' => auth()->id(),
-            'permissions' => auth()->user()->permissions->pluck('name')
-        ]);
-        abort(403, 'Non autorizzato a caricare file su SFTP.');
-    }
-
-    try {
-        $sftpService = app(FtpUploadService::class);
-        
-        // Verifica preliminare della connessione
-        Log::channel('sftp')->info('UploadController: Verifica connessione SFTP');
-        $connectionTest = $sftpService->testConnection();
-        
-        if (!$connectionTest['success']) {
-            Log::channel('sftp')->error('UploadController: Test connessione fallito', [
-                'error' => $connectionTest['error'],
-                'details' => $connectionTest['details'] ?? null
-            ]);
-            
-            $upload->update([
-                'sftp_status' => 'error',
-                'sftp_error_message' => $connectionTest['error']
-            ]);
-            
-            throw new \Exception("Errore connessione SFTP: " . $connectionTest['error']);
-        }
-
-        // Verifica esistenza file
-        if (!Storage::disk('private')->exists($upload->stored_filename)) {
-            Log::channel('sftp')->error('UploadController: File locale non trovato', [
-                'filepath' => $upload->stored_filename,
-                'original_filename' => $upload->original_filename
-            ]);
-            
-            $upload->update([
-                'sftp_status' => 'error',
-                'sftp_error_message' => 'File non trovato nel filesystem locale'
-            ]);
-            
-            throw new \Exception("File non trovato nel filesystem locale");
-        }
-
-        Log::channel('sftp')->info('UploadController: Avvio upload file', [
-            'filename' => basename($upload->stored_filename),
-            'size' => $upload->file_size,
-            'mime_type' => $upload->mime_type
-        ]);
-
-        // Aggiorna lo stato prima dell'upload
-        $upload->update(['sftp_status' => 'processing']);
-
-        $result = $sftpService->uploadFile($upload);
-
-        if (!$result['success']) {
-            $upload->update([
-                'sftp_status' => 'error',
-                'sftp_error_message' => $result['error']
-            ]);
-            
-            throw new \Exception($result['error']);
-        }
-
-        // Upload completato con successo
-        $upload->update([
-            'sftp_status' => 'completed',
-            'sftp_error_message' => null,
-            'sftp_uploaded_at' => now()
-        ]);
-
-        Log::channel('sftp')->info('UploadController: Upload completato', [
+    public function uploadToSftp(FileUpload $upload)
+    {
+        Log::channel('sftp')->debug('UploadController: Richiesta upload SFTP ricevuta', [
             'upload_id' => $upload->id,
-            'remote_path' => $result['remote_path'] ?? null,
-            'uploaded_at' => $upload->sftp_uploaded_at
+            'user_id' => auth()->id()
         ]);
 
-        return response()->json([
-            'message' => 'File caricato su SFTP con successo',
-            'upload' => [
-                'id' => $upload->id,
-                'sftp_status' => $upload->sftp_status,
-                'sftp_uploaded_at' => $upload->sftp_uploaded_at
-            ]
-        ]);
-
-    } catch (\Exception $e) {
-        $errorContext = [
-            'upload_id' => $upload->id,
-            'error' => $e->getMessage(),
-            'error_code' => $e->getCode(),
-            'trace' => $e->getTraceAsString(),
-            'file_info' => [
-                'original_filename' => $upload->original_filename,
-                'stored_filename' => $upload->stored_filename,
-                'file_size' => $upload->file_size,
-                'mime_type' => $upload->mime_type,
-                'exists' => Storage::disk('private')->exists($upload->stored_filename)
-            ],
-            'server_info' => [
-                'php_version' => PHP_VERSION,
-                'memory_limit' => ini_get('memory_limit'),
-                'max_execution_time' => ini_get('max_execution_time')
-            ]
-        ];
-
-        Log::channel('sftp')->error('UploadController: Errore critico durante upload SFTP', $errorContext);
-
-        // Aggiorna lo stato se non è già stato fatto nel catch precedente
-        if ($upload->sftp_status !== 'error') {
-            $upload->update([
-                'sftp_status' => 'error',
-                'sftp_error_message' => $e->getMessage()
+        if (!Gate::allows('upload-to-sftp')) {
+            Log::channel('sftp')->warning('UploadController: Accesso non autorizzato all\'upload SFTP', [
+                'user_id' => auth()->id()
             ]);
+            abort(403, 'Non autorizzato a caricare file su SFTP.');
         }
 
-        return response()->json([
-            'message' => 'Errore durante l\'upload su SFTP: ' . $e->getMessage(),
-            'debug_info' => app()->environment('local') ? $errorContext : null
-        ], 500);
-    }
-}
+        try {
+            Log::channel('sftp')->debug('UploadController: Inizializzazione SftpService');
 
-// In FtpUploadService.php
+            $sftpService = app(FtpUploadService::class);
 
-public function testConnection(): array
-{
-    try {
-        $config = config('filesystems.disks.sftp');
-        
-        Log::channel('sftp')->debug('FtpUploadService: Test connessione', [
-            'host' => $config['host'],
-            'port' => $config['port'],
-            'username' => $config['username']
-        ]);
-
-        $sftp = new \phpseclib3\Net\SFTP($config['host'], $config['port']);
-        
-        if (!$sftp->login($config['username'], $this->getAuthenticationMethod())) {
-            $lastError = $sftp->getLastError() ?: 'Autenticazione fallita';
-            Log::channel('sftp')->error('FtpUploadService: Errore login', [
-                'error' => $lastError,
-                'auth_type' => !empty($config['privateKey']) ? 'private_key' : 'password'
+            Log::channel('sftp')->debug('UploadController: Avvio upload file', [
+                'upload_id' => $upload->id
             ]);
-            return [
-                'success' => false, 
-                'error' => $lastError,
-                'details' => ['auth_failed' => true]
-            ];
+
+            $sftpService->uploadFile($upload);
+
+            Log::channel('sftp')->info('UploadController: Upload SFTP completato con successo', [
+                'upload_id' => $upload->id
+            ]);
+
+            return response()->json([
+                'message' => 'File caricato su SFTP con successo'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::channel('sftp')->error('UploadController: Errore durante l\'upload su SFTP', [
+                'upload_id' => $upload->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'Errore durante l\'upload su SFTP: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Test lettura directory
-        $pwd = $sftp->pwd();
-        $ls = $sftp->nlist($pwd);
-        
-        if ($ls === false) {
-            $error = $sftp->getLastError() ?: 'Impossibile leggere la directory remota';
-            return [
-                'success' => false,
-                'error' => $error,
-                'details' => ['directory_listing_failed' => true]
-            ];
-        }
-        
-        Log::channel('sftp')->info('FtpUploadService: Connessione stabilita', [
-            'current_dir' => $pwd,
-            'can_list_files' => true,
-            'files_count' => count($ls)
-        ]);
-
-        return ['success' => true];
-
-    } catch (\Exception $e) {
-        Log::channel('sftp')->error('FtpUploadService: Errore connessione', [
-            'error' => $e->getMessage(),
-            'code' => $e->getCode(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        
-        return [
-            'success' => false,
-            'error' => $e->getMessage(),
-            'details' => [
-                'code' => $e->getCode(),
-                'type' => get_class($e)
-            ]
-        ];
     }
-}
 }
