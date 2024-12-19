@@ -232,7 +232,7 @@
                                 </label>
                                 <div class="mt-1 relative rounded-xl shadow-sm">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i data-lucide="map-pin" class="h-5 w-5 text-gray-400"></i>
+                                        <i data-lucide="flag" class="h-5 w-5 text-gray-400"></i>
                                     </div>
                                     <input id="state" type="text" x-model="formData.state"
                                         class="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-sm"
@@ -270,7 +270,7 @@
                                 </label>
                                 <div class="mt-1 relative rounded-xl shadow-sm">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i data-lucide="building" class="h-5 w-5 text-gray-400"></i>
+                                        <i data-lucide="map-pin-house" class="h-5 w-5 text-gray-400"></i>
                                     </div>
                                     <input id="city" type="text" x-model="formData.city"
                                         class="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-sm"
@@ -306,15 +306,15 @@
                             <!-- Indirizzo -->
                             <div>
                                 <label for="address" class="block text-sm font-medium text-gray-700">
-                                    Address <span class="text-red-500">*</span>
+                                    Indirizzo <span class="text-red-500">*</span>
                                 </label>
                                 <div class="mt-1 relative rounded-xl shadow-sm">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i data-lucide="map" class="h-5 w-5 text-gray-400"></i>
+                                        <i data-lucide="building" class="h-5 w-5 text-gray-400"></i>
                                     </div>
-                                    <input id="address" type="text" x-model="formData.address" maxlength="5"
+                                    <input id="address" type="text" x-model="formData.address"
                                         class="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-sm"
-                                        :class="{ 'border-red-300': errors.address }" placeholder="Es: 20100" />
+                                        :class="{ 'border-red-300': errors.address }" placeholder="Es: Viale Sarca, 336" />
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center"
                                         x-show="errors.address">
                                         <i data-lucide="x-circle" class="h-5 w-5 text-red-400"></i>

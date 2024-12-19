@@ -8,9 +8,11 @@ document.addEventListener("alpine:init", () => {
             vat_number: "",
             company_name: "",
             legal_name: "",
+            state: "",
             county: "",
             city: "",
             postal_code: "",
+            address: "",
             iban: "",
             swift: "",
             first_name: "",
@@ -165,9 +167,11 @@ document.addEventListener("alpine:init", () => {
                                 Object.assign(this.formData, {
                                     company_name: data.publisher.company_name,
                                     legal_name: data.publisher.legal_name,
+                                    state: data.publisher.state,
                                     county: data.publisher.county,
                                     city: data.publisher.city,
                                     postal_code: data.publisher.postal_code,
+                                    address: data.publisher.address,
                                     iban: data.publisher.iban,
                                     swift: data.publisher.swift,
                                 });
@@ -196,6 +200,14 @@ document.addEventListener("alpine:init", () => {
                     break;
 
                 case 3:
+                    if (!this.formData.state) {
+                        this.errors.state = "Lo stato è obbligatoria";
+                        return false;
+                    }
+                    if (!this.validateTextOnly(this.formData.state)) {
+                        this.errors.county = "Lo stato può contenere solo lettere";
+                        return false;
+                    }
                     if (!this.formData.county) {
                         this.errors.county = "La provincia è obbligatoria";
                         return false;
@@ -218,6 +230,10 @@ document.addEventListener("alpine:init", () => {
                     }
                     if (!this.validatePostalCode(this.formData.postal_code)) {
                         this.errors.postal_code = "Il CAP deve essere di 5 cifre numeriche";
+                        return false;
+                    }
+                    if (!this.formData.address) {
+                        this.errors.address = "L'indirizzo è obbligatorio";
                         return false;
                     }
                     break;
