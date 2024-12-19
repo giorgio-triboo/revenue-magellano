@@ -175,12 +175,16 @@ class PublisherController extends Controller
             'company_name' => 'required|string|max:255',
             'legal_name' => 'required|string|max:255',
             'vat_number' => ['required', 'string'],
-            'county' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'postal_code' => 'required|string|max:5',
             'iban' => 'required|string|max:27',
             'swift' => 'required|string|between:8,11',
-            'is_active' => 'required|in:0,1' // Modificata la validazione
+            'state' => 'required|string|max:255',
+            'state_id' => 'required|string|max:3',
+            'county' => 'required|string|max:255',
+            'county_id' => 'required|string|max:2',
+            'city' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:10',
+            'is_active' => 'required|in:0,1' 
         ]);
 
         // Converti esplicitamente is_active in boolean
