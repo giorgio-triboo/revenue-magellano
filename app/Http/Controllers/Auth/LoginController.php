@@ -42,28 +42,28 @@ class LoginController extends Controller
         }
 
         // Credenziali di test per jtt 
-        if ($request->email === 'jtt@jtt.it' && $request->password === 'jtt') {
-            $user = User::findOrFail(2);
-            Log::info('Accesso effettuato con credenziali di test', [
-                'user_id' => 2,
-                'role' => 'publisher',
-            ]);
-            Auth::login($user, $request->filled('remember'));
-            $request->session()->regenerate();
-            return redirect()->route('dashboard');
-        }
+        // if ($request->email === 'jtt@jtt.it' && $request->password === 'jtt') {
+        //     $user = User::findOrFail(2);
+        //     Log::info('Accesso effettuato con credenziali di test', [
+        //         'user_id' => 2,
+        //         'role' => 'publisher',
+        //     ]);
+        //     Auth::login($user, $request->filled('remember'));
+        //     $request->session()->regenerate();
+        //     return redirect()->route('dashboard');
+        // }
 
         // Credenziali di test per il publisher 
-        if ($request->email === 'publisher@publisher.it' && $request->password === 'publisher') {
-            $user = User::findOrFail(3);
-            Log::info('Accesso effettuato con credenziali di test', [
-                'user_id' => 3,
-                'role' => 'publisher',
-            ]);
-            Auth::login($user, $request->filled('remember'));
-            $request->session()->regenerate();
-            return redirect()->route('dashboard');
-        }
+        // if ($request->email === 'publisher@publisher.it' && $request->password === 'publisher') {
+        //     $user = User::findOrFail(3);
+        //     Log::info('Accesso effettuato con credenziali di test', [
+        //         'user_id' => 3,
+        //         'role' => 'publisher',
+        //     ]);
+        //     Auth::login($user, $request->filled('remember'));
+        //     $request->session()->regenerate();
+        //     return redirect()->route('dashboard');
+        // }
 
         // Rate Limiting con protezione avanzata
         $key = Str::lower($request->email) . '|' . $request->ip();

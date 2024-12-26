@@ -305,7 +305,7 @@
                                     </div>
                                     <div class="ml-3">
                                         <p class="text-md text-blue-700">
-                                            Per modificare i tuoi dati, scrivi a pannello@triboo.it
+                                            Per modificare i tuoi dati, apri un ticket nella sezione Assistenza.
                                         </p>
                                     </div>
                                 </div>
