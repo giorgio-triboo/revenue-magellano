@@ -97,14 +97,11 @@
                                 <!-- Email -->
                                 <div>
                                     <label for="email" class="block text-md font-medium text-gray-700 mb-2">
-                                        Email <span class="text-red-500">*</span>
+                                        Email
                                     </label>
-                                    <input type="email" name="email" id="email"
-                                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                                        value="{{ old('email', $user->email) }}" required>
-                                    @error('email')
-                                        <p class="mt-2 text-md text-red-600">{{ $message }}</p>
-                                    @enderror
+                                    <div class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700">
+                                        {{ $user->email }}
+                                    </div>
                                 </div>
 
                                 <!-- Submit Button -->
