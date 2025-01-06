@@ -64,8 +64,8 @@ class RegisterController extends Controller
                 'description' => '7 cifre seguite da 1 o 2 lettere'
             ],
             'AA' => [
-            'pattern' => '/^[A-Za-z0-9]{1,30}$/',
-            'description' => 'Inserisci un valore alfanumerico massimo 30 caratteri'
+                'pattern' => '/^[A-Za-z0-9]{1,30}$/',
+                'description' => 'Inserisci un valore alfanumerico massimo 30 caratteri'
             ]
         ]
     ];
@@ -78,31 +78,52 @@ class RegisterController extends Controller
 
 
     protected function validateVatNumber($countryCode, $number)
-{
-    $rules = $this->vatConfig['rules'];
+    {
+        $rules = $this->vatConfig['rules'];
 
-    if (!isset($rules[$countryCode])) {
-        return [
-            'valid' => false,
-            'message' => 'Paese non supportato'
-        ];
-    }
-
-    $cleanNumber = preg_replace('/[\s\-\.]/', '', $number);
-
-    // Caso speciale per 'AA'
-    if ($countryCode === 'AA') {
-        if (strlen($cleanNumber) > 30) {
+        if (!isset($rules[$countryCode])) {
             return [
                 'valid' => false,
-                'message' => 'Il numero non può superare i 30 caratteri'
+                'message' => 'Paese non supportato'
             ];
         }
 
-        if (!preg_match('/^[A-Za-z0-9]+$/', $cleanNumber)) {
+        $cleanNumber = preg_replace('/[\s\-\.]/', '', $number);
+
+        // Caso speciale per 'AA'
+        if ($countryCode === 'AA') {
+            if (strlen($cleanNumber) > 30) {
+                return [
+                    'valid' => false,
+                    'message' => 'Il numero non può superare i 30 caratteri'
+                ];
+            }
+
+            if (!preg_match('/^[A-Za-z0-9]+$/', $cleanNumber)) {
+                return [
+                    'valid' => false,
+                    'message' => 'Sono ammessi solo caratteri alfanumerici'
+                ];
+            }
+
+            return [
+                'valid' => true,
+                'cleanNumber' => $cleanNumber
+            ];
+        }
+
+        // Validazione normale per gli altri paesi
+        if (strlen($cleanNumber) !== $rules[$countryCode]['length']) {
             return [
                 'valid' => false,
-                'message' => 'Sono ammessi solo caratteri alfanumerici'
+                'message' => "Il numero deve essere di {$rules[$countryCode]['length']} caratteri per $countryCode"
+            ];
+        }
+
+        if (!preg_match($rules[$countryCode]['pattern'], $cleanNumber)) {
+            return [
+                'valid' => false,
+                'message' => "Formato non valido per il paese selezionato"
             ];
         }
 
@@ -111,27 +132,6 @@ class RegisterController extends Controller
             'cleanNumber' => $cleanNumber
         ];
     }
-
-    // Validazione normale per gli altri paesi
-    if (strlen($cleanNumber) !== $rules[$countryCode]['length']) {
-        return [
-            'valid' => false,
-            'message' => "Il numero deve essere di {$rules[$countryCode]['length']} caratteri per $countryCode"
-        ];
-    }
-
-    if (!preg_match($rules[$countryCode]['pattern'], $cleanNumber)) {
-        return [
-            'valid' => false,
-            'message' => "Formato non valido per il paese selezionato"
-        ];
-    }
-
-    return [
-        'valid' => true,
-        'cleanNumber' => $cleanNumber
-    ];
-}
 
     public function checkVat(Request $request)
     {
@@ -215,9 +215,13 @@ class RegisterController extends Controller
                     'string',
                     'min:8',
                     'confirmed',
-                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/'
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&€])[A-Za-z\d@$!%*?&€]+$/'
                 ],
                 'privacy_accepted' => 'required|boolean|accepted',
+            ];
+
+            $customMessages = [
+                'password.regex' => 'La password deve contenere almeno una lettera maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&€)',
             ];
 
             $validatedData = $request->validate($baseValidation);
