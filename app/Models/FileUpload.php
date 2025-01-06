@@ -46,8 +46,13 @@ class FileUpload extends Model
         'ax_export_path',
         'sftp_status',
         'sftp_error_message',
-        'sftp_uploaded_at'
+        'sftp_uploaded_at',
+        'notification_sent_at'
     ];
+
+    protected $dates = [
+        'notification_sent_at'
+    ];    
 
     protected $casts = [
         'process_date' => 'date',

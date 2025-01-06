@@ -253,7 +253,7 @@
                                                         <!-- Pulsante Email -->
                                                         <button type="button"
                                                             @click="confirmSendEmail(@js($upload))"
-                                                            @if ($upload->status !== 'published') disabled @endif
+                                                            @if ($upload->status !== 'published' || $upload->notification_sent_at !== null) disabled @endif
                                                             class="inline-flex items-center px-3 py-1 border border-transparent rounded-xl shadow-sm text-md font-medium text-white bg-custom-activeItem hover:bg-custom-activeItem/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem disabled:opacity-50">
                                                             Email
                                                         </button>

@@ -29,6 +29,7 @@ return new class extends Migration
             $table->date('process_date');
             $table->timestamp('processed_at')->nullable();
             $table->timestamp('published_at')->nullable();
+            $table->timestamp('notification_sent_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
