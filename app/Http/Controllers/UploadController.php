@@ -494,106 +494,106 @@ class UploadController extends Controller
 
     public function downloadTemplate()
     {
-        $path = storage_path('app/templates/upload-def.csv');
+        $path = storage_path('app/private/template/upload-def.csv');
 
-        if (!Storage::exists('templates/upload-def.csv')) {
-            Storage::put(
-                'templates/upload-def.csv',
+        if (!Storage::disk('private')->exists('template/upload-def.csv')) {
+            Storage::disk('private')->put(
+                'template/upload-def.csv',
                 "anno_consuntivo;mese_consuntivo;anno_competenza;mese_competenza;nome_campagna_HO;publisher_id;sub_publisher_id;tipologia_revenue;quantita_validata;pay;importo\n" .
                 "2025;1;2025;1;campagna 1;1;1;cpl;100;25;2500"
             );
         }
 
-        return response()->download($path, 'template_consuntivo.csv', [
+        return Storage::disk('private')->download('template/upload-def.csv', 'template_consuntivo.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
 
     public function sendEmail(FileUpload $upload)
-{
-    try {
-        Log::info('Debug Upload', [
-            'upload_id' => $upload->id
-        ]);
+    {
+        try {
+            Log::info('Debug Upload', [
+                'upload_id' => $upload->id
+            ]);
 
-        // Verifica se l'email è già stata inviata
-        if ($upload->notification_sent_at !== null) {
-            return response()->json([
-                'message' => 'Le email sono già state inviate per questo upload'
-            ], 400);
-        }
+            // Verifica se l'email è già stata inviata
+            if ($upload->notification_sent_at !== null) {
+                return response()->json([
+                    'message' => 'Le email sono già state inviate per questo upload'
+                ], 400);
+            }
 
-        $statements = Statement::where('file_upload_id', $upload->id)
-            ->with([
-                'publisher.users' => function ($query) {
-                    $query->where('is_active', true)
-                        ->where('can_receive_email', true)
-                        ->whereHas('role', function ($q) {
-                            $q->where('code', 'publisher');
-                        });
-                }
-            ])
-            ->get();
+            $statements = Statement::where('file_upload_id', $upload->id)
+                ->with([
+                    'publisher.users' => function ($query) {
+                        $query->where('is_active', true)
+                            ->where('can_receive_email', true)
+                            ->whereHas('role', function ($q) {
+                                $q->where('code', 'publisher');
+                            });
+                    }
+                ])
+                ->get();
 
-        Log::info('Debug Statements', [
-            'total_statements' => $statements->count()
-        ]);
+            Log::info('Debug Statements', [
+                'total_statements' => $statements->count()
+            ]);
 
-        $validPublishers = $statements
-            ->pluck('publisher')
-            ->filter()
-            ->unique('id')
-            ->filter(function ($publisher) {
-                return $publisher->users->isNotEmpty();
-            });
+            $validPublishers = $statements
+                ->pluck('publisher')
+                ->filter()
+                ->unique('id')
+                ->filter(function ($publisher) {
+                    return $publisher->users->isNotEmpty();
+                });
 
-        if ($validPublishers->isEmpty()) {
-            return response()->json([
-                'message' => 'Nessun publisher con utenti validi trovato per questo upload'
-            ], 400);
-        }
+            if ($validPublishers->isEmpty()) {
+                return response()->json([
+                    'message' => 'Nessun publisher con utenti validi trovato per questo upload'
+                ], 400);
+            }
 
-        $sentCount = 0;
-        foreach ($validPublishers as $publisher) {
-            foreach ($publisher->users as $user) {
-                if (filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
-                    Mail::to($user->email)
-                        ->send(new StatementPublished($upload));
-                    $sentCount++;
-                    Log::info('Email inviata a user', [
-                        'publisher_id' => $publisher->id,
-                        'user_id' => $user->id,
-                        'email' => $user->email
-                    ]);
+            $sentCount = 0;
+            foreach ($validPublishers as $publisher) {
+                foreach ($publisher->users as $user) {
+                    if (filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+                        Mail::to($user->email)
+                            ->send(new StatementPublished($upload));
+                        $sentCount++;
+                        Log::info('Email inviata a user', [
+                            'publisher_id' => $publisher->id,
+                            'user_id' => $user->id,
+                            'email' => $user->email
+                        ]);
+                    }
                 }
             }
+
+            if ($sentCount === 0) {
+                throw new \Exception('Nessuna email valida trovata per gli utenti dei publisher');
+            }
+
+            // Aggiorniamo il timestamp di invio
+            $upload->update([
+                'notification_sent_at' => now()
+            ]);
+
+            return response()->json([
+                'message' => "Email inviate con successo a {$sentCount} utenti"
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Errore invio email pubblicazione', [
+                'error' => $e->getMessage(),
+                'upload_id' => $upload->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'Errore durante l\'invio delle email'
+            ], 500);
         }
-
-        if ($sentCount === 0) {
-            throw new \Exception('Nessuna email valida trovata per gli utenti dei publisher');
-        }
-
-        // Aggiorniamo il timestamp di invio
-        $upload->update([
-            'notification_sent_at' => now()
-        ]);
-
-        return response()->json([
-            'message' => "Email inviate con successo a {$sentCount} utenti"
-        ]);
-
-    } catch (\Exception $e) {
-        Log::error('Errore invio email pubblicazione', [
-            'error' => $e->getMessage(),
-            'upload_id' => $upload->id,
-            'trace' => $e->getTraceAsString()
-        ]);
-
-        return response()->json([
-            'message' => 'Errore durante l\'invio delle email'
-        ], 500);
     }
-}
 
     public function uploadToSftp(FileUpload $upload)
     {
