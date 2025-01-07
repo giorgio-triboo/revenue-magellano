@@ -11,13 +11,13 @@
                     Upload Consuntivi
                 </h2>
             </div>
-            <div class="flex justify-between items-center mb-4">
+            {{-- <div class="flex justify-between items-center mb-4">
                 <a href="{{ route('uploads.template') }}"
                     class="inline-flex justify-end items-center px-4 py-2 rounded-xl bg-custom-btn text-white hover:bg-custom-btn">
                     <i data-lucide="download" class="h-5 w-5 mr-2"></i>
                     Scarica Template
                 </a>
-            </div>
+            </div> --}}
         </div>
 
         <!-- Cards Container -->
