@@ -500,7 +500,7 @@ class UploadController extends Controller
             Storage::disk('private')->put(
                 'template/upload-def.csv',
                 "anno_consuntivo;mese_consuntivo;anno_competenza;mese_competenza;nome_campagna_HO;publisher_id;sub_publisher_id;tipologia_revenue;quantita_validata;pay;importo\n" .
-                "2025;1;2025;1;campagna 1;1;1;cpl;100;25;2500"
+                "2025;01;2025;01;campagna 1;1;1;cpl;100;25;2500"
             );
         }
 
