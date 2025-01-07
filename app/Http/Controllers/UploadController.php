@@ -493,17 +493,17 @@ class UploadController extends Controller
     }
 
     public function downloadTemplate()
-{
-    Storage::disk('private')->put(
-        'template/upload-def.csv',
-        "anno_consuntivo;mese_consuntivo;anno_competenza;mese_competenza;nome_campagna_HO;publisher_id;sub_publisher_id;tipologia_revenue;quantita_validata;pay;importo\n" .
-        "2025;01;2025;01;campagna 1;1;1;cpl;100;25;2500"
-    );
+    {
+        Storage::disk('private')->put(
+            'template/upload-def.csv',
+            "anno_consuntivo;mese_consuntivo;anno_competenza;mese_competenza;nome_campagna_HO;publisher_id;sub_publisher_id;tipologia_revenue;quantita_validata;pay;importo\n" .
+            "2025;=\"01\";2025;=\"01\";campagna 1;1;1;cpl;100;25;2500"
+        );
 
-    return Storage::disk('private')->download('template/upload-def.csv', 'template_consuntivo.csv', [
-        'Content-Type' => 'text/csv; charset=UTF-8',
-    ]);
-}
+        return Storage::disk('private')->download('template/upload-def.csv', 'template_consuntivo.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
 
     public function sendEmail(FileUpload $upload)
     {
