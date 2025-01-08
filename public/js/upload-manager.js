@@ -369,11 +369,11 @@ function uploadManager() {
 
         // async uploadToSftp(uploadId) {
         //     if (!uploadId) return;
-
+        
         //     const timeout = 60000; // Timeout di 60 secondi
         //     const controller = new AbortController();
         //     const id = setTimeout(() => controller.abort(), timeout);
-
+        
         //     try {
         //         const response = await fetch(`/uploads/${uploadId}/upload-sftp`, {
         //             method: 'POST',
@@ -384,17 +384,17 @@ function uploadManager() {
         //             },
         //             signal: controller.signal // Aggiunto il controller per gestire il timeout
         //         });
-
+        
         //         clearTimeout(id);
-
+        
         //         if (!response.ok) {
         //             const contentType = response.headers.get('content-type');
         //             if (contentType && contentType.includes('text/html')) {
         //                 throw new Error('Risposta non valida dal server (HTML invece di JSON)');
         //             }
         //         }
-
-
+                
+        
         //         const data = await response.json();
         //         this.showNotification('success', data.message || 'File caricato su SFTP con successo');
         //         window.location.reload();
@@ -408,14 +408,14 @@ function uploadManager() {
         //         }
         //     }
         // },
-
+        
         async uploadToSftp(uploadId) {
             if (!uploadId) return;
-
+        
             const timeout = 30000; // Timeout di 30 secondi
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), timeout);
-
+        
             try {
                 const response = await fetch(`/uploads/${uploadId}/upload-sftp`, {
                     method: 'POST',
@@ -426,9 +426,9 @@ function uploadManager() {
                     },
                     signal: controller.signal // Aggiunto il controller per gestire il timeout
                 });
-
+        
                 clearTimeout(id);
-
+        
                 if (!response.ok) {
                     const contentType = response.headers.get('content-type');
                     if (contentType && contentType.includes('text/html')) {
@@ -440,7 +440,7 @@ function uploadManager() {
                         throw new Error('Errore durante l\'upload');
                     }
                 }
-
+        
                 const data = await response.json();
                 this.showNotification('success', data.message || 'File caricato su SFTP con successo');
                 window.location.reload();
@@ -454,7 +454,7 @@ function uploadManager() {
                 }
             }
         },
-
+                
         async sendTestEmail() {
             if (!this.selectedUpload) return;
 
@@ -592,56 +592,18 @@ function uploadManager() {
         },
 
         formatErrorDetails() {
-            // Se non ci sono informazioni sull'upload corrente
-            if (!this.currentInfoUpload) {
-                return {
-                    errorCount: 0,
-                    errorLines: [],
-                    generalError: 'Nessuna informazione disponibile'
-                };
+            if (!this.currentInfoUpload?.processing_stats?.error_details?.length) {
+                return 'Nessun dettaglio errore disponibile';
             }
 
-            let errorDetails = {
-                errorCount: 0,
-                errorLines: [],
-                generalError: null
+            const errors = this.currentInfoUpload.processing_stats.error_details;
+            return {
+                errorCount: errors.length,
+                errorLines: errors.map(e => ({
+                    line: e.line,
+                    message: e.error
+                }))
             };
-
-            // Gestione errore generale dal messaggio di errore principale
-            if (this.currentInfoUpload.error_message) {
-                errorDetails.generalError = this.currentInfoUpload.error_message;
-                errorDetails.errorCount++;
-                errorDetails.errorLines.push({
-                    type: 'general',
-                    line: 'Generale',
-                    message: this.currentInfoUpload.error_message
-                });
-            }
-
-            // Gestione errori specifici dai processing_stats
-            if (this.currentInfoUpload.processing_stats?.error_details?.length > 0) {
-                this.currentInfoUpload.processing_stats.error_details.forEach(error => {
-                    errorDetails.errorCount++;
-                    errorDetails.errorLines.push({
-                        type: 'specific',
-                        line: error.line,
-                        message: error.error || error.message
-                    });
-                });
-            }
-
-            // Se non sono stati trovati errori ma lo stato è 'error'
-            if (errorDetails.errorCount === 0 && this.currentInfoUpload.status === 'error') {
-                errorDetails.generalError = 'Si è verificato un errore durante l\'elaborazione del file. Contattare il supporto tecnico.';
-                errorDetails.errorCount = 1;
-                errorDetails.errorLines.push({
-                    type: 'general',
-                    line: 'Generale',
-                    message: 'Errore non specificato'
-                });
-            }
-
-            return errorDetails;
-        },
+        }
     };
 }

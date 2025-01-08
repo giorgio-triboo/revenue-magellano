@@ -454,49 +454,11 @@
                                 <dd class="mt-2">
                                     <div class="bg-red-50 p-4 rounded-xl">
                                         <div class="text-md text-red-700">
-                                            <div>
-                                                <!-- Errore Generale -->
-                                                <template x-if="formatErrorDetails().generalError">
-                                                    <div class="mb-4">
-                                                        <p class="font-medium mb-2">Errore:</p>
-                                                        <div class="whitespace-pre-line text-sm"
-                                                            x-text="formatErrorDetails().generalError"></div>
-                                                    </div>
-                                                </template>
-
-                                                <!-- Errori Specifici -->
-                                                <template x-if="formatErrorDetails().errorLines.length > 0">
-                                                    <div>
-                                                        <p class="font-medium mb-2">Dettagli errori:</p>
-                                                        <ul class="list-disc pl-5 space-y-1">
-                                                            <template x-for="error in formatErrorDetails().errorLines"
-                                                                :key="error.line">
-                                                                <li>
-                                                                    <template x-if="error.type === 'specific'">
-                                                                        <span
-                                                                            x-text="`Riga ${error.line}: ${error.message}`"></span>
-                                                                    </template>
-                                                                    <template x-if="error.type === 'general'">
-                                                                        <span class="font-medium"
-                                                                            x-text="error.message"></span>
-                                                                    </template>
-                                                                </li>
-                                                            </template>
-                                                        </ul>
-                                                    </div>
-                                                </template>
-
-                                                <!-- Suggerimenti -->
-                                                <div class="mt-4 text-sm bg-red-100 p-3 rounded">
-                                                    <p class="font-medium mb-1">Suggerimenti per la risoluzione:</p>
-                                                    <ul class="list-disc pl-4 space-y-1">
-                                                        <li>Verifica che il file CSV sia nel formato corretto</li>
-                                                        <li>Controlla che tutte le colonne richieste siano presenti</li>
-                                                        <li>Assicurati che i valori siano nel formato corretto</li>
-                                                        <li>Verifica che non ci siano righe vuote nel file</li>
-                                                        <li>Se l'errore persiste, contatta il supporto tecnico</li>
-                                                    </ul>
-                                                </div>
+                                            <!-- Messaggio di Errore -->
+                                            <div class="mb-4">
+                                                <p class="whitespace-pre-line"
+                                                    x-text="currentInfoUpload.error_message || 'Nessun dettaglio errore disponibile'">
+                                                </p>
                                             </div>
                                         </div>
                                     </div>

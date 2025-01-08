@@ -497,7 +497,7 @@ class UploadController extends Controller
         $instructions = <<<EOT
 ISTRUZIONI PER IL CARICAMENTO
 - estensione file .csv
-- utilizzare ; come separtore
+- utilizzare ; come separatore
 - anno_consuntivo e anno_competenza vogliono l'anno in 4 cifre. es "2025"
 - mese_consuntivo e mese_competenza vogliono due cifre per la data. es "01 non "1".
 - nessun carattere speciale (es. € nella colonna "importo" o "pay")
