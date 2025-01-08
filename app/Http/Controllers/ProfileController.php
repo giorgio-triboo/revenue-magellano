@@ -37,7 +37,7 @@ class ProfileController extends Controller
                     'required',
                     'string',
                     'max:255',
-                    'regex:/^[\p{L}\s\-]+$/u'  // Solo lettere, spazi e trattini
+                    'regex:/^[\p{L}\s\-]+$/u'
                 ],
                 'last_name' => [
                     'required',
@@ -45,16 +45,9 @@ class ProfileController extends Controller
                     'max:255',
                     'regex:/^[\p{L}\s\-]+$/u'
                 ],
-                'email' => [
-                    'required',
-                    'email',
-                    'max:255',
-                    'unique:users,email,'.$user->id
-                ],
             ], [
                 'first_name.regex' => 'Il nome può contenere solo lettere, spazi e trattini',
                 'last_name.regex' => 'Il cognome può contenere solo lettere, spazi e trattini',
-                'email.unique' => 'Questo indirizzo email è già in uso'
             ]);
 
             if ($validator->fails()) {
