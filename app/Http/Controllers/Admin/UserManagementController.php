@@ -296,7 +296,8 @@ class UserManagementController extends Controller
             DB::transaction(function () use ($user) {
                 $user->restore();
                 $user->update([
-                    'is_active' => true
+                    'is_active' => true,
+                    'is_validated' => true
                 ]);
             });
 
