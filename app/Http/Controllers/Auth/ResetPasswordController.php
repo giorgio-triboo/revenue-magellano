@@ -18,7 +18,6 @@ class ResetPasswordController extends Controller
     public function show(Request $request)
     {
         try {
-            // Ottieni l'utente dall'ID invece che dall'email
             $user = User::findOrFail($request->user);
             $email = $user->email;
 
@@ -75,20 +74,20 @@ class ResetPasswordController extends Controller
 
     public function reset(Request $request)
     {
-        $request->validate([
-            'token' => 'required',
-            'user' => 'required|exists:users,id',
-            'password' => [
-                'required',
-                'confirmed',
-                'min:8',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/'
-            ],
-        ], [
-            'password.regex' => 'La password deve contenere almeno una lettera maiuscola, una minuscola, un numero e un carattere speciale.'
-        ]);
-
         try {
+            $request->validate([
+                'token' => 'required',
+                'user' => 'required|exists:users,id',
+                'password' => [
+                    'required',
+                    'confirmed',
+                    'min:8',
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/'
+                ],
+            ], [
+                'password.regex' => 'La password deve contenere almeno una lettera maiuscola, una minuscola, un numero e un carattere speciale.'
+            ]);
+
             $user = User::findOrFail($request->user);
             $email = $user->email;
 
@@ -96,63 +95,69 @@ class ResetPasswordController extends Controller
                 'user_id' => $user->id
             ]);
 
+            // Verifica token
             $tokenData = DB::table('password_reset_tokens')
                 ->where('email', $email)
+                ->where('token', $request->token)
                 ->first();
 
             if (!$tokenData) {
-                Log::error('Token non trovato durante il reset', [
+                Log::error('Token non valido o non trovato', [
                     'user_id' => $user->id
                 ]);
-                
-                return redirect()->route('password.request')
-                    ->with('error', 'Il token di reset non è più valido. Richiedine uno nuovo.');
+                return redirect()
+                    ->route('password.request')
+                    ->with('error', 'Token non valido. Richiedine uno nuovo.');
             }
 
+            // Verifica scadenza token
             $tokenCreatedAt = Carbon::parse($tokenData->created_at);
-            $minutesElapsed = Carbon::now()->diffInMinutes($tokenCreatedAt);
+            if (Carbon::now()->diffInMinutes($tokenCreatedAt) > 60) {
+                DB::table('password_reset_tokens')
+                    ->where('email', $email)
+                    ->delete();
+                    
+                return redirect()
+                    ->route('password.request')
+                    ->with('error', 'Il token è scaduto. Richiedine uno nuovo.');
+            }
 
-            if ($minutesElapsed > 60) {
+            // Verifica se la nuova password è uguale alla precedente
+            if (Hash::check($request->password, $user->password)) {
+                return back()
+                    ->withErrors(['password' => 'La nuova password non può essere uguale alla precedente.']);
+            }
+
+            DB::beginTransaction();
+            try {
+                // Aggiorna la password
+                $user->forceFill([
+                    'password' => Hash::make($request->password),
+                    'remember_token' => Str::random(60),
+                ])->save();
+
+                // Rimuovi il token di reset
                 DB::table('password_reset_tokens')
                     ->where('email', $email)
                     ->delete();
 
-                return redirect()->route('password.request')
-                    ->with('error', 'Il link per il reset della password è scaduto. Richiedine uno nuovo.');
+                DB::commit();
+
+                // Trigger dell'evento di reset password
+                event(new PasswordReset($user));
+                
+                Log::info('Password reset completato con successo', [
+                    'user_id' => $user->id
+                ]);
+
+                return redirect()
+                    ->route('login')
+                    ->with('status', 'La password è stata reimpostata con successo!');
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
             }
-
-            if (Hash::check($request->password, $user->password)) {
-                return back()->withErrors(['password' => 'La nuova password non può essere uguale alla precedente.']);
-            }
-
-            $status = Password::reset(
-                [
-                    'email' => $email,
-                    'password' => $request->password,
-                    'password_confirmation' => $request->password_confirmation,
-                    'token' => $request->token
-                ],
-                function ($user, $password) {
-                    $user->forceFill([
-                        'password' => Hash::make($password),
-                        'remember_token' => Str::random(60),
-                    ])->save();
-
-                    DB::table('password_reset_tokens')
-                        ->where('email', $user->email)
-                        ->delete();
-
-                    event(new PasswordReset($user));
-                    Log::info('Password reset completato con successo', ['user_id' => $user->id]);
-                }
-            );
-
-            if ($status === Password::PASSWORD_RESET) {
-                return redirect()->route('login')
-                    ->with('password_reset_success', 'La password è stata reimpostata con successo!');
-            }
-
-            return back()->withErrors(['email' => __($status)]);
 
         } catch (\Exception $e) {
             Log::error('Errore durante il reset della password', [
@@ -161,7 +166,8 @@ class ResetPasswordController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
-            return back()->withErrors(['email' => 'Si è verificato un errore durante il reset della password.']);
+            return back()
+                ->withErrors(['email' => 'Si è verificato un errore durante il reset della password.']);
         }
     }
 }
