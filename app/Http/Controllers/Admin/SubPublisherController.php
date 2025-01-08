@@ -39,6 +39,8 @@ class SubPublisherController extends Controller
             $validated = $request->validate([
                 'display_name' => 'required|string|max:255',
                 'invoice_group' => 'required|string|max:255',
+                'ax_name' => 'required|string|max:255',
+                'channel_detail' => 'nullable|string',
                 'notes' => 'nullable|string',
                 'is_primary' => 'boolean'
             ]);
