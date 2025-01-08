@@ -3,7 +3,7 @@
 @section('title', 'Gestione Utenti')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="userManagement()" >
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="userManagement()">
         <!-- Header con pulsante export -->
         <div class="md:flex md:items-center md:justify-between mb-4">
             <div class="min-w-0 flex-1">
@@ -20,10 +20,11 @@
             </div>
         </div>
 
-        <!-- Search Bar -->
+        <!-- Search Bar e Filtri -->
         <div class="mt-4">
             <div class="max-w-xl">
-                <form action="{{ request()->url() }}" method="GET">
+                <form action="{{ request()->url() }}" method="GET" class="space-y-4">
+                    <!-- Search input -->
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
@@ -39,6 +40,34 @@
                             @endif
                         </div>
                     </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm font-medium text-gray-700">Stato utenti:</span>
+                        <div class="flex space-x-2">
+                            <button type="submit" name="status" value="active"
+                                class="px-3 py-1 rounded-full text-sm font-medium {{ request('status', 'active') === 'active' ? 'bg-custom-activeItem text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                                <div class="flex items-center space-x-1">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-green-400"></span>
+                                    <span>Attivi</span>
+                                </div>
+                            </button>
+                            <button type="submit" name="status" value="deleted"
+                                class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') === 'deleted' ? 'bg-custom-activeItem text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                                <div class="flex items-center space-x-1">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-red-400"></span>
+                                    <span>Eliminati</span>
+                                </div>
+                            </button>
+                            <button type="submit" name="status" value="all"
+                                class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') === 'all' ? 'bg-custom-activeItem text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                                <div class="flex items-center space-x-1">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-gray-400"></span>
+                                    <span>Tutti</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
@@ -51,22 +80,28 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                                         Utente
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                                         Email
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                                         Publisher
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                                         Verifica Email
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                                         Validazione Admin
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                                         Stato Account
                                     </th>
                                     <th scope="col" class="relative px-6 py-3">
@@ -84,40 +119,46 @@
                                             {{ $user->email }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-md text-gray-500">
-                                            {{ $user->publisher->company_name }}
+                                            {{ $user->publisher?->company_name }}
                                         </td>
                                         <!-- Verifica Email -->
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($user->email_verified)
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            @if ($user->email_verified)
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                     Verificata
                                                 </span>
                                             @else
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
                                                     In attesa
                                                 </span>
                                             @endif
                                         </td>
                                         <!-- Validazione Admin -->
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($user->is_validated)
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            @if ($user->is_validated)
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                     Validato
                                                 </span>
                                             @else
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
                                                     In attesa
                                                 </span>
                                             @endif
                                         </td>
                                         <!-- Stato Account -->
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($user->is_active)
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            @if ($user->is_active)
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                     Attivo
                                                 </span>
                                             @else
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                                                     Non attivo
                                                 </span>
                                             @endif
@@ -126,8 +167,9 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-md font-medium">
                                             <div class="flex justify-end space-x-2">
                                                 @if ($user->trashed())
-                                                    <button @click="restoreUser({{ $user->id }})"
-                                                        class="text-custom-activeItem hover:text-custom-activeItem/90">
+                                                    <button @click="restoreUser('{{ $user->id }}')"
+                                                        class="text-green-600 hover:text-green-700"
+                                                        title="Ripristina utente">
                                                         <i data-lucide="refresh-cw" class="h-5 w-5"></i>
                                                     </button>
                                                 @else
@@ -136,12 +178,12 @@
                                                         <i data-lucide="eye" class="h-5 w-5"></i>
                                                     </button>
                                                     <a href="{{ route('users.edit', $user) }}"
-                                                    class="text-custom-activeItem hover:text-custom-activeItem/90">
+                                                        class="text-custom-activeItem hover:text-custom-activeItem/90">
                                                         <i data-lucide="edit" class="h-5 w-5"></i>
                                                     </a>
                                                     @if ($user->id !== auth()->id())
                                                         <button @click="confirmDelete({{ $user->id }})"
-                                                            class="text-red-600 hover:text-red-600/90">
+                                                            class="text-red-600 hover:text-red-700">
                                                             <i data-lucide="trash-2" class="h-5 w-5"></i>
                                                         </button>
                                                     @endif
@@ -151,7 +193,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6"
+                                        <td colspan="7"
                                             class="px-6 py-4 whitespace-nowrap text-md text-gray-500 text-center">
                                             Nessun utente trovato
                                         </td>
@@ -192,8 +234,6 @@
                             <div class="flex items-center justify-between">
                                 <h3 class="text-lg leading-6 font-medium text-gray-900"
                                     x-text="userDetails ? userDetails.first_name + ' ' + userDetails.last_name : ''"></h3>
-                                <div class="flex space-x-2">
-                                </div>
                             </div>
 
                             <!-- Status Cards Section -->
@@ -292,19 +332,6 @@
                                             <dd class="mt-1 text-md text-gray-900 sm:mt-0 sm:col-span-2"
                                                 x-text="userDetails?.publisher?.vat_number"></dd>
                                         </div>
-                                        <div class="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 bg-gray-50">
-                                            <dt class="text-md font-medium text-gray-500">Sito Web</dt>
-                                            <dd class="mt-1 text-md text-gray-900 sm:mt-0 sm:col-span-2">
-                                                <a :href="userDetails?.publisher?.website"
-                                                    class="text-custom-activeItem hover:text-custom-activeItem/90"
-                                                    target="_blank" x-text="userDetails?.publisher?.website"></a>
-                                            </dd>
-                                        </div>
-                                        <div class="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4">
-                                            <dt class="text-md font-medium text-gray-500">Indirizzo</dt>
-                                            <dd class="mt-1 text-md text-gray-900 sm:mt-0 sm:col-span-2"
-                                                x-text="formatAddress(userDetails?.publisher)"></dd>
-                                        </div>
                                     </dl>
                                 </div>
                             </div>
@@ -381,26 +408,27 @@
                 showDeleteModal: false,
                 userIdToDelete: null,
 
-                debounceSearch() {
-                    clearTimeout(this.searchTimeout);
-                    this.searchTimeout = setTimeout(() => {
-                        this.applySearch();
-                    }, 500);
-                },
+                async restoreUser(userId) {
+                    if (confirm('Sei sicuro di voler ripristinare questo utente?')) {
+                        try {
+                            const response = await fetch(`/users/${userId}/restore`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                }
+                            });
 
-                applySearch() {
-                    const params = new URLSearchParams(window.location.search);
-                    if (this.searchQuery) {
-                        params.set('search', this.searchQuery);
-                    } else {
-                        params.delete('search');
+                            const data = await response.json();
+                            if (data.success) {
+                                window.location.reload();
+                            } else {
+                                console.error('Errore durante il ripristino:', data.message);
+                            }
+                        } catch (error) {
+                            console.error('Errore durante il ripristino:', error);
+                        }
                     }
-                    window.location.search = params.toString();
-                },
-
-                resetSearch() {
-                    this.searchQuery = '';
-                    this.applySearch();
                 },
 
                 showDetails(userId) {
@@ -415,30 +443,31 @@
                         .catch(error => console.error("Errore nella richiesta AJAX:", error));
                 },
 
-                // Aggiunta della funzione confirmDelete
+                formatAddress(publisher) {
+                    if (!publisher) return '';
+                    return `${publisher.city} (${publisher.county}), ${publisher.postal_code}`;
+                },
+
                 confirmDelete(userId) {
-                    console.log("confirmDelete chiamato con userId:", userId);
                     this.userIdToDelete = userId;
                     this.showDeleteModal = true;
                 },
 
-                // Funzione per eliminare effettivamente l'utente
                 deleteUser() {
                     if (!this.userIdToDelete) return;
 
                     fetch(`/users/${this.userIdToDelete}`, {
                             method: 'DELETE',
                             headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                             }
                         })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                console.log("Utente eliminato con successo");
                                 this.showDeleteModal = false;
                                 this.userIdToDelete = null;
-                                window.location.reload(); // Ricarica la pagina per aggiornare la lista
+                                window.location.reload();
                             } else {
                                 console.error("Errore nell'eliminazione dell'utente:", data.message);
                             }
