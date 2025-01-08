@@ -69,27 +69,31 @@ class PublisherObserver
     }
 
     public function updated(Publisher $publisher)
-    {
-        if ($publisher->isDirty('is_active') && !$publisher->is_active) {
-            try {
-                $publisher->users()->update(['is_active' => false]);
-                if ($publisher->axData) {
-                    // Here you could add any necessary AX data updates when publisher is deactivated
-                }
-
-                Log::info('Publisher, users and related data deactivated', [
-                    'publisher_id' => $publisher->id,
-                    'users_count' => $publisher->users()->count()
-                ]);
-            } catch (\Exception $e) {
-                Log::error('Error deactivating publisher related data', [
-                    'publisher_id' => $publisher->id,
-                    'error' => $e->getMessage()
-                ]);
-                throw $e;
+{
+    if ($publisher->isDirty('is_active') && !$publisher->is_active) {
+        try {
+            $publisher->users()->update([
+                'is_active' => false,
+                'is_validated' => false
+            ]);
+            
+            if ($publisher->axData) {
+                // Here you could add any necessary AX data updates when publisher is deactivated
             }
+            
+            Log::info('Publisher, users and related data deactivated', [
+                'publisher_id' => $publisher->id,
+                'users_count' => $publisher->users()->count()
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deactivating publisher related data', [
+                'publisher_id' => $publisher->id,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
         }
     }
+}
 
     private function generateVendAccount($lastVendAccount)
     {
