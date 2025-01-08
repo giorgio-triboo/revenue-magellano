@@ -19,8 +19,6 @@
             </div>
         </div>
 
-
-
         <div class="mt-8 space-y-8">
             <!-- Filters & Quick Stats -->
             <div class="grid gap-8 md:grid-cols-3">
@@ -142,7 +140,14 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        @forelse($monthlyStats as $stat)
+                        @php
+                            $currentMonth = now()->month;
+                            $displayMonths = collect($monthlyStats)->filter(function($stat) use ($currentMonth) {
+                                return $stat['month_number'] < $currentMonth;
+                            });
+                        @endphp
+                        
+                        @forelse($displayMonths as $stat)
                             <a href="{{ route('statements.details', array_merge(request()->query(), ['statement_month' => $stat['month_number']])) }}"
                                 class="block">
                                 <div
@@ -165,5 +170,4 @@
             </div>
         </div>
     </div>
-
 @endsection
