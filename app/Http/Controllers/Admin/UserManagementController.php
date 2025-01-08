@@ -29,58 +29,59 @@ class UserManagementController extends Controller
      * Display a listing of users.
      */
     public function index(Request $request)
-{
-    try {
-        $status = $request->get('status', 'active');
-        
-        $query = User::with(['role', 'publisher']);
+    {
+        try {
+            $status = $request->get('status', 'active');
 
-        // Gestione filtro stato
-        switch ($status) {
-            case 'deleted':
-                $query->onlyTrashed();
-                break;
-            case 'all':
-                $query->withTrashed();
-                break;
-            case 'active':
-            default:
-                $query->whereNull('deleted_at');
-                break;
+            // Query di base con le relazioni
+            $query = User::with(['role', 'publisher']);
+
+            // Gestione del filtro stato
+            switch ($status) {
+                case 'deleted':
+                    $query->onlyTrashed(); // Solo utenti eliminati
+                    break;
+                case 'all':
+                    $query->withTrashed(); // Tutti gli utenti, inclusi quelli eliminati
+                    break;
+                case 'active':
+                default:
+                    $query->whereNull('deleted_at'); // Solo utenti attivi
+                    break;
+            }
+
+            // Ricerca
+            if ($request->filled('search')) {
+                $search = str_replace('*', '%', $request->search);
+                $query->where(function ($q) use ($search) {
+                    $q->where('email', 'LIKE', "%{$search}%")
+                        ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'LIKE', "%{$search}%")
+                        ->orWhereHas('publisher', function ($query) use ($search) {
+                            $query->where('legal_name', 'LIKE', "%{$search}%")
+                                ->orWhere('company_name', 'LIKE', "%{$search}%");
+                        });
+                });
+            }
+
+            $users = $query->paginate(12)->withQueryString();
+            $roles = Role::all();
+
+            Log::info('Lista utenti recuperata', [
+                'status' => $status,
+                'search' => $request->search,
+                'count' => $users->count()
+            ]);
+
+            return view('users.index', compact('users', 'roles'));
+        } catch (\Exception $e) {
+            Log::error('Errore nel recupero della lista utenti', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()->with('error', 'Si è verificato un errore nel recupero della lista utenti.');
         }
-
-        // Ricerca
-        if ($request->filled('search')) {
-            $search = str_replace('*', '%', $request->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('email', 'LIKE', "%{$search}%")
-                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'LIKE', "%{$search}%")
-                    ->orWhereHas('publisher', function ($query) use ($search) {
-                        $query->where('legal_name', 'LIKE', "%{$search}%")
-                            ->orWhere('company_name', 'LIKE', "%{$search}%");
-                    });
-            });
-        }
-
-        $users = $query->paginate(12)->withQueryString();
-        $roles = Role::all();
-
-        Log::info('Lista utenti recuperata', [
-            'status' => $status,
-            'search' => $request->search,
-            'count' => $users->count()
-        ]);
-
-        return view('users.index', compact('users', 'roles'));
-    } catch (\Exception $e) {
-        Log::error('Errore nel recupero della lista utenti', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-
-        return back()->with('error', 'Si è verificato un errore nel recupero della lista utenti.');
     }
-}
 
     /**
      * Show user details.

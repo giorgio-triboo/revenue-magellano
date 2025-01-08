@@ -332,19 +332,6 @@
                                             <dd class="mt-1 text-md text-gray-900 sm:mt-0 sm:col-span-2"
                                                 x-text="userDetails?.publisher?.vat_number"></dd>
                                         </div>
-                                        <div class="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 bg-gray-50">
-                                            <dt class="text-md font-medium text-gray-500">Sito Web</dt>
-                                            <dd class="mt-1 text-md text-gray-900 sm:mt-0 sm:col-span-2">
-                                                <a :href="userDetails?.publisher?.website"
-                                                    class="text-custom-activeItem hover:text-custom-activeItem/90"
-                                                    target="_blank" x-text="userDetails?.publisher?.website"></a>
-                                            </dd>
-                                        </div>
-                                        <div class="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4">
-                                            <dt class="text-md font-medium text-gray-500">Indirizzo</dt>
-                                            <dd class="mt-1 text-md text-gray-900 sm:mt-0 sm:col-span-2"
-                                                x-text="formatAddress(userDetails?.publisher)"></dd>
-                                        </div>
                                     </dl>
                                 </div>
                             </div>
