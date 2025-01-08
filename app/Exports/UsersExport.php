@@ -84,7 +84,7 @@ class UsersExport implements FromQuery, WithHeadings, WithMapping, WithEvents
     {
         return [
             AfterSheet::class => function(AfterSheet $event) {
-                $event->sheet->getStyle('A1:K1')->applyFromArray([
+                $event->sheet->getStyle('A1:V1')->applyFromArray([
                     'font' => [
                         'bold' => true,
                         'size' => 12
