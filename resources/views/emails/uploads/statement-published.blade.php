@@ -1,7 +1,7 @@
 @component('mail::message')
 
-@if ($upload->user)
-Buongiorno {{ $upload->user->first_name }},
+@if ($user)
+Buongiorno {{ $user->first_name }},
 @else
 Gentile utente,
 @endif
