@@ -167,7 +167,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-md font-medium">
                                             <div class="flex justify-end space-x-2">
                                                 @if ($user->trashed())
-                                                    <button @click="restoreUser('{{ $user->id }}')"
+                                                    <button @click="confirmRestore('{{ $user->id }}')"
                                                         class="text-green-600 hover:text-green-700"
                                                         title="Ripristina utente">
                                                         <i data-lucide="refresh-cw" class="h-5 w-5"></i>
@@ -247,8 +247,7 @@
                                             <span x-show="userDetails && userDetails.email_verified"
                                                 class="flex items-center text-green-600">
                                                 <i data-lucide="check-circle" class="h-4 w-4 mr-1"></i>
-                                                <span class="text-xs">Verificata</span>
-                                            </span>
+                                                <span class="text-xs">Verificata</span></span>
                                             <span x-show="userDetails && !userDetails.email_verified"
                                                 class="flex items-center text-yellow-600">
                                                 <i data-lucide="clock" class="h-4 w-4 mr-1"></i>
@@ -394,6 +393,49 @@
                 </div>
             </div>
         </div>
+
+        <!-- Restore Confirmation Modal -->
+        <div x-show="showRestoreModal" class="fixed z-10 inset-0 overflow-y-auto" x-cloak>
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"
+                    @click="showRestoreModal = false"></div>
+
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                <div
+                    class="inline-block align-bottom bg-custom-card rounded-xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-md transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-xl bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i data-lucide="refresh-cw" class="h-6 w-6 text-green-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                Conferma ripristino
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-md text-gray-500">
+                                    Sei sicuro di voler ripristinare questo utente? L'utente tornerà ad essere attivo nel
+                                    sistema.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                        <button type="button"
+                            class="inline-flex justify-center py-2 px-4 border border-transparent rounded-xl shadow-sm text-md font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                            @click="executeRestore">
+                            Ripristina
+                        </button>
+                        <button type="button"
+                            class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-200 rounded-xl shadow-sm text-md font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem"
+                            @click="showRestoreModal = false">
+                            Annulla
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -406,28 +448,39 @@
                 showModal: false,
                 userDetails: null,
                 showDeleteModal: false,
+                showRestoreModal: false,
                 userIdToDelete: null,
+                userIdToRestore: null,
 
-                async restoreUser(userId) {
-                    if (confirm('Sei sicuro di voler ripristinare questo utente?')) {
-                        try {
-                            const response = await fetch(`/users/${userId}/restore`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                                }
-                            });
+                // Funzione per mostrare il modale di ripristino
+                confirmRestore(userId) {
+                    this.userIdToRestore = userId;
+                    this.showRestoreModal = true;
+                },
 
-                            const data = await response.json();
-                            if (data.success) {
-                                window.location.reload();
-                            } else {
-                                console.error('Errore durante il ripristino:', data.message);
+                // Funzione per eseguire il ripristino
+                async executeRestore() {
+                    if (!this.userIdToRestore) return;
+
+                    try {
+                        const response = await fetch(`/users/${this.userIdToRestore}/restore`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                             }
-                        } catch (error) {
-                            console.error('Errore durante il ripristino:', error);
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            this.showRestthis.showRestoreModal = false;
+                            this.userIdToRestore = null;
+                            window.location.reload();
+                        } else {
+                            console.error('Errore durante il ripristino:', data.message);
                         }
+                    } catch (error) {
+                        console.error('Errore durante il ripristino:', error);
                     }
                 },
 
