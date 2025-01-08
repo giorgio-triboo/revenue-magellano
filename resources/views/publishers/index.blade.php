@@ -23,10 +23,11 @@
             @endif
         </div>
 
-        <!-- Search Bar -->
+        <!-- Search Bar e Filtri -->
         <div class="mt-4">
             <div class="max-w-xl">
-                <form action="{{ request()->url() }}" method="GET">
+                <form action="{{ request()->url() }}" method="GET" class="space-y-4">
+                    <!-- Search input -->
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
@@ -40,6 +41,34 @@
                                     <i data-lucide="x-circle" class="h-5 w-5 text-gray-400 hover:text-gray-500"></i>
                                 </a>
                             @endif
+                        </div>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm font-medium text-gray-700">Stato publisher:</span>
+                        <div class="flex space-x-2">
+                            <button type="submit" name="status" value="active"
+                                class="px-3 py-1 rounded-full text-sm font-medium {{ request('status', 'active') === 'active' ? 'bg-custom-activeItem text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                                <div class="flex items-center space-x-1">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-green-400"></span>
+                                    <span>Attivi</span>
+                                </div>
+                            </button>
+                            <button type="submit" name="status" value="inactive"
+                                class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') === 'inactive' ? 'bg-custom-activeItem text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                                <div class="flex items-center space-x-1">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-red-400"></span>
+                                    <span>Non attivi</span>
+                                </div>
+                            </button>
+                            <button type="submit" name="status" value="all"
+                                class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') === 'all' ? 'bg-custom-activeItem text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                                <div class="flex items-center space-x-1">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-gray-400"></span>
+                                    <span>Tutti</span>
+                                </div>
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -60,19 +89,23 @@
                                             Nome Azienda
                                         </div>
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
-                                        Database</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
-                                        Stato</th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
+                                        Database
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
+                                        Stato
+                                    </th>
                                     <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                                         <span class="sr-only">Azioni</span>
                                     </th>
+                                </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 bg-white">
                                 @forelse($publishers as $publisher)
                                     <tr>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-md font-medium text-gray-900">
+                                        <td class="px-6 py-4 whitespace-nowrap text-md font-medium text-gray-900">
                                             {{ $publisher->company_name }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-md text-gray-500">
@@ -84,8 +117,7 @@
                                                 {{ $publisher->is_active ? 'Attivo' : 'Non attivo' }}
                                             </span>
                                         </td>
-                                        <td
-                                            class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-md font-medium sm:pr-6">
+                                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-md font-medium sm:pr-6">
                                             <div class="flex justify-end space-x-2">
                                                 <!-- Visualizza -->
                                                 <a href="{{ route('publishers.show', $publisher) }}"
@@ -107,7 +139,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5"
+                                        <td colspan="4"
                                             class="px-6 py-4 whitespace-nowrap text-md text-gray-500 text-center">
                                             Nessun publisher trovato
                                         </td>
@@ -137,76 +169,6 @@
                     status: @json($filters['status'] ?? ''),
                     sort: @json($filters['sort'] ?? 'company_name'),
                     direction: @json($filters['direction'] ?? 'asc')
-                },
-
-                get hasActiveFilters() {
-                    return Object.entries(this.filters).some(([key, value]) => {
-                        return value && key !== 'sort' && key !== 'direction';
-                    });
-                },
-
-                get activeFilters() {
-                    return Object.fromEntries(
-                        Object.entries(this.filters)
-                        .filter(([key, value]) => value && key !== 'sort' && key !== 'direction')
-                    );
-                },
-
-                formatFilterLabel(key, value) {
-                    const labels = {
-                        search: 'Ricerca',
-                        status: 'Stato',
-                        sub_publishers_count: 'Numero Sub-Publisher'
-                    };
-
-                    if (key === 'status') {
-                        return `${labels[key]}: ${value === 'active' ? 'Attivo' : 'Non attivo'}`;
-                    }
-
-                    if (key === 'sub_publishers_count') {
-                        return `${labels[key]}: ${value}`;
-                    }
-
-                    return `${labels[key]}: ${value}`;
-                },
-
-                removeFilter(key) {
-                    if (key === 'sub_publishers_count') {
-                        this.filters.sort = 'company_name';
-                    }
-                    this.filters[key] = '';
-                    this.applyFilters();
-                },
-
-                resetFilters() {
-                    Object.keys(this.filters).forEach(key => {
-                        if (key !== 'sort' && key !== 'direction') {
-                            this.filters[key] = '';
-                        }
-                    });
-                    this.filters.sort = 'company_name';
-                    this.filters.direction = 'asc';
-                    this.applyFilters();
-                },
-
-                sort(field) {
-                    if (this.filters.sort === field) {
-                        this.filters.direction = this.filters.direction === 'asc' ? 'desc' : 'asc';
-                    } else {
-                        this.filters.sort = field;
-                        this.filters.direction = 'asc';
-                    }
-                    this.applyFilters();
-                },
-
-                applyFilters() {
-                    const queryParams = new URLSearchParams();
-                    Object.entries(this.filters).forEach(([key, value]) => {
-                        if (value) {
-                            queryParams.set(key, value);
-                        }
-                    });
-                    window.location.search = queryParams.toString();
                 },
 
                 async exportData() {
