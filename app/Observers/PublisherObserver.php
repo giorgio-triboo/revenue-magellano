@@ -34,7 +34,7 @@ class PublisherObserver
             $axData = new AxData([
                 'publisher_id' => $publisher->id,
                 'ax_vend_account' => $vendAccount,
-                'ax_vend_id' => $vendId,           
+                'ax_vend_id' => $vendId,
                 'vend_group' => 'I',
                 'party_type' => 'N',
                 'tax_withhold_calculate' => 'N',
@@ -57,7 +57,7 @@ class PublisherObserver
                 'sub_publisher_id' => $subPublisher->id,
                 'ax_data_id' => $axData->id,
                 'vend_account' => $vendAccount,
-                'vend_id' => $vendId            
+                'vend_id' => $vendId
             ]);
         } catch (\Exception $e) {
             Log::error('Error creating publisher related data', [
@@ -69,31 +69,46 @@ class PublisherObserver
     }
 
     public function updated(Publisher $publisher)
-{
-    if ($publisher->isDirty('is_active') && !$publisher->is_active) {
-        try {
-            $publisher->users()->update([
-                'is_active' => false,
-                'is_validated' => false
-            ]);
-            
-            if ($publisher->axData) {
-                // Here you could add any necessary AX data updates when publisher is deactivated
+    {
+        if ($publisher->isDirty('is_active')) {
+            try {
+                if (!$publisher->is_active) {
+                    // Disattivazione
+                    $publisher->users()->update([
+                        'is_active' => false,
+                        'is_validated' => false
+                    ]);
+
+                    if ($publisher->axData) {
+                        // Here you could add any necessary AX data updates when publisher is deactivated
+                    }
+
+                    Log::info('Publisher, users and related data deactivated', [
+                        'publisher_id' => $publisher->id,
+                        'users_count' => $publisher->users()->count()
+                    ]);
+                } else {
+                    // Attivazione
+                    $publisher->users()->update([
+                        'is_active' => true,
+                        'is_validated' => true
+                    ]);
+
+                    Log::info('Publisher and users activated', [
+                        'publisher_id' => $publisher->id,
+                        'users_count' => $publisher->users()->count()
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Error updating publisher related data', [
+                    'publisher_id' => $publisher->id,
+                    'is_active' => $publisher->is_active,
+                    'error' => $e->getMessage()
+                ]);
+                throw $e;
             }
-            
-            Log::info('Publisher, users and related data deactivated', [
-                'publisher_id' => $publisher->id,
-                'users_count' => $publisher->users()->count()
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error deactivating publisher related data', [
-                'publisher_id' => $publisher->id,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
         }
     }
-}
 
     private function generateVendAccount($lastVendAccount)
     {
@@ -104,7 +119,7 @@ class PublisherObserver
         // Extract the numeric part and increment
         $lastNumber = intval(substr($lastVendAccount->ax_vend_account, 4));
         $newNumber = $lastNumber + 1;
-        
+
         // Format with leading zeros
         return 'TRD1' . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
     }
