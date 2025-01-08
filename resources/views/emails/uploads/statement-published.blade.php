@@ -1,10 +1,7 @@
 @component('mail::message')
 
-@if ($user)
-Buongiorno {{ $user->first_name }},
-@else
+
 Gentile utente,
-@endif
 
 ti confermiamo che è possibile inviare la fattura elettronica con codice destinatario **M5UXCR1** alla pec triboo.direct@legalmail.it o il preavviso di pagamento relativo **al mese di {{ $publishDetails['month'] }} {{ $publishDetails['year'] }}** all'indirizzo e-mail amministrazione.trd@triboo.it con gli importi maturati nel mese di {{ $publishDetails['month'] }} {{ $publishDetails['year'] }} e tutti gli eventuali altri mesi non ancora richiesti, consultando il pannello dedicato.
 
