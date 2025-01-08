@@ -28,81 +28,69 @@ class ProfileController extends Controller
 
 
     public function updateProfile(Request $request)
-    {
-        try {
-            $user = auth()->user();
-            
-            $validator = Validator::make($request->all(), [
-                'first_name' => [
-                    'required',
-                    'string',
-                    'max:255',
-                    'regex:/^[\p{L}\s\-]+$/u'
-                ],
-                'last_name' => [
-                    'required',
-                    'string',
-                    'max:255',
-                    'regex:/^[\p{L}\s\-]+$/u'
-                ],
-            ], [
-                'first_name.regex' => 'Il nome può contenere solo lettere, spazi e trattini',
-                'last_name.regex' => 'Il cognome può contenere solo lettere, spazi e trattini',
-            ]);
+{
+    try {
+        $user = auth()->user();
+        
+        $validator = Validator::make($request->all(), [
+            'first_name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\p{L}\s\-]+$/u'
+            ],
+            'last_name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\p{L}\s\-]+$/u'
+            ],
+        ], [
+            'first_name.regex' => 'Il nome può contenere solo lettere, spazi e trattini',
+            'last_name.regex' => 'Il cognome può contenere solo lettere, spazi e trattini',
+        ]);
 
-            if ($validator->fails()) {
-                throw new ValidationException($validator);
-            }
-
-            $validated = $validator->validated();
-
-            // Sanificazione aggiuntiva
-            $validated['first_name'] = strip_tags($validated['first_name']);
-            $validated['last_name'] = strip_tags($validated['last_name']);
-            $validated['email'] = filter_var($validated['email'], FILTER_SANITIZE_EMAIL);
-
-            // Verifica se l'email è stata modificata
-            if ($validated['email'] !== $user->email) {
-                // Qui potresti voler implementare una verifica email
-                // Per ora logghiamo il cambio
-                Log::info('Email change requested', [
-                    'user_id' => $user->id,
-                    'old_email' => $user->email,
-                    'new_email' => $validated['email']
-                ]);
-            }
-
-            $user->update($validated);
-
-            Log::info('Profile updated successfully', [
-                'user_id' => $user->id,
-                'fields' => array_keys($validated)
-            ]);
-
-            return back()->with('success', 'Profilo aggiornato con successo!');
-
-        } catch (ValidationException $e) {
-            Log::warning('Profile update validation failed', [
-                'user_id' => auth()->id(),
-                'errors' => $e->errors()
-            ]);
-
-            return back()
-                ->withErrors($e->errors())
-                ->withInput();
-
-        } catch (\Exception $e) {
-            Log::error('Error updating profile', [
-                'user_id' => auth()->id(),
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return back()
-                ->with('error', 'Si è verificato un errore durante l\'aggiornamento del profilo.')
-                ->withInput();
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
         }
+
+        $validated = $validator->validated();
+
+        // Sanificazione aggiuntiva
+        $validated['first_name'] = strip_tags($validated['first_name']);
+        $validated['last_name'] = strip_tags($validated['last_name']);
+
+        $user->update($validated);
+
+        Log::info('Profile updated successfully', [
+            'user_id' => $user->id,
+            'fields' => array_keys($validated)
+        ]);
+
+        return back()->with('success', 'Profilo aggiornato con successo!');
+
+    } catch (ValidationException $e) {
+        Log::warning('Profile update validation failed', [
+            'user_id' => auth()->id(),
+            'errors' => $e->errors()
+        ]);
+
+        return back()
+            ->withErrors($e->errors())
+            ->withInput();
+
+    } catch (\Exception $e) {
+        Log::error('Error updating profile', [
+            'user_id' => auth()->id(),
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        return back()
+            ->with('error', 'Si è verificato un errore durante l\'aggiornamento del profilo.')
+            ->withInput();
     }
+}
 
 
     
