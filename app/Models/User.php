@@ -60,23 +60,26 @@ class User extends Authenticatable
      * Metodo centralizzato per verificare e attivare l'account se necessario
      */
     public function validateAccount()
-{
-    $this->update([
-        'is_validated' => true,
-        'is_active' => true
-    ]);
+    {
+        $this->update([
+            'is_validated' => true,
+            'is_active' => true
+        ]);
 
-    Log::info('Account validato e attivato', [
-        'user_id' => $this->id,
-        'email' => $this->email
-    ]);
+        Log::info('Account validato e attivato', [
+            'user_id' => $this->id,
+            'email' => $this->email
+        ]);
 
-    return true;
-}
+        return true;
+    }
 
     public function deactivateAccount()
     {
-        $this->update(['is_active' => false]);
+        $this->update([
+            'is_active' => false,
+            'is_validated' => false
+        ]);
     }
 
     /**
@@ -223,11 +226,11 @@ class User extends Authenticatable
 
     public static function getActiveAdmins()
     {
-        return self::where('role_id', function($query) {
-                $query->select('id')
-                      ->from('roles')
-                      ->where('code', 'admin');
-            })
+        return self::where('role_id', function ($query) {
+            $query->select('id')
+                ->from('roles')
+                ->where('code', 'admin');
+        })
             ->where('publisher_id', 1)
             ->where('is_active', true)
             ->where('can_receive_email', true)
