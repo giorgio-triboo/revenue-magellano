@@ -100,7 +100,7 @@ class LoginController extends Controller
 
         // Verifica se l'account è bloccato
         if ($user->isLockedOut()) {
-            $minutesLeft = now()->diffInMinutes($user->locked_until);
+            $minutesLeft = floor(now()->diffInMinutes($user->locked_until));
 
             Log::warning('Tentativo di accesso su account bloccato', [
                 'user_id' => $user->id,
