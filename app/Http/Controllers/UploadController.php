@@ -494,15 +494,40 @@ class UploadController extends Controller
 
     public function downloadTemplate()
     {
-        Storage::disk('private')->put(
-            'template/upload-def.csv',
-            "anno_consuntivo;mese_consuntivo;anno_competenza;mese_competenza;nome_campagna_HO;publisher_id;sub_publisher_id;tipologia_revenue;quantita_validata;pay;importo\n" .
-            "2025;=\"01\";2025;=\"01\";campagna 1;1;1;cpl;100;25;2500"
-        );
+        $instructions = <<<EOT
+ISTRUZIONI PER IL CARICAMENTO
+- estensione file .csv
+- utilizzare ; come separtore
+- anno_consuntivo e anno_competenza vogliono l'anno in 4 cifre. es "2025"
+- mese_consuntivo e mese_competenza vogliono due cifre per la data. es "01 non "1".
+- nessun carattere speciale (es. € nella colonna "importo" o "pay")
 
-        return Storage::disk('private')->download('template/upload-def.csv', 'template_consuntivo.csv', [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-        ]);
+Intestazioni obbligatorie:
+anno_consuntivo
+mese_consuntivo
+anno_competenza
+mese_competenza
+nome_campagna_HO
+nome_publisher
+publisher_id
+sub_publisher_id
+tipologia_revenue
+quantita_validata
+pay
+importo
+data_invio
+note
+EOT;
+
+        Storage::disk('private')->put('template/istruzioni.txt', $instructions);
+
+        return Storage::disk('private')->download(
+            'template/istruzioni.txt',
+            'istruzioni_caricamento.txt',
+            [
+                'Content-Type' => 'text/plain; charset=UTF-8',
+            ]
+        );
     }
 
     public function sendEmail(FileUpload $upload)

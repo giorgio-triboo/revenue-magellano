@@ -29,17 +29,17 @@ class LoginController extends Controller
         $request->session()->put('auth.user_agent', $request->userAgent());
         $request->session()->put('auth.last_active', time());
 
-        // Credenziali di test per l'utente admin
-        if ($request->email === 'admin@admin.it' && $request->password === 'admin') {
-            $user = User::findOrFail(1);
-            Log::info('Accesso effettuato con credenziali di test', [
-                'user_id' => 1,
-                'role' => 'admin',
-            ]);
-            Auth::login($user, $request->filled('remember'));
-            $request->session()->regenerate();
-            return redirect()->route('dashboard');
-        }
+        // // Credenziali di test per l'utente admin
+        // if ($request->email === 'admin@admin.it' && $request->password === 'admin') {
+        //     $user = User::findOrFail(1);
+        //     Log::info('Accesso effettuato con credenziali di test', [
+        //         'user_id' => 1,
+        //         'role' => 'admin',
+        //     ]);
+        //     Auth::login($user, $request->filled('remember'));
+        //     $request->session()->regenerate();
+        //     return redirect()->route('dashboard');
+        // }
 
         // Credenziali di test per jtt 
         // if ($request->email === 'jtt@jtt.it' && $request->password === 'jtt') {

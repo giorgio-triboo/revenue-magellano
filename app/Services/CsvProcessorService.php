@@ -178,7 +178,26 @@ class CsvProcessorService
 
         $missingHeaders = array_diff($this->requiredHeaders, $headers);
         if (!empty($missingHeaders)) {
-            throw new \Exception('Headers mancanti: ' . implode(', ', $missingHeaders));
+            $errorMessage = "Headers mancanti nel file CSV: " . implode(', ', $missingHeaders) . ".\n";
+            $errorMessage .= "Per risolvere:\n";
+            $errorMessage .= "1. Apri il file CSV\n";
+            $errorMessage .= "2. Verifica che la prima riga contenga tutte le intestazioni richieste\n";
+            $errorMessage .= "3. Le intestazioni richieste sono: " . implode(', ', $this->requiredHeaders);
+            
+            // Aggiorna lo stato del file upload con informazioni dettagliate
+            $this->fileUpload->update([
+                'status' => FileUpload::STATUS_ERROR,
+                'error_message' => $errorMessage,
+                'processing_stats' => [
+                    'error' => $errorMessage,
+                    'error_details' => [[
+                        'line' => 1,
+                        'error' => 'Headers mancanti: ' . implode(', ', $missingHeaders)
+                    ]]
+                ]
+            ]);
+
+            throw new \Exception($errorMessage);
         }
     }
 
