@@ -354,4 +354,58 @@ class PublisherController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Update AX data for the specified publisher.
+     */
+    public function updateAxData(Request $request, Publisher $publisher)
+    {
+        try {
+            $this->authorize('update', $publisher);
+
+            $validated = $request->validate([
+                'ax_vend_account' => 'nullable|string|max:255',
+                'ax_vend_id' => 'nullable|string|max:255',
+                'vend_group' => 'nullable|string|max:255',
+                'party_type' => 'nullable|string|max:255',
+                'tax_withhold_calculate' => 'nullable|string|max:255',
+                'item_id' => 'nullable|string|max:255',
+                'ax_vat_number' => 'nullable|string|max:255',
+                'email' => 'nullable|email|max:255',
+                'cost_profit_center' => 'nullable|string|max:255',
+                'payment' => 'nullable|string|max:255',
+                'payment_mode' => 'nullable|string|max:255',
+                'currency_code' => 'nullable|string|max:255',
+                'sales_tax_group' => 'nullable|string|max:255',
+                'number_sequence_group_id' => 'nullable|string|max:255'
+            ]);
+
+            Log::debug('Aggiornamento dati AX', [
+                'publisher_id' => $publisher->id,
+                'data' => $validated
+            ]);
+
+            // Aggiorna o crea i dati AX
+            $axData = $publisher->axData()->updateOrCreate(
+                ['publisher_id' => $publisher->id],
+                $validated
+            );
+
+            return response()->json([
+                'message' => 'Dati AX aggiornati con successo',
+                'data' => $axData
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Errore nell\'aggiornamento dei dati AX', [
+                'publisher_id' => $publisher->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'Si è verificato un errore durante l\'aggiornamento dei dati AX'
+            ], 500);
+        }
+    }
 }

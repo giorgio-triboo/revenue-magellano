@@ -123,6 +123,8 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{publisher}', [PublisherController::class, 'update'])
                 ->name('publishers.update')
                 ->middleware('can:update,publisher');
+            Route::put('/{publisher}/ax-data', [PublisherController::class, 'updateAxData'])
+            ->name('publishers.ax-data.update');
         });
 
         // User Management Routes

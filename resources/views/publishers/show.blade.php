@@ -659,8 +659,7 @@
                                     <div>
                                         <label for="payment"
                                             class="block text-md font-medium text-gray-700">payment</label>
-                                        <input type="text" x-model="editingAXData.payment"
-                                            id="payment"
+                                        <input type="text" x-model="editingAXData.payment" id="payment"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                     </div>
                                     <div>
@@ -673,8 +672,7 @@
                                     <div>
                                         <label for="currency_code"
                                             class="block text-md font-medium text-gray-700">currency_code</label>
-                                        <input type="text" x-model="editingAXData.currency_code"
-                                            id="currency_code"
+                                        <input type="text" x-model="editingAXData.currency_code" id="currency_code"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                     </div>
                                     <div>
@@ -799,107 +797,117 @@
         </div>
 
         <!-- Add Database Modal -->
-<div x-show="showAddDatabaseModal" class="fixed z-10 inset-0 overflow-y-auto" role="dialog" aria-modal="true" x-cloak>
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <!-- Overlay -->
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showAddDatabaseModal = false"></div>
+        <div x-show="showAddDatabaseModal" class="fixed z-10 inset-0 overflow-y-auto" role="dialog" aria-modal="true"
+            x-cloak>
+            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <!-- Overlay -->
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                    @click="showAddDatabaseModal = false"></div>
 
-        <!-- Modal panel -->
-        <div class="inline-block align-middle bg-custom-card rounded-xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-            <form @submit.prevent="submitNewDatabase">
-                <div class="sm:flex sm:items-start">
-                    <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">Aggiungi Database</h3>
-                        <div class="mt-6 space-y-6">
-                            <!-- Display Name -->
-                            <div>
-                                <label for="display_name" class="block text-md font-medium text-gray-700">
-                                    Nome Database <span class="text-red-500">*</span>
-                                </label>
-                                <div class="mt-1 relative rounded-xl shadow-sm">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i data-lucide="database" class="h-5 w-5 text-gray-400"></i>
+                <!-- Modal panel -->
+                <div
+                    class="inline-block align-middle bg-custom-card rounded-xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                    <form @submit.prevent="submitNewDatabase">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">Aggiungi Database</h3>
+                                <div class="mt-6 space-y-6">
+                                    <!-- Display Name -->
+                                    <div>
+                                        <label for="display_name" class="block text-md font-medium text-gray-700">
+                                            Nome Database <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="mt-1 relative rounded-xl shadow-sm">
+                                            <div
+                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i data-lucide="database" class="h-5 w-5 text-gray-400"></i>
+                                            </div>
+                                            <input type="text" x-model="newDatabase.display_name" id="display_name"
+                                                required
+                                                class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        </div>
                                     </div>
-                                    <input type="text" x-model="newDatabase.display_name" id="display_name" required
-                                        class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
-                                </div>
-                            </div>
 
-                            <!-- AX Name -->
-                            <div>
-                                <label for="ax_name" class="block text-md font-medium text-gray-700">
-                                    Nome AX <span class="text-red-500">*</span>
-                                </label>
-                                <div class="mt-1 relative rounded-xl shadow-sm">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i data-lucide="box" class="h-5 w-5 text-gray-400"></i>
+                                    <!-- AX Name -->
+                                    <div>
+                                        <label for="ax_name" class="block text-md font-medium text-gray-700">
+                                            Nome AX <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="mt-1 relative rounded-xl shadow-sm">
+                                            <div
+                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i data-lucide="box" class="h-5 w-5 text-gray-400"></i>
+                                            </div>
+                                            <input type="text" x-model="newDatabase.ax_name" id="ax_name" required
+                                                class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        </div>
                                     </div>
-                                    <input type="text" x-model="newDatabase.ax_name" id="ax_name" required
-                                        class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
-                                </div>
-                            </div>
 
-                            <!-- Channel Detail -->
-                            <div>
-                                <label for="channel_detail" class="block text-md font-medium text-gray-700">
-                                    Channel Details <span class="text-red-500">*</span>
-                                </label>
-                                <div class="mt-1 relative rounded-xl shadow-sm">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i data-lucide="database" class="h-5 w-5 text-gray-400"></i>
+                                    <!-- Channel Detail -->
+                                    <div>
+                                        <label for="channel_detail" class="block text-md font-medium text-gray-700">
+                                            Channel Details <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="mt-1 relative rounded-xl shadow-sm">
+                                            <div
+                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i data-lucide="database" class="h-5 w-5 text-gray-400"></i>
+                                            </div>
+                                            <input type="text" x-model="newDatabase.channel_detail"
+                                                id="channel_detail" required
+                                                class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        </div>
                                     </div>
-                                    <input type="text" x-model="newDatabase.channel_detail" id="channel_detail" required
-                                        class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
-                                </div>
-                            </div>
 
-                            <!-- Notes -->
-                            <div>
-                                <label for="notes" class="block text-md font-medium text-gray-700">Note</label>
-                                <div class="mt-1 relative rounded-xl shadow-sm">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i data-lucide="file-text" class="h-5 w-5 text-gray-400"></i>
-                                    </div>
-                                    <textarea id="notes" x-model="newDatabase.notes" rows="3"
-                                        class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                    <!-- Notes -->
+                                    <div>
+                                        <label for="notes" class="block text-md font-medium text-gray-700">Note</label>
+                                        <div class="mt-1 relative rounded-xl shadow-sm">
+                                            <div
+                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i data-lucide="file-text" class="h-5 w-5 text-gray-400"></i>
+                                            </div>
+                                            <textarea id="notes" x-model="newDatabase.notes" rows="3"
+                                                class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                     </textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Is Primary Toggle -->
+                                    <div class="flex items-center">
+                                        <button type="button"
+                                            class="relative inline-flex flex-shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem"
+                                            :class="[newDatabase.is_primary ? 'bg-custom-activeItem' : 'bg-gray-200']"
+                                            @click="newDatabase.is_primary = !newDatabase.is_primary">
+                                            <span
+                                                class="relative inline-block w-5 h-5 transition duration-200 ease-in-out transform bg-white rounded-full shadow pointer-events-none"
+                                                :class="[newDatabase.is_primary ? 'translate-x-5' : 'translate-x-0']">
+                                            </span>
+                                        </button>
+                                        <span class="ml-3 text-md font-medium text-gray-900">Database Principale</span>
+                                    </div>
                                 </div>
                             </div>
-
-                            <!-- Is Primary Toggle -->
-                            <div class="flex items-center">
-                                <button type="button"
-                                    class="relative inline-flex flex-shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem"
-                                    :class="[newDatabase.is_primary ? 'bg-custom-activeItem' : 'bg-gray-200']"
-                                    @click="newDatabase.is_primary = !newDatabase.is_primary">
-                                    <span class="relative inline-block w-5 h-5 transition duration-200 ease-in-out transform bg-white rounded-full shadow pointer-events-none"
-                                        :class="[newDatabase.is_primary ? 'translate-x-5' : 'translate-x-0']">
-                                    </span>
-                                </button>
-                                <span class="ml-3 text-md font-medium text-gray-900">Database Principale</span>
-                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                    <button type="submit" :disabled="isSubmitting"
-                        class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-custom-activeItem text-base font-medium text-white hover:bg-custom-activeItem/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem sm:ml-3 sm:w-auto sm:text-md disabled:opacity-50">
-                        <span x-show="!isSubmitting">Salva</span>
-                        <div x-show="isSubmitting" class="flex items-center">
-                            <i data-lucide="loader" class="animate-spin h-5 w-5 mr-2"></i>
-                            <span>Salvataggio...</span>
+                        <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                            <button type="submit" :disabled="isSubmitting"
+                                class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-custom-activeItem text-base font-medium text-white hover:bg-custom-activeItem/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem sm:ml-3 sm:w-auto sm:text-md disabled:opacity-50">
+                                <span x-show="!isSubmitting">Salva</span>
+                                <div x-show="isSubmitting" class="flex items-center">
+                                    <i data-lucide="loader" class="animate-spin h-5 w-5 mr-2"></i>
+                                    <span>Salvataggio...</span>
+                                </div>
+                            </button>
+                            <button type="button" @click="showAddDatabaseModal = false"
+                                class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-200 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem sm:mt-0 sm:w-auto sm:text-md">
+                                Annulla
+                            </button>
                         </div>
-                    </button>
-                    <button type="button" @click="showAddDatabaseModal = false"
-                        class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-200 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem sm:mt-0 sm:w-auto sm:text-md">
-                        Annulla
-                    </button>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
-</div>
 
     </div>
 @endsection
@@ -1131,30 +1139,20 @@
                 editAXData() {
                     if (!this.editingAXData) {
                         this.editingAXData = {
-                            period: '',
-                            vend_account: '',
-                            purch_id: '',
-                            line_number: '',
-                            vend_name: '{{ $publisher->legal_name }}',
-                            site_url: '',
-                            address: '',
-                            street: '',
-                            zip_code: '',
-                            city: '',
-                            state: '',
-                            country_region_id: '',
+                            ax_vend_account: '',
+                            ax_vend_id: '',
                             vend_group: '',
                             party_type: '',
-                            vat_num: '{{ $publisher->vat_number }}',
-                            fiscal_code: '',
-                            payment: '',
-                            paym_mode: '',
                             tax_withhold_calculate: '',
                             item_id: '',
-                            email: '{{ $publisher->ax_email }}',
-                            bank_iban: '{{ $publisher->iban }}',
+                            ax_vat_number: '',
+                            email: '',
                             cost_profit_center: '',
-                            channel_detail: ''
+                            payment: '',
+                            payment_mode: '',
+                            currency_code: '',
+                            sales_tax_group: '',
+                            number_sequence_group_id: ''
                         };
                     }
                     this.showEditAXModal = true;
