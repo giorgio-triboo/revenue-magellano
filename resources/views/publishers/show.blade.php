@@ -313,14 +313,10 @@
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                        <span
-                                                            class="px-2.5 inline-flex text-sm leading-5 font-semibold rounded-xl bg-blue-100 text-blue-800">
-                                                            {{ $user->role->name }}
-                                                        </span>
                                                         <div class="text-sm mt-1">
                                                             <span
-                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-sm font-medium {{ $user->admin_validated_at ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                                {{ $user->admin_validated_at ? 'Validato Admin' : 'Non Validato' }}
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-sm font-medium {{ $user->email_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                                                {{ $user->email_verified ? 'Validato Admin' : 'Non Validato' }}
                                                             </span>
                                                         </div>
                                                     </td>

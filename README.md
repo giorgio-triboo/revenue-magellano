@@ -1,320 +1,253 @@
 # Magellano.ai - Revenue Management Platform
 
-A Laravel-based platform for revenue management and statement processing.
+A Laravel-based platform for revenue management and statement processing. The platform enables publishers to manage their revenue data, upload billing information, and provides administrators with advanced tools for monitoring and processing financial information.
 
 ## Requirements
 - PHP 8.2+
 - MySQL 8.0+
 - Node.js & NPM
+- Redis 6.0+ (for queues and cache)
+- PHP Extensions:
+  - php8.0-mysql
+  - php8.0-redis
+  - php8.0-xml
+  - php8.0-zip
+  - php8.0-mbstring
+  - php8.0-gd
 
-
-## TODO
-script afterInstall
-- generare .env
-- eliminare .git folder
-
-
-# Developer Documentation
-Project: revenue.magellano.ai
-Version: 1.0.0
-
-## Project Overview
-
-### Tech Stack
-- PHP 8.0+
+## Tech Stack
 - Laravel Framework
 - MySQL/MariaDB
-- Redis (code e cache)
-- Node.js e NPM (frontend assets)
+- Redis (queues and cache)
+- Node.js and NPM (frontend assets)
 - Alpine.js (frontend interactivity)
 - Tailwind CSS (styling)
 
-### Key Features
-- Sistema autenticazione multi-ruolo
-- Gestione publisher e sub-publisher
-- Upload e processing file CSV
-- Generazione export AX
-- Integrazione FTP
-- Sistema notifiche email
-
-## Setup Development Environment
-
-### Prerequisites
-```bash
-
-# Requisiti di sistema
-PHP >= 8.0
-MySQL >= 8.0
-Redis >= 6.0
-Node >= 14
-
-# PHP Extensions necessarie
-php8.0-mysql
-php8.0-redis
-php8.0-xml
-php8.0-zip
-php8.0-mbstring
-php8.0-gd
-```
-
-### Key Files
-- `app/Http/Controllers/UploadController.php`: Gestione upload file
-- `app/Services/CsvProcessorService.php`: Elaborazione CSV
-- `app/Services/AxExportService.php`: Export AX
-- `app/Services/FtpUploadService.php`: Upload FTP
+## Key Features
+- Multi-role authentication system
+- Publisher and sub-publisher management
+- CSV file upload and processing
+- AX export generation
+- FTP integration
+- Email notification system
 
 ## Core Components
 
 ### Authentication System
-Localizzato in `app/Http/Controllers/Auth/`
+Located in `app/Http/Controllers/Auth/`
+- Advanced login system with rate limiting and brute force protection
+- User registration with VAT validation
+- Email verification
+- Password management with secure reset workflow
+- Session security and monitoring
+
+### Publisher Management
+- Complete publisher lifecycle management
+- VAT number validation with multi-country support
+- Sub-publisher hierarchy management
+- Financial data management
+- AX system integration
 
 ### File Upload System
-Localizzato in `app/Services/UploadService.php`
+Located in `app/Services/UploadService.php`
+- File validation and processing
+- Progress monitoring
+- Automated notifications
+- Integration with SFTP servers
+- Security checks and validations
 
 ### CSV Processing System
-Localizzato in `app/Jobs/ProcessCsvUpload.php`
+Located in `app/Jobs/ProcessCsvUpload.php`
+- Asynchronous processing with queues
+- Custom header mapping
+- Batch processing
+- Memory monitoring
+- Progress tracking
+- Error handling and reporting
 
 ### Export System
-Localizzato in `app/Services/AxExportService.php`
+Located in `app/Services/AxExportService.php`
+- Multiple export formats support
+- AX format generation
+- Automated SFTP upload
+- Error handling and retry mechanisms
 
+### Statement Management
+- Complete statement lifecycle
+- Revenue type management
+- Publication status tracking
+- Financial data validation
+- Export capabilities
 
-//////////////////////////
+## Security Features
 
-# VERSIONE = 1.0.0
-
-# Documentazione Progetto: Sistema di Gestione Publisher
-
-## 1. Overview del Sistema
-Il sistema è una piattaforma web sviluppata in PHP/Laravel che gestisce le relazioni tra publisher e sub-publisher, con funzionalità di gestione utenti, upload file, elaborazione consuntivi e integrazione con sistemi esterni (AX e FTP).
-
-### 1.1 Caratteristiche Principali
-- Gestione multi-ruolo (admin, publisher)
-- Sistema di autenticazione e autorizzazione avanzato
-- Gestione publisher e sub-publisher
-- Upload e processamento file CSV
-- Generazione export per sistema AX
-- Integrazione FTP
-- Sistema di notifiche email
-- Gestione consuntivi e statements
-
-## 2. Architettura del Sistema
-
-### 2.1 Componenti Core
-- **Authentication System**: Gestione completa del ciclo di autenticazione (login, registrazione, reset password)
-- **Role-Based Access Control**: Sistema di autorizzazione basato su ruoli e policy
-- **File Processing System**: Sistema di elaborazione file con code asincrona
-- **Notification System**: Sistema di notifiche email per vari eventi
-- **Export System**: Generazione export per sistema AX e FTP
-- **API Layer**: API interne per la gestione dei dati
-
-### 2.2 Modelli Principali
-- `User`: Gestione utenti con relazioni a ruoli e publisher
-- `Publisher`: Gestione editori con dati anagrafici e fiscali
-- `SubPublisher`: Gestione sotto-editori collegati ai publisher
-- `Statement`: Gestione consuntivi e dati finanziari
-- `FileUpload`: Gestione upload e processing file
-- `Role`: Gestione ruoli utente
-
-## 3. Funzionalità Dettagliate
-
-### 3.1 Sistema di Autenticazione
-- **Login**: 
-  - Rate limiting per sicurezza
-  - Protezione contro attacchi brute force
-  - Validazione email e account
-  - Gestione sessioni sicure
-
-- **Registrazione**:
-  - Validazione partita IVA
-  - Verifica esistenza publisher
-  - Validazione dati anagrafici e fiscali
-  - Invio email di verifica
-
-- **Reset Password**:
-  - Token sicuri per reset
-  - Validazione password complessa
-  - Notifiche email
-
-### 3.2 Gestione Publisher
-- Creazione e modifica publisher
-- Gestione dati fiscali e bancari
-- Sistema di sub-publisher
-- Export dati in formato Excel
-- Integrazione con sistema AX
-
-### 3.3 Sistema Upload File
-- Upload file CSV
-- Validazione formati e contenuti
-- Processing asincrono con code
-- Gestione stati elaborazione
-- Generazione report errori
-- Export verso sistema AX
-- Upload FTP automatizzato
-
-### 3.4 Gestione Consuntivi
-- Creazione consuntivi da file
-- Validazione dati
-- Calcolo importi e statistiche
-- Sistema di pubblicazione
-- Export dati
-
-### 3.5 Sistema di Notifiche
-- Notifiche email per:
-  - Verifica account
-  - Reset password
-  - Upload completati
-  - Pubblicazione consuntivi
-  - Errori elaborazione
-
-## 4. Sicurezza
-
-### 4.1 Misure di Sicurezza Implementate
-- CSRF protection
-- Rate limiting
+### Middleware Protection
+- IP validation
+- Role-based access control
 - Session security
-- Password hashing
-- Input validation
-- SQL injection protection
+- HTTPS enforcement
+- Rate limiting
+- CSRF protection
 - XSS protection
-- Security headers
 
-### 4.2 Middleware di Sicurezza
-- `CheckRole`: Validazione ruoli
-- `SessionSecurity`: Gestione sessioni sicure
-- `SecurityHeaders`: Headers HTTP sicuri
-- `ForceHttps`: Forzatura HTTPS
-- `EnsureTermsAccepted`: Validazione termini
+### Authorization System
+- Role-based permissions
+- Resource access control
+- Publisher-level restrictions
+- File access management
+- Audit logging
 
-## 5. Integrazioni
+## Frontend Architecture
 
-### 5.1 Sistema AX
-- Generazione file TSV
-- Validazione dati
-- Upload automatico
-- Gestione errori
+### Dashboard Components
+- Responsive layout
+- Real-time interactive charts
+- Dynamic filtering
+- Real-time notifications
 
-### 5.2 FTP
-- Upload automatico file
-- Gestione connessioni sicure
-- Retry automatici
-- Logging operazioni
+### File Management Interface
+- Visual upload progress
+- Drag-and-drop support
+- Client-side validation
+- Preview capabilities
 
-## 6. Jobs e Code
+## Development Setup
 
-### 6.1 Jobs Principali
-- `ProcessCsvUpload`: Elaborazione CSV
-- `GenerateAxExport`: Generazione export AX
+### Local Environment Setup
+1. Clone the repository
+2. Install PHP dependencies via Composer
+3. Install Node.js dependencies
+4. Configure environment variables
+5. Set up database
+6. Run migrations
+7. Start development server
 
-### 6.2 Eventi e Listener
-- `FileUploadProcessed`
-- `DispatchAxExport`
+### Key Configuration Files
+- `.env`: Environment configuration
+- `config/`: Application configuration files
+- `routes/`: Application routes
+- `app/Http/Controllers/`: Core controllers
+- `app/Services/`: Business logic services
 
-## 7. Manutenzione
+## Core Controllers
 
-### 7.1 Sistema di Logging
-- Log dettagliati per operazioni critiche
-- Rotazione log automatica
-- Categorizzazione per canali
+### Authentication Controllers
+Located in `app/Http/Controllers/Auth/`
 
-### 7.2 Pulizia Sistema
-- Cleanup file temporanei
-- Pulizia log vecchi
-- Gestione file esportati
+#### RegisterController
+- New user registration handling
+- VAT validation with multi-country support (IT, FR, DE, ES, GB, CY, IE)
+- Publisher account creation
+- Verification email dispatch
+- Privacy policy management
 
-## 8. API e Endpoints
+#### LoginController
+- Credential validation
+- Brute force protection
+- Advanced rate limiting (5 max attempts)
+- Secure session management
+- Account status verification
+- IP and User Agent tracking
 
-### 8.1 API Pubbliche
-- `/api/check-vat`: Validazione partita IVA
-- `/api/publishers/search`: Ricerca publisher
-- `/api/publishers/{id}`: Dettagli publisher
+#### EmailVerificationController
+- Email verification process
+- Token validation
+- Account status updates
+- User notifications
 
-### 8.2 API Protette
-- Upload management
-- Publisher management
-- User management
-- Statement management
+#### ForgotPasswordController & ResetPasswordController
+- Password reset request handling
+- Token management (60-minute validity)
+- Secure password validation
+- Reset confirmation
 
-## 9. Requisiti Tecnici
+### Publisher Management Controllers
 
-### 9.1 Server Requirements
-- PHP 8.0+
-- MySQL/MariaDB
-- Redis (per code)
-- Composer
-- Node.js e NPM
+#### PublisherController
+- Publisher listing with pagination
+- Advanced filtering and dynamic sorting
+- Sub-publisher management
+- Publisher details and editing
+- Data export to Excel
+- API endpoints for publisher operations
 
-### 9.2 Dipendenze Principali
-- Laravel Framework
-- Alpine.js
-- Tailwind CSS
-- Excel library
-- FTP library
+#### ProfileController
+- Profile data management
+- Personal information updates
+- Notification preferences
+- Account deactivation handling
 
-## 10. Best Practices Implementate
+### Data Processing Controllers
 
-### 10.1 Coding Standards
+#### UploadController
+- File upload management
+- Status monitoring
+- Format validation
+- Publication status control
+- Template downloads
+- SFTP integration
+
+#### StatementController
+- Statement listing and details
+- Advanced filtering
+- Monthly statistics calculation
+- Export functionality
+- Data validation
+- Publisher data association
+
+### Support System
+
+#### SupportController
+- Support request management
+- Category-based routing
+- Admin notifications
+- Input validation and sanitization
+- Activity logging
+
+### Dashboard Controllers
+
+#### DashboardController
+- Role-specific dashboard views
+- Data visualization
+- Real-time updates
+- Custom metrics display
+
+Each controller implements:
+- Input validation
+- Authorization checks
+- Error handling
+- Event dispatching
+- Logging
+- Response formatting
+
+## Queue Workers and Jobs
+
+### Main Jobs
+- CSV Processing
+- AX Export Generation
+- FTP Upload
+- Notification Dispatch
+
+### Queue Configuration
+- Redis as queue driver
+- Multiple queues for different job types
+- Retry policies
+- Error handling
+
+## TODO
+- Generate .env file after installation
+- Remove .git folder after installation
+- Implement distributed cache
+- Optimize upload performance
+- Enhance security measures
+- Develop public APIs
+
+## Best Practices and Standards
 - PSR-12 compliance
 - SOLID principles
 - DRY principle
 - Repository pattern
 - Service pattern
-
-### 10.2 Performance
-- Caching
-- Code asincrone
-- Ottimizzazione query
-- Lazy loading
-- Indici database
-
-### 10.3 Testing
-- Unit tests
-- Feature tests
-- Integration tests
-- Error handling
-- Logging
-
-## 11. Deployment e Ambiente
-
-### 11.1 Ambienti
-- Development
-- Staging
-- Production
-
-### 11.2 Configurazione
-- Variabili ambiente
-- File di configurazione
-- Secrets management
-
-## 12. Workflow Tipici
-
-### 12.1 Upload Consuntivo
-1. Upload file CSV
-2. Validazione formato
-3. Processing asincrono
-4. Generazione report
-5. Notifica completamento
-6. Export AX/FTP
-
-### 12.2 Registrazione Publisher
-1. Inserimento P.IVA
-2. Verifica esistenza
-3. Compilazione dati
-4. Validazione email
-5. Approvazione admin
-6. Attivazione account
-
-## 13. Considerazioni Future
-
-### 13.1 Possibili Miglioramenti
-- Implementazione cache distribuita
-- Miglioramento performance upload
-- Ottimizzazione query pesanti
-- Enhancement sicurezza
-- API pubbliche
-
-### 13.2 Scalabilità
-- Horizontal scaling
-- Load balancing
-- Queue workers
-- Cache distribution
-- Database sharding
+- Comprehensive testing suite
+- Performance optimization
+- Security best practices
