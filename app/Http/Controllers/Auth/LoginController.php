@@ -154,7 +154,7 @@ class LoginController extends Controller
             ]);
 
             return back()
-                ->with('warning', 'Attendi che un admin verifichi il tuo account o scrivi a galileo@triboo.it')
+                ->with('warning', 'Attendi che un admin verifichi il tuo account o scrivici a revenue@magellano.ai')
                 ->withInput($request->except('password'));
         }
 
