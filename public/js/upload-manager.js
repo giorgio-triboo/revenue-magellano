@@ -58,13 +58,13 @@ function uploadManager() {
             if (type === 'success' || type === 'error') {
                 setTimeout(() => {
                     window.location.reload();
-                }, 3000);
+                }, 5000);
             }
 
             if (autoDismiss) {
                 this.notifications.timeout = setTimeout(() => {
                     this.notifications.show = false;
-                }, 3000);
+                }, 5000);
             }
         },
 
