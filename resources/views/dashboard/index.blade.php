@@ -13,7 +13,7 @@
                     </h2>
                 </div>
             </div>
-        
+
 
             <!-- Welcome Card -->
             <div class="bg-white shadow rounded-lg">
@@ -82,19 +82,6 @@
                         </div>
                     </a>
 
-                    <!-- Card Consuntivi -->
-                    <a href="{{ route('statements.index') }}"
-                        class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-yellow-100">
-                                <i data-lucide="file-text" class="w-6 h-6 text-yellow-600"></i>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-xl font-medium text-gray-900">Consuntivi</h3>
-                                <p class="text-md text-gray-500">Gestione consuntivi</p>
-                            </div>
-                        </div>
-                    </a>
 
                     <!-- Card Gestione Profili -->
                     <a href="{{ route('users.index') }}"
@@ -110,6 +97,20 @@
                         </div>
                     </a>
                 @endif
+
+                <!-- Card Consuntivi -->
+                <a href="{{ route('statements.index') }}"
+                    class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-100">
+                            <i data-lucide="file-text" class="w-6 h-6 text-yellow-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-xl font-medium text-gray-900">Consuntivi</h3>
+                            <p class="text-md text-gray-500">Gestione consuntivi</p>
+                        </div>
+                    </div>
+                </a>
             </div>
 
 
