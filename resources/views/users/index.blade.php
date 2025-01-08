@@ -446,11 +446,12 @@
                 searchQuery: '{{ request('search') }}',
                 searchTimeout: null,
                 showModal: false,
-                userDetails: null,
                 showDeleteModal: false,
                 showRestoreModal: false,
+                userDetails: null,
                 userIdToDelete: null,
                 userIdToRestore: null,
+
 
                 // Funzione per mostrare il modale di ripristino
                 confirmRestore(userId) {
@@ -473,7 +474,7 @@
 
                         const data = await response.json();
                         if (data.success) {
-                            this.showRestthis.showRestoreModal = false;
+                            this.showRestoreModal = false; // Correzione qui
                             this.userIdToRestore = null;
                             window.location.reload();
                         } else {
