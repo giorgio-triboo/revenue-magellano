@@ -74,6 +74,9 @@ class ResetPasswordController extends Controller
 
     public function reset(Request $request)
     {
+        Log::info('Inizio processo di reset password', [
+            'user_id' => $request->user
+        ]);
         try {
             $request->validate([
                 'token' => 'required',
@@ -124,22 +127,42 @@ class ResetPasswordController extends Controller
 
             // Verifica se la nuova password è uguale alla precedente
             if (Hash::check($request->password, $user->password)) {
+                Log::warning('Tentativo di utilizzare la stessa password', [
+                    'user_id' => $user->id
+                ]);
                 return back()
+                    ->withInput()
                     ->withErrors(['password' => 'La nuova password non può essere uguale alla precedente.']);
             }
 
+            Log::info('Inizio transazione database', [
+                'user_id' => $user->id
+            ]);
+            
             DB::beginTransaction();
             try {
                 // Aggiorna la password
-                $user->forceFill([
-                    'password' => Hash::make($request->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+                $newPassword = Hash::make($request->password);
+                Log::info('Password hashata correttamente', [
+                    'user_id' => $user->id
+                ]);
+
+                $user->password = $newPassword;
+                $user->remember_token = Str::random(60);
+                $user->save();
+
+                Log::info('Password utente aggiornata', [
+                    'user_id' => $user->id
+                ]);
 
                 // Rimuovi il token di reset
                 DB::table('password_reset_tokens')
                     ->where('email', $email)
                     ->delete();
+
+                Log::info('Token di reset rimosso', [
+                    'user_id' => $user->id
+                ]);
 
                 DB::commit();
 
@@ -156,6 +179,11 @@ class ResetPasswordController extends Controller
 
             } catch (\Exception $e) {
                 DB::rollBack();
+                Log::error('Errore durante la transazione di reset password', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
                 throw $e;
             }
 
@@ -163,11 +191,22 @@ class ResetPasswordController extends Controller
             Log::error('Errore durante il reset della password', [
                 'user_id' => $request->user ?? null,
                 'error' => $e->getMessage(),
+                'error_class' => get_class($e),
                 'trace' => $e->getTraceAsString()
             ]);
 
+            $errorMessage = 'Si è verificato un errore durante il reset della password.';
+            
+            // Gestione errori specifici
+            if ($e instanceof \Illuminate\Database\QueryException) {
+                $errorMessage = 'Errore durante il salvataggio della password. Riprova.';
+            } elseif ($e instanceof \PDOException) {
+                $errorMessage = 'Errore di connessione al database. Riprova più tardi.';
+            }
+
             return back()
-                ->withErrors(['email' => 'Si è verificato un errore durante il reset della password.']);
+                ->withInput()
+                ->withErrors(['password' => $errorMessage]);
         }
     }
 }
