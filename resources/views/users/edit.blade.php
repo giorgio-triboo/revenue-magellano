@@ -201,9 +201,15 @@
                                 </label>
                                 <div class="mt-1">
                                     <input type="email" name="email" id="email"
-                                        class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md"
-                                        value="{{ old('email', $user->email) }}" required>
+                                        class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md {{ $user->id === auth()->id() ? 'bg-gray-50' : '' }}"
+                                        value="{{ old('email', $user->email) }}"
+                                        {{ $user->id === auth()->id() ? 'disabled' : '' }} required>
                                 </div>
+                                @if ($user->id === auth()->id())
+                                    <p class="mt-2 text-md text-gray-500">
+                                        Non puoi modificare la tua email
+                                    </p>
+                                @endif
                                 @error('email')
                                     <p class="mt-2 text-md text-red-600">{{ $message }}</p>
                                 @enderror

@@ -29,44 +29,58 @@ class UserManagementController extends Controller
      * Display a listing of users.
      */
     public function index(Request $request)
-    {
+{
+    try {
+        $status = $request->get('status', 'active');
+        
+        $query = User::with(['role', 'publisher']);
 
-        try {
-            $query = User::with(['role', 'publisher'])
-                ->when($request->filled('search'), function ($query) use ($request) {
-                    $search = $request->search;
-
-                    // Gestione wildcard
-                    $search = str_replace('*', '%', $search);
-
-                    return $query->where(function ($q) use ($search) {
-                        $q->where('email', 'LIKE', $search)
-                            ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'LIKE', "%{$search}%")
-                            ->orWhereHas('publisher', function ($query) use ($search) {
-                                $query->where('legal_name', 'LIKE', $search)
-                                    ->orWhere('company_name', 'LIKE', "%{$search}%");
-                            });
-                    });
-                });
-
-            $users = $query->paginate(12)->withQueryString();
-            $roles = Role::all();
-
-            Log::info('Lista utenti recuperata', [
-                'search' => $request->search,
-                'count' => $users->count()
-            ]);
-
-            return view('users.index', compact('users', 'roles'));
-        } catch (\Exception $e) {
-            Log::error('Errore nel recupero della lista utenti', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return back()->with('error', 'Si è verificato un errore nel recupero della lista utenti.');
+        // Gestione filtro stato
+        switch ($status) {
+            case 'deleted':
+                $query->onlyTrashed();
+                break;
+            case 'all':
+                $query->withTrashed();
+                break;
+            case 'active':
+            default:
+                $query->whereNull('deleted_at');
+                break;
         }
+
+        // Ricerca
+        if ($request->filled('search')) {
+            $search = str_replace('*', '%', $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('email', 'LIKE', "%{$search}%")
+                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'LIKE', "%{$search}%")
+                    ->orWhereHas('publisher', function ($query) use ($search) {
+                        $query->where('legal_name', 'LIKE', "%{$search}%")
+                            ->orWhere('company_name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $users = $query->paginate(12)->withQueryString();
+        $roles = Role::all();
+
+        Log::info('Lista utenti recuperata', [
+            'status' => $status,
+            'search' => $request->search,
+            'count' => $users->count()
+        ]);
+
+        return view('users.index', compact('users', 'roles'));
+    } catch (\Exception $e) {
+        Log::error('Errore nel recupero della lista utenti', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        return back()->with('error', 'Si è verificato un errore nel recupero della lista utenti.');
     }
+}
 
     /**
      * Show user details.
@@ -242,7 +256,8 @@ class UserManagementController extends Controller
             DB::transaction(function () use ($user) {
                 // Invece di eliminare l'utente, lo disattiviamo
                 $user->update([
-                    'is_active' => false
+                    'is_active' => false,
+                    'is_validated' => false
                 ]);
 
                 // Utilizziamo softDelete per mantenere lo storico
