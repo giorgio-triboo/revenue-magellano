@@ -1,6 +1,5 @@
 @component('mail::message')
 <div class="header">
-    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="logo">
     <h1>Nuova Richiesta di Supporto</h1>
 </div>
 

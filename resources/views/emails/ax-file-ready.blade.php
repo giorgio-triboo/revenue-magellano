@@ -1,6 +1,5 @@
 @component('mail::message')
 <div class="header">
-    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="logo">
     <h1>File AX Pronto per il Download</h1>
 </div>
 
