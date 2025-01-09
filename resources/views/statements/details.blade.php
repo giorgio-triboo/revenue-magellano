@@ -68,9 +68,10 @@
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
                                     </div>
-                                    <input type="text" name="search" id="search" value="{{ request('search') }}"
+                                    <input type="text" name="search" id="search"
                                         class="appearance-none block w-full pl-10 pr-12 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md"
-                                        placeholder="Cerca per campagna, publisher o database">
+                                        placeholder="{{ auth()->user()->isAdmin() ? 'Cerca per campagna, publisher o database' : 'Cerca per campagna o database' }}"
+                                        value="{{ request('search') }}">
                                     <div class="absolute inset-y-0 right-0 flex items-center">
                                         @if (request('search'))
                                             <a href="{{ request()->url() }}" class="pr-2">
