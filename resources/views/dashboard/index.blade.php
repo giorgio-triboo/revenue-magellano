@@ -26,48 +26,23 @@
 
             <!-- Quick Access Cards -->
             <div class="grid grid-cols-3 gap-4">
-                <!-- Card Dashboard - Per tutti -->
-                <a href="{{ route('dashboard') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-blue-100">
-                            <i data-lucide="layout-grid" class="w-6 h-6 text-blue-600"></i>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-xl font-medium text-gray-900">Dashboard</h3>
-                            <p class="text-md text-gray-500">Panoramica generale</p>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Card Dashboard - Per tutti -->
-                <a href="{{ route('profile.show') }}"
+                <!-- Card Consuntivi -->
+                <a href="{{ route('statements.index') }}"
                     class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
                     <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-gray-100">
-                            <i data-lucide="user" class="w-6 h-6 text-gray-600"></i>
+                        <div class="p-3 rounded-full bg-yellow-100">
+                            <i data-lucide="file-text" class="w-6 h-6 text-yellow-600"></i>
                         </div>
                         <div class="ml-4">
-                            <h3 class="text-xl font-medium text-gray-900">Profilo Personale</h3>
-                            <p class="text-md text-gray-500">Profilo Utente</p>
+                            <h3 class="text-xl font-medium text-gray-900">Consuntivi</h3>
+                            <p class="text-md text-gray-500">Gestione consuntivi</p>
                         </div>
                     </div>
                 </a>
 
-                @if (auth()->user()->isAdmin())
-                    <!-- Card Editori -->
-                    <a href="{{ route('publishers.index') }}"
-                        class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-green-100">
-                                <i data-lucide="book-open" class="w-6 h-6 text-green-600"></i>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-xl font-medium text-gray-900">Lista Editori</h3>
-                                <p class="text-md text-gray-500">Gestione editori</p>
-                            </div>
-                        </div>
-                    </a>
+                
 
+                @if (auth()->user()->isAdmin())
                     <!-- Card Upload -->
                     <a href="{{ route('uploads.index') }}"
                         class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
@@ -78,6 +53,20 @@
                             <div class="ml-4">
                                 <h3 class="text-xl font-medium text-gray-900">Upload</h3>
                                 <p class="text-md text-gray-500">Carica documenti</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Card Editori -->
+                    <a href="{{ route('publishers.index') }}"
+                        class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100">
+                                <i data-lucide="book-open" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-xl font-medium text-gray-900">Lista Editori</h3>
+                                <p class="text-md text-gray-500">Gestione editori</p>
                             </div>
                         </div>
                     </a>
@@ -98,16 +87,16 @@
                     </a>
                 @endif
 
-                <!-- Card Consuntivi -->
-                <a href="{{ route('statements.index') }}"
+                <!-- Card Profilo - Per tutti -->
+                <a href="{{ route('profile.show') }}"
                     class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
                     <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-yellow-100">
-                            <i data-lucide="file-text" class="w-6 h-6 text-yellow-600"></i>
+                        <div class="p-3 rounded-full bg-gray-100">
+                            <i data-lucide="user" class="w-6 h-6 text-gray-600"></i>
                         </div>
                         <div class="ml-4">
-                            <h3 class="text-xl font-medium text-gray-900">Consuntivi</h3>
-                            <p class="text-md text-gray-500">Gestione consuntivi</p>
+                            <h3 class="text-xl font-medium text-gray-900">Profilo Personale</h3>
+                            <p class="text-md text-gray-500">Profilo Utente</p>
                         </div>
                     </div>
                 </a>
