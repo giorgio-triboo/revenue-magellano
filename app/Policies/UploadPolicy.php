@@ -69,6 +69,6 @@ class UploadPolicy
     }
     public function list(User $user): bool
     {
-        return false; // Nessuno può accedere
+        return in_array($user->role?->code, ['admin', 'operator']);
     }
 }

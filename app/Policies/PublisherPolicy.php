@@ -78,4 +78,5 @@ class PublisherPolicy
     {
         return $user->isAdmin();
     }
+    
 }
