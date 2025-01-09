@@ -630,7 +630,7 @@
                                             13 del Regolamento UE 2016/679 (GDPR)
                                             e acconsento al trattamento dei miei dati personali per le finalità indicate
                                             nell'informativa.
-                                            <a href="/privacy-policy"
+                                            <a href="https://privacy.trdi.eu/gdpr/privacy/?utm_source=revenue"
                                                 class="text-custom-activeItem hover:text-custom-activeItem/90"
                                                 target="_blank">
                                                 Leggi l'informativa completa
