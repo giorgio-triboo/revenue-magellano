@@ -26,7 +26,6 @@ class StatementsExport implements FromCollection, WithHeadings, WithMapping, Wit
     public function headings(): array
     {
         return [
-            'ID',
             'Publisher',
             'Sub Publisher',
             'Campaign',
@@ -46,7 +45,6 @@ class StatementsExport implements FromCollection, WithHeadings, WithMapping, Wit
     public function map($statement): array
     {
         return [
-            $statement->id,
             $statement->publisher->company_name ?? 'N/A',
             $statement->subPublisher->display_name ?? 'N/A',
             $statement->campaign_name,
@@ -68,7 +66,7 @@ class StatementsExport implements FromCollection, WithHeadings, WithMapping, Wit
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 // Formattazione header
-                $event->sheet->getStyle('A1:N1')->applyFromArray([
+                $event->sheet->getStyle('A1:M1')->applyFromArray([
                     'font' => [
                         'bold' => true,
                         'size' => 12
@@ -82,17 +80,17 @@ class StatementsExport implements FromCollection, WithHeadings, WithMapping, Wit
                 ]);
 
                 // Auto-size columns
-                foreach (range('A', 'N') as $column) {
+                foreach (range('A', 'M') as $column) {
                     $event->sheet->getColumnDimension($column)->setAutoSize(true);
                 }
 
                 // Formattazione colonne numeriche
                 $lastRow = $event->sheet->getHighestRow();
                 // Formatta la colonna delle quantità (J) solo con numeri interi
-                $event->sheet->getStyle('J2:J' . $lastRow)->getNumberFormat()
+                $event->sheet->getStyle('I2:I' . $lastRow)->getNumberFormat()
                     ->setFormatCode('#,##0');
                 // Formatta le colonne degli importi (K-L) con due decimali
-                $event->sheet->getStyle('K2:L' . $lastRow)->getNumberFormat()
+                $event->sheet->getStyle('J2:K' . $lastRow)->getNumberFormat()
                     ->setFormatCode('#,##0.00');
             }
         ];

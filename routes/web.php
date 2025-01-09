@@ -188,15 +188,3 @@ Route::middleware(['auth'])->group(function () {
 
     });
 });
-
-/*
-|--------------------------------------------------------------------------
-| API Web Routes
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth'])->prefix('api')->group(function () {
-    Route::get('/publishers/search', [PublisherController::class, 'search'])
-        ->name('api.publishers.search');
-    Route::get('/publishers/{publisher}', [PublisherController::class, 'getDetails'])
-        ->name('api.publishers.details');
-});
