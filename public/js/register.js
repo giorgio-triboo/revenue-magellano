@@ -87,7 +87,7 @@ document.addEventListener("alpine:init", () => {
         },
 
         validatePostalCode(cap) {
-            return /^\d{5}$/.test(cap);
+            return /^[A-Z0-9]{1,27}$/.test(cap);
         },
 
         validateIban(iban) {
@@ -201,11 +201,11 @@ document.addEventListener("alpine:init", () => {
 
                 case 3:
                     if (!this.formData.state) {
-                        this.errors.state = "Lo stato è obbligatoria";
+                        this.errors.state = "Lo stato è obbligatorio";
                         return false;
                     }
                     if (!this.validateTextOnly(this.formData.state)) {
-                        this.errors.county = "Lo stato può contenere solo lettere";
+                        this.errors.state = "Lo stato può contenere solo lettere";
                         return false;
                     }
                     if (!this.formData.county) {
@@ -229,7 +229,7 @@ document.addEventListener("alpine:init", () => {
                         return false;
                     }
                     if (!this.validatePostalCode(this.formData.postal_code)) {
-                        this.errors.postal_code = "Il CAP deve essere di 5 cifre numeriche";
+                        this.errors.postal_code = "Il CAP deve essere di almeno 5 caratteri";
                         return false;
                     }
                     if (!this.formData.address) {

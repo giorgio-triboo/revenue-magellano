@@ -203,7 +203,7 @@ class RegisterController extends Controller
                 'state' => 'required|string|max:255',
                 'county' => 'required|string|max:255',
                 'city' => 'required|string|max:255',
-                'postal_code' => 'required|string|size:5',
+                'postal_code' => 'required|string|max:11',
                 'address' => 'required|string|max:255',
                 'iban' => 'required|string',
                 'swift' => 'max:11',
