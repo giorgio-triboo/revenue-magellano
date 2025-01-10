@@ -387,7 +387,7 @@
 
                         <div>
                             <dt class="text-md font-medium text-gray-500">VendName</dt>
-                            <dd class="mt-1 text-md text-gray-900">{{ $axData->ax_vend_id }}</dd>
+                            <dd class="mt-1 text-md text-gray-900">{{ $axData->ax_vend_id ?? 'N/A' }}</dd>
                         </div>
 
                         <div>
