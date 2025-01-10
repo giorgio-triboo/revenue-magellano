@@ -86,6 +86,9 @@ class SubPublisherController extends Controller
 
             $validated = $request->validate([
                 'display_name' => 'required|string|max:255',
+                'invoice_group' => 'required|string|max:255',
+                'ax_name' => 'required|string|max:255',      // Presente in store
+                'channel_detail' => 'nullable|string',       // Presente in store
                 'notes' => 'nullable|string',
                 'is_primary' => 'boolean'
             ]);

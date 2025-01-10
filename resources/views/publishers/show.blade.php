@@ -426,11 +426,6 @@
                         </div>
 
                         <div>
-                            <dt class="text-md font-medium text-gray-500">ChannelDetail</dt>
-                            <dd class="mt-1 text-md text-gray-900">{{ $subPublisher->channel_detail ?? 'N/A' }}</dd>
-                        </div>
-
-                        <div>
                             <dt class="text-md font-medium text-gray-500">payment</dt>
                             <dd class="mt-1 text-md text-gray-900">{{ $axData->payment ?? 'N/A' }}</dd>
                         </div>
