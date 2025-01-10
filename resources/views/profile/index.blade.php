@@ -117,6 +117,8 @@
                 </div>
             </div>
 
+
+            @if (auth()->user()->isPublisher())
             <!-- Profile Controls -->
             <div class="bg-white shadow-lg rounded-2xl">
                 <div class="p-8">
@@ -145,7 +147,7 @@
                             </div>
                         </div>
                         
-                        @if (auth()->user()->isPublisher())
+                        
                         <div class="border-t border-gray-100"></div>
 
                         <!-- Account Deactivation -->
