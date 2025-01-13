@@ -16,8 +16,8 @@ class FileUploadObserver
         Log::info('FileUploadObserver: aggiornamento rilevato', ['upload_id' => $upload->id]);
 
         // Gestione notifiche SFTP
-        if ($upload->isDirty('sftp_status')) {
-            Log::info('FileUploadObserver: Stato SFTP aggiornato', [
+        if ($upload->isDirty('sftp_status') && in_array($upload->sftp_status, ['completed', 'error'])) {
+            Log::info('FileUploadObserver: Stato FTP finale aggiornato', [
                 'upload_id' => $upload->id,
                 'sftp_status' => $upload->sftp_status
             ]);
