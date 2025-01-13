@@ -496,12 +496,19 @@ class UploadController extends Controller
     {
         $instructions = <<<EOT
 ISTRUZIONI PER IL CARICAMENTO
+/ Formato File
 - estensione file .csv
 - utilizzare ; come separatore delle colonne
-- anno_consuntivo e anno_competenza vogliono l'anno in 4 cifre. es "2025"
-- mese_consuntivo e mese_competenza vogliono due cifre per la data. es "01 non "1"
-- nessun carattere speciale (es. € nella colonna "importo" o "pay")
-- i payout devono avere un massimo di 2 decimali
+
+/ Colonne Specifiche
+- "anno_consuntivo" e "anno_competenza" prevedono l'anno in 4 cifre (es. "2025")
+- "mese_consuntivo" e "mese_competenza" prevedono due cifre per la data (es. "01", non "1")
+- "nome_campagna_HO" non è vincolante ma si consiglia di utilizzare sempre lo stesso in modo da facilitare la ricerca
+- "nome_publisher" non è required per il caricamento
+- "publisher_id" e "sub_publisher_id" prevedono l'inserimento di una cifra per i nuemeri dal 1-9 (es. "1", non "01")
+- "payout" e "importo" possono avere massimo 2 decimali separati da "," (esempio 10,01) e non prevedono caratteri speciali (es. "€")
+- "quantita_validata" accetta solo valori interi
+- "data_invio" e "note", campi di testo non required per il caricamento
 
 Intestazioni obbligatorie:
 anno_consuntivo
