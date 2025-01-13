@@ -99,7 +99,8 @@
                                     <label for="email" class="block text-md font-medium text-gray-700 mb-2">
                                         Email
                                     </label>
-                                    <div class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700">
+                                    <div
+                                        class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-700">
                                         {{ $user->email }}
                                     </div>
                                 </div>
@@ -119,39 +120,40 @@
 
 
             @if (auth()->user()->isPublisher())
-            <!-- Profile Controls -->
-            <div class="bg-white shadow-lg rounded-2xl">
-                <div class="p-8">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-8">Controlli Profilo</h3>
+                <!-- Profile Controls -->
+                <div class="bg-white shadow-lg rounded-2xl">
+                    <div class="p-8">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-8">Controlli Profilo</h3>
 
-                    <div class="space-y-8">
-                        <!-- Email Notifications -->
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <h4 class="font-medium text-gray-900">Notifiche Email</h4>
-                                    <p class="text-md text-gray-500">Gestisci la ricezione delle email dalla piattaforma.
-                                    </p>
+                        <div class="space-y-8">
+                            <!-- Email Notifications -->
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">Notifiche Email</h4>
+                                        <p class="text-md text-gray-500">Gestisci la ricezione delle email dalla
+                                            piattaforma.
+                                        </p>
+                                    </div>
+                                    <form action="{{ route('profile.notifications.toggle') }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit"
+                                            class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 {{ $user->can_receive_email ? 'bg-blue-600' : 'bg-gray-200' }}">
+                                            <span class="sr-only">Abilita notifiche email</span>
+                                            <span
+                                                class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $user->can_receive_email ? 'translate-x-5' : '' }}">
+                                            </span>
+                                        </button>
+                                    </form>
                                 </div>
-                                <form action="{{ route('profile.notifications.toggle') }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <button type="submit"
-                                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 {{ $user->can_receive_email ? 'bg-blue-600' : 'bg-gray-200' }}">
-                                        <span class="sr-only">Abilita notifiche email</span>
-                                        <span
-                                            class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $user->can_receive_email ? 'translate-x-5' : '' }}">
-                                        </span>
-                                    </button>
-                                </form>
                             </div>
-                        </div>
-                        
-                        
-                        <div class="border-t border-gray-100"></div>
 
-                        <!-- Account Deactivation -->
-                        
+
+                            <div class="border-t border-gray-100"></div>
+
+                            <!-- Account Deactivation -->
+
                             <div class="space-y-3">
                                 <div class="flex justify-between items-center">
                                     <div>
@@ -170,162 +172,163 @@
                                     </button>
                                 </div>
                             </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            <!-- Deactivation Confirmation Modal -->
-            <div x-data="{ show: false }" x-show="show"
-                x-on:open-modal.window="if ($event.detail === 'confirm-deactivation') show = true"
-                x-on:close-modal.window="show = false" x-on:keydown.escape.window="show = false"
-                x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-                class="fixed z-10 inset-0 overflow-y-auto" style="display: none;">
-                <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-
-                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-                    <div
-                        class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                        <div class="sm:flex sm:items-start">
-                            <div
-                                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                            </div>
-                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                    Conferma Disattivazione Account
-                                </h3>
-                                <div class="mt-2">
-                                    <p class="text-md text-gray-500">
-                                        Sei sicuro di voler disattivare il tuo account? Questa azione ti disconnetterà
-                                        immediatamente e non potrai più accedere alla piattaforma. Per riattivare l'account
-                                        sarà necessario contattare un amministratore.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                            <form action="{{ route('profile.deactivate') }}" method="POST">
-                                @csrf
-                                <button type="submit"
-                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-md">
-                                    Disattiva Account
-                                </button>
-                            </form>
-                            <button type="button" @click="show = false"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-md">
-                                Annulla
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Publisher Info Section -->
-        <div x-show="activeTab === 'publisher'" class="mt-6" x-cloak>
-            @if ($publisher)
-                <div class="bg-white shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-6">
-                            Informazioni Publisher
-                        </h3>
-
-                        <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-                            <div>
-                                <dt class="text-md font-medium text-gray-500">Partita IVA</dt>
-                                <dd class="mt-1 text-md text-gray-900">{{ $publisher->vat_number }}</dd>
-                            </div>
-
-                            <div>
-                                <dt class="text-md font-medium text-gray-500">Ragione Sociale</dt>
-                                <dd class="mt-1 text-md text-gray-900">{{ $publisher->legal_name }}</dd>
-                            </div>
-
-                            <div>
-                                <dt class="text-md font-medium text-gray-500">Nome Azienda</dt>
-                                <dd class="mt-1 text-md text-gray-900">{{ $publisher->company_name }}</dd>
-                            </div>
-
-                            <div>
-                                <dt class="text-md font-medium text-gray-500">Provincia</dt>
-                                <dd class="mt-1 text-md text-gray-900">{{ $publisher->county }}</dd>
-                            </div>
-
-                            <div>
-                                <dt class="text-md font-medium text-gray-500">Città</dt>
-                                <dd class="mt-1 text-md text-gray-900">{{ $publisher->city }}</dd>
-                            </div>
-
-                            <div>
-                                <dt class="text-md font-medium text-gray-500">CAP</dt>
-                                <dd class="mt-1 text-md text-gray-900">{{ $publisher->postal_code }}</dd>
-                            </div>
-
-                            <div>
-                                <dt class="text-md font-medium text-gray-500">IBAN</dt>
-                                <dd class="mt-1 text-md text-gray-900">{{ $publisher->iban }}</dd>
-                            </div>
-
-                            <div>
-                                <dt class="text-md font-medium text-gray-500">SWIFT</dt>
-                                <dd class="mt-1 text-md text-gray-900">{{ $publisher->swift }}</dd>
-                            </div>
-                        </dl>
-
-                        <div class="mt-6">
-                            <div class="rounded-md bg-blue-50 p-4">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd"
-                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="text-md text-blue-700">
-                                            Per modificare i tuoi dati, apri un ticket nella sezione Assistenza.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @else
-                <div class="rounded-md bg-yellow-50 p-4">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-md font-medium text-yellow-800">
-                                Nessun publisher associato
-                            </h3>
-                            <div class="mt-2 text-md text-yellow-700">
-                                <p>
-                                    Non risulta alcun publisher associato al tuo account.
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>
             @endif
         </div>
+    </div>
+    </div>
+
+    <!-- Deactivation Confirmation Modal -->
+    <div x-data="{ show: false }" x-show="show"
+        x-on:open-modal.window="if ($event.detail === 'confirm-deactivation') show = true"
+        x-on:close-modal.window="show = false" x-on:keydown.escape.window="show = false"
+        x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+        class="fixed z-10 inset-0 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div
+                class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <div
+                        class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            Conferma Disattivazione Account
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-md text-gray-500">
+                                Sei sicuro di voler disattivare il tuo account? Questa azione ti disconnetterà
+                                immediatamente e non potrai più accedere alla piattaforma. Per riattivare l'account
+                                sarà necessario contattare un amministratore.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <form action="{{ route('profile.deactivate') }}" method="POST">
+                        @csrf
+                        <button type="submit"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-md">
+                            Disattiva Account
+                        </button>
+                    </form>
+                    <button type="button" @click="show = false"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-md">
+                        Annulla
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Publisher Info Section -->
+    <div x-show="activeTab === 'publisher'" class="mt-6" x-cloak>
+        @if ($publisher)
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900 mb-6">
+                        Informazioni Publisher
+                    </h3>
+
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">Partita IVA</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $publisher->vat_number }}</dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">Ragione Sociale</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $publisher->legal_name }}</dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">Nome Azienda</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $publisher->company_name }}</dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">Provincia</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $publisher->county }}</dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">Città</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $publisher->city }}</dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">CAP</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $publisher->postal_code }}</dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">IBAN</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $publisher->iban }}</dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-md font-medium text-gray-500">SWIFT</dt>
+                            <dd class="mt-1 text-md text-gray-900">{{ $publisher->swift }}</dd>
+                        </div>
+                    </dl>
+
+                    <div class="mt-6">
+                        <div class="rounded-md bg-blue-50 p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-md text-blue-700">
+                                        Per modificare i tuoi dati, apri un ticket nella sezione Assistenza.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="rounded-md bg-yellow-50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-md font-medium text-yellow-800">
+                            Nessun publisher associato
+                        </h3>
+                        <div class="mt-2 text-md text-yellow-700">
+                            <p>
+                                Non risulta alcun publisher associato al tuo account.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection
