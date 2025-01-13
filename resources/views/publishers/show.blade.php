@@ -903,6 +903,9 @@
                                             <input type="text" x-model="newDatabase.channel_detail"
                                                 id="channel_detail" required
                                                 class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                            <p class="mt-1 text-sm text-gray-500">
+                                                Nome del Database su AX. Per i nuovi utenti inserire il nome del database/editore.
+                                            </p>
                                         </div>
                                     </div>
 
