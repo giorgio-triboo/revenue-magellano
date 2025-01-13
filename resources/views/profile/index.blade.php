@@ -256,16 +256,6 @@
                             </div>
 
                             <div>
-                                <dt class="text-md font-medium text-gray-500">Sito Web</dt>
-                                <dd class="mt-1 text-md text-gray-900">
-                                    <a href="{{ $publisher->website }}" target="_blank"
-                                        class="text-blue-600 hover:text-blue-500">
-                                        {{ $publisher->website }}
-                                    </a>
-                                </dd>
-                            </div>
-
-                            <div>
                                 <dt class="text-md font-medium text-gray-500">Provincia</dt>
                                 <dd class="mt-1 text-md text-gray-900">{{ $publisher->county }}</dd>
                             </div>
