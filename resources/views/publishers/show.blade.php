@@ -506,15 +506,17 @@
                                         <label for="edit_channel_detail" class="block text-md font-medium text-gray-700">
                                             Channel Details <span class="text-red-500">*</span>
                                         </label>
-                                        <div class="mt-1 relative rounded-xl shadow-sm">
-                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <i data-lucide="layers" class="h-5 w-5 text-gray-400"></i>
+                                        <div class="mt-1">
+                                            <div class="relative flex items-center">
+                                                <input type="text" 
+                                                       x-model="editingDatabase.channel_detail"
+                                                       id="edit_channel_detail"
+                                                       class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <i data-lucide="database" class="h-5 w-5 text-gray-400"></i>
+                                                </div>
                                             </div>
-                                            <input type="text" 
-                                                   x-model="editingDatabase.channel_detail"
-                                                   id="edit_channel_detail"
-                                                   class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
-                                            <p class="mt-2 text-sm text-gray-500 leading-relaxed">
+                                            <p class="mt-2 text-sm text-gray-500">
                                                 Nome database su AX.
                                             </p>
                                         </div>
@@ -902,16 +904,18 @@
                                         <label for="channel_detail" class="block text-md font-medium text-gray-700">
                                             Channel Details <span class="text-red-500">*</span>
                                         </label>
-                                        <div class="mt-1 relative rounded-xl shadow-sm">
-                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <i data-lucide="layers" class="h-5 w-5 text-gray-400"></i>
+                                        <div class="mt-1">
+                                            <div class="relative flex items-center">
+                                                <input type="text" 
+                                                       x-model="newDatabase.channel_detail"
+                                                       id="channel_detail" 
+                                                       required
+                                                       class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <i data-lucide="database" class="h-5 w-5 text-gray-400"></i>
+                                                </div>
                                             </div>
-                                            <input type="text" 
-                                                   x-model="newDatabase.channel_detail"
-                                                   id="channel_detail" 
-                                                   required
-                                                   class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
-                                            <p class="mt-2 text-sm text-gray-500 leading-relaxed">
+                                            <p class="mt-2 text-sm text-gray-500">
                                                 Per i nuovi utenti inserire il nome del database/editore.
                                             </p>
                                         </div>
