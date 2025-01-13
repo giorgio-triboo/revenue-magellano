@@ -597,8 +597,7 @@
                                             id="ax_vend_account"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Identificativo univoco publisher (se editore già registrato in passato, recuperare informazioni)
                                         </p>
                                     </div>
 
@@ -608,8 +607,7 @@
                                         <input type="text" x-model="editingAXData.ax_vend_id" id="ax_vend_id"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Identificativo univoco publisher (se editore già registrato in passato, recuperare informazioni)
                                         </p>
                                     </div>
 
@@ -619,8 +617,7 @@
                                         <input type="text" x-model="editingAXData.vend_group" id="vend_group"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Per publisher Italiani "I", per publisher stranieri "C".
                                         </p>
                                     </div>
 
@@ -630,8 +627,7 @@
                                         <input type="text" x-model="editingAXData.party_type" id="party_type"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Sempre "N".
                                         </p>
                                     </div>
 
@@ -642,8 +638,7 @@
                                             id="tax_withhold_calculate"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Sempre "N".
                                         </p>
                                     </div>
 
@@ -653,8 +648,7 @@
                                         <input type="text" x-model="editingAXData.item_id" id="item_id"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Sempre "MADV_PERF".
                                         </p>
                                     </div>
 
@@ -664,8 +658,7 @@
                                         <input type="text" x-model="editingAXData.email" id="email"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Email del primo utente registrato per il publisher. È l'indirizzo email di riferimento amministrativo.
                                         </p>
                                     </div>
                                     <div>
@@ -674,8 +667,7 @@
                                         <input type="text" x-model="editingAXData.ax_vat_number" id="ax_vat_number"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Partita IVA / CF del publisher. In automatico viene visualizzata quella del Publisher.
                                         </p>
                                     </div>
 
@@ -686,8 +678,7 @@
                                             id="cost_profit_center"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Sempre "R00008".
                                         </p>
                                     </div>
 
@@ -698,8 +689,7 @@
                                         <input type="text" x-model="editingAXData.payment" id="payment"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Tempische di pagamento della fattura (30FM, 60FM, 90FM, VISTA, etc).
                                         </p>
                                     </div>
                                     <div>
@@ -709,8 +699,7 @@
                                             id="cost_profit_center"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Tipologia di pagamento, solitamente "BB".
                                         </p>
                                     </div>
                                     <div>
@@ -719,8 +708,7 @@
                                         <input type="text" x-model="editingAXData.currency_code" id="currency_code"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Valuta del pagamento, default "EUR".
                                         </p>
                                     </div>
                                     <div>
@@ -730,8 +718,7 @@
                                             id="sales_tax_group"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Per Publisher Italiani "AcqDom", per Publisher extra-Italia "AcqUe".
                                         </p>
                                     </div>
                                     <div>
@@ -741,8 +728,7 @@
                                             id="number_sequence_group_id"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                                            incididunt ut labore.
+                                            Per Publisher Italiani "TBA.A_ITEX", per Publisher extra-Italia "TBA.A_UE".
                                         </p>
                                     </div>
                                 </div>
