@@ -307,23 +307,23 @@
                                                         <div class="text-md text-gray-900">{{ $user->email }}</div>
                                                         <div class="text-sm mt-1">
                                                             <span
-                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-sm font-medium {{ $user->email_verified_at ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                                {{ $user->email_verified_at ? 'Email Verificata' : 'Email Non Verificata' }}
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-sm font-medium {{ $user->email_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                                                {{ $user->email_verified ? 'Email Verificata' : 'Email Non Verificata' }}
                                                             </span>
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
                                                         <div class="text-sm mt-1">
                                                             <span
-                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-sm font-medium {{ $user->email_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                                {{ $user->email_verified ? 'Validato Admin' : 'Non Validato' }}
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-sm font-medium {{ $user->is_validated ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                                                {{ $user->is_validated ? 'Validato Admin' : 'Non Validato' }}
                                                             </span>
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
                                                         <div class="flex flex-col space-y-1">
                                                             <span
-                                                                class="inline-flex rounded-xl px-2.5 py-0.5 text-sm font-medium {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-xl text-sm font-medium {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                                                 {{ $user->is_active ? 'Account Attivo' : 'Account Non Attivo' }}
                                                             </span>
                                                         </div>
