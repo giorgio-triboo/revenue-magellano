@@ -107,7 +107,7 @@
                                 <!-- Submit Button -->
                                 <div class="flex items-end justify-end">
                                     <button type="submit"
-                                        class="w-sm px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200">
+                                        class="inline-flex items-center px-4 py-2 rounded-xl bg-custom-activeItem text-white hover:bg-custom-activeItem/90">
                                         Salva Modifiche
                                     </button>
                                 </div>
