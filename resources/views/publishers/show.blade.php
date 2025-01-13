@@ -668,6 +668,10 @@
                                             class="block text-md font-medium text-gray-700">ax_vat_number</label>
                                         <input type="text" x-model="editingAXData.ax_vat_number" id="ax_vat_number"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
 
                                     <div>
@@ -904,7 +908,8 @@
                                                 id="channel_detail" required
                                                 class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                             <p class="mt-1 text-sm text-gray-500">
-                                                Nome del Database su AX. Per i nuovi utenti inserire il nome del database/editore.
+                                                Nome del Database su AX. Per i nuovi utenti inserire il nome del
+                                                database/editore.
                                             </p>
                                         </div>
                                     </div>
