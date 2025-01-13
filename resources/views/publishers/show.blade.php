@@ -591,6 +591,10 @@
                                         <input type="text" x-model="editingAXData.ax_vend_account"
                                             id="ax_vend_account"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
 
                                     <div>
@@ -598,6 +602,10 @@
                                             class="block text-md font-medium text-gray-700">VendName</label>
                                         <input type="text" x-model="editingAXData.ax_vend_id" id="ax_vend_id"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
 
                                     <div>
@@ -605,6 +613,10 @@
                                             class="block text-md font-medium text-gray-700">VendGroup</label>
                                         <input type="text" x-model="editingAXData.vend_group" id="vend_group"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
 
                                     <div>
@@ -612,6 +624,10 @@
                                             class="block text-md font-medium text-gray-700">PartyType</label>
                                         <input type="text" x-model="editingAXData.party_type" id="party_type"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
 
                                     <div>
@@ -620,6 +636,10 @@
                                         <input type="text" x-model="editingAXData.tax_withhold_calculate"
                                             id="tax_withhold_calculate"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
 
                                     <div>
@@ -627,6 +647,10 @@
                                             class="block text-md font-medium text-gray-700">ItemId</label>
                                         <input type="text" x-model="editingAXData.item_id" id="item_id"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
 
                                     <div>
@@ -634,6 +658,10 @@
                                             class="block text-md font-medium text-gray-700">Email</label>
                                         <input type="text" x-model="editingAXData.email" id="email"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
                                     <div>
                                         <label for="ax_vat_number"
@@ -648,6 +676,10 @@
                                         <input type="text" x-model="editingAXData.cost_profit_center"
                                             id="cost_profit_center"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
 
 
@@ -656,6 +688,10 @@
                                             class="block text-md font-medium text-gray-700">payment</label>
                                         <input type="text" x-model="editingAXData.payment" id="payment"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
                                     <div>
                                         <label for="cost_profit_center"
@@ -663,12 +699,20 @@
                                         <input type="text" x-model="editingAXData.payment_mode"
                                             id="cost_profit_center"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
                                     <div>
                                         <label for="currency_code"
                                             class="block text-md font-medium text-gray-700">currency_code</label>
                                         <input type="text" x-model="editingAXData.currency_code" id="currency_code"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
                                     <div>
                                         <label for="sales_tax_group"
@@ -676,6 +720,10 @@
                                         <input type="text" x-model="editingAXData.sales_tax_group"
                                             id="sales_tax_group"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
                                     <div>
                                         <label for="number_sequence_group_id"
@@ -683,6 +731,10 @@
                                         <input type="text" x-model="editingAXData.number_sequence_group_id"
                                             id="number_sequence_group_id"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                                            incididunt ut labore.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
