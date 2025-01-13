@@ -508,11 +508,11 @@
                                         </label>
                                         <div class="mt-1">
                                             <div class="relative flex items-center">
-                                                <input type="text" 
-                                                       x-model="editingDatabase.channel_detail"
-                                                       id="edit_channel_detail"
-                                                       class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
-                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <input type="text" x-model="editingDatabase.channel_detail"
+                                                    id="edit_channel_detail"
+                                                    class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <i data-lucide="database" class="h-5 w-5 text-gray-400"></i>
                                                 </div>
                                             </div>
@@ -597,7 +597,8 @@
                                             id="ax_vend_account"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Identificativo univoco publisher (se editore già registrato in passato, recuperare informazioni)
+                                            Identificativo univoco publisher (se editore già registrato in passato,
+                                            recuperare informazioni)
                                         </p>
                                     </div>
 
@@ -607,7 +608,8 @@
                                         <input type="text" x-model="editingAXData.ax_vend_id" id="ax_vend_id"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Identificativo univoco publisher (se editore già registrato in passato, recuperare informazioni)
+                                            Identificativo univoco publisher (se editore già registrato in passato,
+                                            recuperare informazioni)
                                         </p>
                                     </div>
 
@@ -658,7 +660,8 @@
                                         <input type="text" x-model="editingAXData.email" id="email"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Email del primo utente registrato per il publisher. È l'indirizzo email di riferimento amministrativo.
+                                            Email del primo utente registrato per il publisher. È l'indirizzo email di
+                                            riferimento amministrativo.
                                         </p>
                                     </div>
                                     <div>
@@ -667,7 +670,8 @@
                                         <input type="text" x-model="editingAXData.ax_vat_number" id="ax_vat_number"
                                             class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Partita IVA / CF del publisher. In automatico viene visualizzata quella del Publisher.
+                                            Partita IVA / CF del publisher. In automatico viene visualizzata quella del
+                                            Publisher.
                                         </p>
                                     </div>
 
@@ -892,12 +896,11 @@
                                         </label>
                                         <div class="mt-1">
                                             <div class="relative flex items-center">
-                                                <input type="text" 
-                                                       x-model="newDatabase.channel_detail"
-                                                       id="channel_detail" 
-                                                       required
-                                                       class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
-                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <input type="text" x-model="newDatabase.channel_detail"
+                                                    id="channel_detail" required
+                                                    class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl shadow-sm focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-md">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <i data-lucide="database" class="h-5 w-5 text-gray-400"></i>
                                                 </div>
                                             </div>
