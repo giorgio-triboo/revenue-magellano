@@ -1,4 +1,4 @@
-# Magellano.ai - Revenue Management Platform
+# Magellano.ai - Revenue Management Platform #
 
 A Laravel-based platform for revenue management and statement processing. The platform enables publishers to manage their revenue data, upload billing information, and provides administrators with advanced tools for monitoring and processing financial information.
 
