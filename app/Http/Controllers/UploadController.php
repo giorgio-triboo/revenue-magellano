@@ -509,6 +509,7 @@ ISTRUZIONI PER IL CARICAMENTO
 - "payout" e "importo" possono avere massimo 2 decimali separati da "," (esempio 10,01) e non prevedono caratteri speciali (es. "€")
 - "quantita_validata" accetta solo valori interi
 - "data_invio" e "note", campi di testo non required per il caricamento
+- "tipologia_revenue" accettate cpl, cpc, cpm, tmk, crg, cpa, sms
 
 Intestazioni obbligatorie:
 anno_consuntivo
