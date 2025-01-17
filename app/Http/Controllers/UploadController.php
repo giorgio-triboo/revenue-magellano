@@ -499,6 +499,7 @@ ISTRUZIONI PER IL CARICAMENTO
 / Formato File
 - estensione file .csv
 - utilizzare ; come separatore delle colonne
+- l'ordine delle colonne non è vincolante al caricamento del file
 
 / Colonne Specifiche
 - "anno_consuntivo" e "anno_competenza" prevedono l'anno in 4 cifre (es. "2025")
