@@ -626,11 +626,7 @@
                                         <label for="privacy" class="font-medium text-gray-700">Accetto l'informativa
                                             sulla privacy <span class="text-red-500">*</span></label>
                                         <p class="text-gray-500">
-                                            Dichiaro di aver letto e compreso l'informativa sulla privacy ai sensi dell'art.
-                                            13 del Regolamento UE 2016/679 (GDPR)
-                                            e acconsento al trattamento dei miei dati personali per le finalità indicate
-                                            nell'informativa.
-                                            <a href="https://privacy.trdi.eu/gdpr/privacy/?utm_source=revenue"
+                                            Dichiaro di aver letto e compreso l'informativa sulla privacy ai sensi dell'art. 13 del Regolamento UE 2016/679 (GDPR). Leggi l'informativa completa. <a href="/privacy/revenue-magellano-privacy.pdf"
                                                 class="text-custom-activeItem hover:text-custom-activeItem/90"
                                                 target="_blank">
                                                 Leggi l'informativa completa
