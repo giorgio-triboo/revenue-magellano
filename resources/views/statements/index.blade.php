@@ -27,7 +27,7 @@
                     <div class="bg-custom-card shadow-md rounded-xl p-6">
                         <form method="GET" action="{{ route('statements.index') }}" class="grid gap-6">
                             <!-- Ricerca full-width -->
-                            <div class="sm:col-span-2">
+                            <div>
                                 <label for="search" class="block text-md font-medium text-gray-700">Ricerca</label>
                                 <div class="mt-1 relative rounded-xl shadow-sm">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -49,7 +49,7 @@
                             </div>
 
                             <!-- Anno, Mese, Tipologia in una riga -->
-                            <div class="grid sm:grid-cols-3 gap-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                                 <!-- Anno Consuntivo -->
                                 <div>
                                     <label for="statement_year" class="block text-md font-medium text-gray-700">Anno
@@ -194,5 +194,4 @@
             </div>
         </div>
     </div>
-
 @endsection
