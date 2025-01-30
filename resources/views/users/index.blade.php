@@ -117,7 +117,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-md text-gray-500"
                                         title="{{ $user->email }}">
-                                        {{ Str::limit($user->email, 28, '...') }}
+                                        {{ Str::limit($user->email, 20, '...') }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-md text-gray-500">
                                         {{ $user->publisher?->company_name }}
