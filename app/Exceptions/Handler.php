@@ -43,7 +43,7 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        Log::debug('Il metodo register del Handler è stato chiamato.');
+        // Log::debug('Il metodo register del Handler è stato chiamato.');
 
         $this->reportable(function (Throwable $e) {
             if ($this->shouldReport($e)) {
