@@ -131,64 +131,115 @@ class ProcessCsvUpload implements ShouldQueue
 
     protected function processRecords(): void
     {
-        $csv = $this->loadCsv();
-        $records = iterator_to_array($csv->getRecords());
-        $totalRecords = count($records);
-        $processed = 0;
-        $batch = [];
-
-        Log::channel('upload')->info('Starting records processing', [
+        Log::channel('upload')->info('Starting processRecords method', [
             'upload_id' => $this->upload->id,
-            'total_records' => $totalRecords
+            'current_status' => $this->upload->status
         ]);
 
-        $this->upload->update([
-            'total_records' => $totalRecords,
-            'status' => FileUpload::STATUS_PROCESSING
-        ]);
-
-        DB::beginTransaction();
         try {
-            foreach ($records as $index => $record) {
-                try {
-                    $validatedData = $this->validateRecord($record, $index + 2);
-                    $transformedData = $this->transformRecord($validatedData);
-                    $batch[] = $transformedData;
-
-                    if (count($batch) >= $this->batchSize) {
-                        $this->saveBatch($batch);
-                        $batch = [];
-                    }
-
-                    $processed++;
-                    $this->updateProgress($processed, $totalRecords);
-
-                } catch (\Exception $e) {
-                    Log::channel('upload')->warning('Error processing record', [
-                        'upload_id' => $this->upload->id,
-                        'line' => $index + 2,
-                        'error' => $e->getMessage()
-                    ]);
-                }
-            }
-
-            // Salva gli ultimi record rimanenti
-            if (!empty($batch)) {
-                $this->saveBatch($batch);
-            }
-
-            DB::commit();
-
-            $this->upload->update([
-                'status' => FileUpload::STATUS_COMPLETED,
-                'processed_records' => $processed,
-                'progress_percentage' => 100
+            $csv = $this->loadCsv();
+            Log::channel('upload')->debug('CSV file loaded successfully', [
+                'upload_id' => $this->upload->id,
+                'file_path' => $this->upload->stored_filename
             ]);
 
-            event(new FileUploadProcessed($this->upload));
+            $records = iterator_to_array($csv->getRecords());
+            $totalRecords = count($records);
+            
+            Log::channel('upload')->info('Records loaded from CSV', [
+                'upload_id' => $this->upload->id,
+                'total_records' => $totalRecords
+            ]);
 
+            if ($totalRecords === 0) {
+                Log::channel('upload')->warning('No records found in CSV file', [
+                    'upload_id' => $this->upload->id
+                ]);
+                $this->upload->update([
+                    'status' => FileUpload::STATUS_ERROR,
+                    'error_message' => 'Il file CSV non contiene record da processare'
+                ]);
+                return;
+            }
+
+            $processed = 0;
+            $batch = [];
+
+            Log::channel('upload')->info('Updating upload status to processing', [
+                'upload_id' => $this->upload->id,
+                'total_records' => $totalRecords
+            ]);
+
+            $this->upload->update([
+                'total_records' => $totalRecords,
+                'status' => FileUpload::STATUS_PROCESSING
+            ]);
+
+            DB::beginTransaction();
+            try {
+                foreach ($records as $index => $record) {
+                    try {
+                        $validatedData = $this->validateRecord($record, $index + 2);
+                        $transformedData = $this->transformRecord($validatedData);
+                        $batch[] = $transformedData;
+
+                        if (count($batch) >= $this->batchSize) {
+                            $this->saveBatch($batch);
+                            $batch = [];
+                        }
+
+                        $processed++;
+                        $this->updateProgress($processed, $totalRecords);
+
+                    } catch (\Exception $e) {
+                        Log::channel('upload')->warning('Error processing record', [
+                            'upload_id' => $this->upload->id,
+                            'line' => $index + 2,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+
+                // Salva gli ultimi record rimanenti
+                if (!empty($batch)) {
+                    $this->saveBatch($batch);
+                }
+
+                DB::commit();
+                Log::channel('upload')->info('Transaction committed successfully', [
+                    'upload_id' => $this->upload->id,
+                    'processed_records' => $processed
+                ]);
+
+                Log::channel('upload')->info('Updating upload status to completed', [
+                    'upload_id' => $this->upload->id,
+                    'processed_records' => $processed,
+                    'total_records' => $totalRecords
+                ]);
+
+                $this->upload->update([
+                    'status' => FileUpload::STATUS_COMPLETED,
+                    'processed_records' => $processed,
+                    'progress_percentage' => 100
+                ]);
+
+                event(new FileUploadProcessed($this->upload));
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::channel('upload')->error('Error during transaction', [
+                    'upload_id' => $this->upload->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e;
+            }
         } catch (\Exception $e) {
-            DB::rollBack();
+            Log::channel('upload')->error('Error in processRecords', [
+                'upload_id' => $this->upload->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             throw $e;
         }
     }
