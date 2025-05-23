@@ -27,6 +27,13 @@ class Kernel extends ConsoleKernel
                 ->withoutOverlapping()
                 ->runInBackground()
                 ->appendOutputTo(storage_path('logs/scheduler.log'));
+
+        // Esegui il queue worker ogni minuto
+        $schedule->command('queue:work --queue=csv-processing,ax-export --tries=3 --timeout=3600 --stop-when-empty')
+                ->everyMinute()
+                ->withoutOverlapping()
+                ->runInBackground()
+                ->appendOutputTo(storage_path('logs/queue-worker.log'));
     }
 
     /**
