@@ -53,10 +53,17 @@ class ProcessCsvUpload implements ShouldQueue
         $startTime = microtime(true);
         Log::channel('upload')->info('Starting CSV processing job', [
             'upload_id' => $this->upload->id,
-            'memory_usage' => $this->formatBytes(memory_get_usage(true))
+            'memory_usage' => $this->formatBytes(memory_get_usage(true)),
+            'queue' => $this->queue,
+            'attempt' => $this->attempts()
         ]);
 
         try {
+            // Aggiorna lo stato a processing
+            $this->upload->update([
+                'status' => FileUpload::STATUS_PROCESSING
+            ]);
+
             // Fase 1: Validazione iniziale del file
             $validationResult = $this->validateFile();
             if (!$validationResult['valid']) {
@@ -397,19 +404,23 @@ class ProcessCsvUpload implements ShouldQueue
 
     protected function handleValidationError(array $validationResult): void
     {
-        $this->upload->update([
-            'status' => FileUpload::STATUS_ERROR,
-            'error_message' => $validationResult['message'],
-            'processing_stats' => [
-                'completed_at' => now()->toDateTimeString(),
-                'error_details' => $validationResult['errors']
-            ]
-        ]);
-
         Log::channel('upload')->error('Validation failed', [
             'upload_id' => $this->upload->id,
             'errors' => $validationResult['errors']
         ]);
+
+        $this->upload->update([
+            'status' => FileUpload::STATUS_ERROR,
+            'error_message' => $validationResult['message'],
+            'processing_stats' => array_merge($this->upload->processing_stats ?? [], [
+                'completed_at' => now()->toDateTimeString(),
+                'error_details' => $validationResult['errors'],
+                'validation_failed' => true
+            ])
+        ]);
+
+        // Dispatch dell'evento per notificare l'errore
+        event(new FileUploadProcessed($this->upload));
     }
 
     protected function handleError(\Exception $e): void

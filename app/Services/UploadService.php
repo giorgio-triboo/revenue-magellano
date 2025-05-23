@@ -41,15 +41,15 @@ class UploadService
                 'stored_path' => $upload->stored_filename
             ]);
 
-            Log::channel('upload')->info('File stored successfully, dispatching processing job', [
+            // Dispatch del job di validazione e processing
+            Log::channel('upload')->info('Dispatching processing job', [
                 'upload_id' => $upload->id,
-                'file_path' => $upload->stored_filename,
-                'memory_usage' => $this->formatBytes(memory_get_usage(true)),
-                'queue' => 'csv-processing'
+                'queue' => 'csv-processing',
+                'job_class' => ProcessCsvUpload::class
             ]);
 
-            // Dispatch del job di validazione e processing
             ProcessCsvUpload::dispatch($upload)->onQueue('csv-processing');
+
             Log::channel('upload')->info('Processing job dispatched successfully', [
                 'upload_id' => $upload->id,
                 'queue' => 'csv-processing'
