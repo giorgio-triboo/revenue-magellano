@@ -17,6 +17,7 @@ class PublisherObserver
                 'display_name' => $publisher->company_name,
                 'invoice_group' => 'main',
                 'ax_name' => $publisher->company_name,
+                'channel_detail' => 'Tutti Terzi Non Rilevanti',
                 'is_primary' => true,
                 'notes' => 'Sub-publisher principale creato automaticamente'
             ]);
@@ -29,6 +30,14 @@ class PublisherObserver
 
             $vendAccount = $this->generateVendAccount($lastVendAccount);
             $vendId = $this->generateVendId($vendAccount);
+
+            // Determine nationality based on VAT number prefix
+            $countryCode = substr($publisher->vat_number, 0, 2);
+            $isItalian = $countryCode === 'IT';
+
+            // Set AX fields based on nationality
+            $salesTaxGroup = $isItalian ? 'AcqDom' : 'AcqUe';
+            $numberSequenceGroupId = $isItalian ? 'TBA.A_ITEX' : 'TBA.A_UE';
 
             // Create corresponding AX data
             $axData = new AxData([
@@ -46,8 +55,8 @@ class PublisherObserver
                 'payment_mode' => null,
                 'currency_code' => 'EUR',
                 'tax_item_group' => null,
-                'sales_tax_group' => null,
-                'number_sequence_group_id' => null
+                'sales_tax_group' => $salesTaxGroup,
+                'number_sequence_group_id' => $numberSequenceGroupId
             ]);
 
             $publisher->axData()->save($axData);
@@ -57,7 +66,12 @@ class PublisherObserver
                 'sub_publisher_id' => $subPublisher->id,
                 'ax_data_id' => $axData->id,
                 'vend_account' => $vendAccount,
-                'vend_id' => $vendId
+                'vend_id' => $vendId,
+                'country_code' => $countryCode,
+                'is_italian' => $isItalian,
+                'sales_tax_group' => $salesTaxGroup,
+                'number_sequence_group_id' => $numberSequenceGroupId,
+                'channel_detail' => 'Tutti Terzi Non Rilevanti'
             ]);
         } catch (\Exception $e) {
             Log::error('Error creating publisher related data', [
