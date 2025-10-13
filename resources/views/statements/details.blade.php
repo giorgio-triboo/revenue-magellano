@@ -144,7 +144,7 @@
 
                             <!-- Bottoni -->
                             <div class="flex justify-end space-x-4">
-                                @if (request()->hasAny(['search', 'statement_month', 'revenue_type']))
+                                @if (request()->hasAny(['search', 'statement_month', 'revenue_type', 'statement_year']))
                                     <a href="{{ route('statements.details') }}"
                                         class=" inline-flex items-center justify-center mt-7 px-4 py-2 rounded-xl border border-gray-200 text-gray-700 bg-white hover:bg-gray-50">
                                         <i data-lucide="x" class="h-5 w-5 mr-2"></i>
