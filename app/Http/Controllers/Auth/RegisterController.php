@@ -133,6 +133,19 @@ class RegisterController extends Controller
         ];
     }
 
+    /**
+     * Deriva automaticamente il state_id dal country_code
+     * 
+     * @param string $countryCode
+     * @return string
+     */
+    protected function deriveStateId($countryCode)
+    {
+        // Mappatura diretta: il country_code diventa lo state_id
+        // Per la maggior parte dei paesi, il codice ISO a 2 lettere è appropriato
+        return strtoupper($countryCode);
+    }
+
     public function checkVat(Request $request)
     {
         try {
@@ -167,6 +180,7 @@ class RegisterController extends Controller
                         'company_name' => $publisher->company_name,
                         'legal_name' => $publisher->legal_name,
                         'state' => $publisher->state,
+                        'state_id' => $publisher->state_id,
                         'county' => $publisher->county,
                         'city' => $publisher->city,
                         'postal_code' => $publisher->postal_code,
@@ -252,11 +266,15 @@ class RegisterController extends Controller
                 $publisher = Publisher::where('vat_number', $fullVatNumber)->first();
 
                 if (!$publisher) {
+                    // Deriva automaticamente state_id dal country_code
+                    $stateId = $this->deriveStateId($validatedData['country_code']);
+                    
                     $publisher = Publisher::create([
                         'vat_number' => $fullVatNumber,
                         'company_name' => $validatedData['company_name'],
                         'legal_name' => $validatedData['legal_name'],
                         'state' => $validatedData['state'],
+                        'state_id' => $stateId,
                         'county' => $validatedData['county'],
                         'city' => $validatedData['city'],
                         'postal_code' => $validatedData['postal_code'],
