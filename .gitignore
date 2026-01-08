@@ -38,6 +38,5 @@ yarn-error.log
 *.sqlite
 
 # Development tools
-/docker/*
-docker-compose.yml
-Dockerfile
+*.sql
+backup_*.sql
