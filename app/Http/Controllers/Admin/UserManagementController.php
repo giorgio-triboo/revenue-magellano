@@ -53,9 +53,17 @@ class UserManagementController extends Controller
             // Ricerca
             if ($request->filled('search')) {
                 $search = str_replace('*', '%', $request->search);
+                // Sanitizzazione aggiuntiva per sicurezza
+                $search = strip_tags($search);
+                $search = addcslashes($search, '%_'); // Escape caratteri speciali LIKE
+                
                 $query->where(function ($q) use ($search) {
                     $q->where('email', 'LIKE', "%{$search}%")
-                        ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'LIKE', "%{$search}%")
+                        // Ricerca separata su first_name e last_name (più sicuro di DB::raw)
+                        ->orWhere(function ($subQuery) use ($search) {
+                            $subQuery->where('first_name', 'LIKE', "%{$search}%")
+                                ->orWhere('last_name', 'LIKE', "%{$search}%");
+                        })
                         ->orWhereHas('publisher', function ($query) use ($search) {
                             $query->where('legal_name', 'LIKE', "%{$search}%")
                                 ->orWhere('company_name', 'LIKE', "%{$search}%");
