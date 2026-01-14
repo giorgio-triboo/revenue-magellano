@@ -210,16 +210,16 @@
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span
                                                         class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-xl"
-                                                        :class="getAxExportStatusClass(@js($upload))">
-                                                        <span x-text="getAxExportStatusText(@js($upload))"></span>
+                                                        :class="getAxExportStatusClass(@js($upload->toFrontendArray()))">
+                                                        <span x-text="getAxExportStatusText(@js($upload->toFrontendArray()))"></span>
                                                     </span>
                                                 </td>
                                                 <!-- Stato SFTP -->
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span
                                                         class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-xl"
-                                                        :class="getSftpStatusClass(@js($upload))">
-                                                        <span x-text="getSftpStatusText(@js($upload))"></span>
+                                                        :class="getSftpStatusClass(@js($upload->toFrontendArray()))">
+                                                        <span x-text="getSftpStatusText(@js($upload->toFrontendArray()))"></span>
                                                     </span>
                                                 </td>
                                                 <!-- Record Elaborati -->
@@ -239,26 +239,26 @@
                                                 <td class="px-6 py-4 whitespace-nowrap text-right text-md font-medium">
                                                     <div class="flex items-center justify-end space-x-3">
                                                         <!-- Pulsante AX -->
-                                                        <button type="button" @click="openExportModal(@js($upload))"
+                                                        <button type="button" @click="openExportModal(@js($upload->toFrontendArray()))"
                                                             @if (!$upload->ax_export_path || $upload->status !== 'completed') disabled @endif
                                                             class="inline-flex items-center px-3 py-1 border border-transparent rounded-xl shadow-sm text-md font-medium text-white bg-custom-activeItem hover:bg-custom-activeItem/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem disabled:opacity-50">
                                                             AX
                                                         </button>
                                                         <!-- Pulsante Pubblica -->
-                                                        <button type="button" @click="confirmPublish(@js($upload))"
+                                                        <button type="button" @click="confirmPublish(@js($upload->toFrontendArray()))"
                                                             @if ($upload->status !== 'completed') disabled @endif
                                                             class="inline-flex items-center px-3 py-1 border border-transparent rounded-xl shadow-sm text-md font-medium text-white bg-custom-activeItem hover:bg-custom-activeItem/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem disabled:opacity-50">
                                                             Pubblica
                                                         </button>
                                                         <!-- Pulsante Email -->
                                                         <button type="button"
-                                                            @click="confirmSendEmail(@js($upload))"
+                                                            @click="confirmSendEmail(@js($upload->toFrontendArray()))"
                                                             @if ($upload->status !== 'published' || $upload->notification_sent_at !== null) disabled @endif
                                                             class="inline-flex items-center px-3 py-1 border border-transparent rounded-xl shadow-sm text-md font-medium text-white bg-custom-activeItem hover:bg-custom-activeItem/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem disabled:opacity-50">
                                                             Email
                                                         </button>
                                                         <!-- Pulsante Info -->
-                                                        <button type="button" @click="showInfo(@js($upload))"
+                                                        <button type="button" @click="showInfo(@js($upload->toFrontendArray()))"
                                                             class="inline-flex items-center px-3 py-1 border border-transparent rounded-xl shadow-sm text-md font-medium text-white bg-custom-activeItem hover:bg-custom-activeItem/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem">
                                                             Info
                                                         </button>

@@ -73,6 +73,14 @@ class FileUpload extends Model
         'ax_export_status' => self::AX_STATUS_PENDING
     ];
 
+    /**
+     * Nascondiamo le relazioni durante la serializzazione per evitare query aggiuntive
+     */
+    protected $hidden = [
+        'user',
+        'statements'
+    ];
+
 
     public function user(): BelongsTo
     {
@@ -192,6 +200,32 @@ class FileUpload extends Model
     public function isAxCompleted(): bool
     {
         return $this->ax_export_status === self::AX_STATUS_COMPLETED;
+    }
+
+    /**
+     * Restituisce solo i dati necessari per la serializzazione JSON nel frontend
+     * Evita di caricare relazioni o accessor che causano query aggiuntive
+     */
+    public function toFrontendArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'status' => $this->status,
+            'process_date' => $this->process_date?->format('Y-m-d'),
+            'progress_percentage' => $this->progress_percentage,
+            'processed_records' => $this->processed_records,
+            'total_records' => $this->total_records,
+            'ax_export_status' => $this->ax_export_status,
+            'ax_export_path' => $this->ax_export_path,
+            'sftp_status' => $this->sftp_status,
+            'sftp_error_message' => $this->sftp_error_message,
+            'sftp_uploaded_at' => $this->sftp_uploaded_at?->toIso8601String(),
+            'published_at' => $this->published_at?->toIso8601String(),
+            'notification_sent_at' => $this->notification_sent_at?->toIso8601String(),
+            'error_message' => $this->error_message,
+            'processing_stats' => $this->processing_stats,
+            'created_at' => $this->created_at?->toIso8601String(),
+        ];
     }
 
     public function isAxError(): bool
