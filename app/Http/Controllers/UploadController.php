@@ -35,11 +35,17 @@ class UploadController extends Controller
             abort(403, 'Non autorizzato ad accedere a questa sezione.');
         }
 
-        $uploads = FileUpload::with(['user', 'statements'])
-            ->when(auth()->user()->role->code === 'publisher', function ($query) {
-                $query->where('user_id', auth()->id());
+        // Carica il ruolo una volta sola per evitare query aggiuntive
+        $user = auth()->user()->load('role');
+        $isPublisher = $user->role->code === 'publisher';
+
+        // Rimuoviamo il caricamento eager di 'user' e 'statements' 
+        // perché non vengono utilizzati nella view principale
+        $uploads = FileUpload::query()
+            ->when($isPublisher, function ($query) use ($user) {
+                $query->where('user_id', $user->id);
             })
-            ->latest()
+            ->latest('created_at')
             ->paginate(10);
 
         return view('uploads.index', compact('uploads'));
@@ -52,12 +58,17 @@ class UploadController extends Controller
         }
 
         try {
-            $uploads = FileUpload::with(['user', 'statements'])
-                ->when(auth()->user()->role->code === 'publisher', function ($query) {
-                    $query->where('user_id', auth()->id());
+            // Carica il ruolo una volta sola per evitare query aggiuntive
+            $user = auth()->user()->load('role');
+            $isPublisher = $user->role->code === 'publisher';
+
+            // Rimuoviamo il caricamento eager non necessario
+            $uploads = FileUpload::query()
+                ->when($isPublisher, function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
                 })
                 ->whereIn('status', ['pending', 'processing'])
-                ->latest()
+                ->latest('created_at')
                 ->get()
                 ->map(function ($upload) {
                     return [
