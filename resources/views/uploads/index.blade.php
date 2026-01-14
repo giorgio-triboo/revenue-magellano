@@ -190,8 +190,8 @@
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span
                                                         class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-xl"
-                                                        :class="getStatusClass('{{ $upload->status }}')">
-                                                        <span x-text="getStatusText('{{ $upload->status }}')"></span>
+                                                        :class="getStatusClass('{{ $upload->status }}', @js($upload->toFrontendArray()))">
+                                                        <span x-text="getStatusText('{{ $upload->status }}', @js($upload->toFrontendArray()))"></span>
                                                     </span>
                                                     @if ($upload->status === 'processing')
                                                         <div class="mt-1">
@@ -381,8 +381,8 @@
                             <dt class="text-md font-medium text-gray-500">Status CSV</dt>
                             <dd class="text-md text-gray-900 col-span-2">
                                 <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-xl"
-                                    :class="getStatusClass(currentInfoUpload?.status)">
-                                    <span x-text="getStatusText(currentInfoUpload?.status)"></span>
+                                    :class="getStatusClass(currentInfoUpload?.status, currentInfoUpload)">
+                                    <span x-text="getStatusText(currentInfoUpload?.status, currentInfoUpload)"></span>
                                 </span>
                             </dd>
                         </div>
@@ -448,18 +448,44 @@
                         </div>
 
                         <!-- Sezione Errori CSV -->
-                        <template x-if="currentInfoUpload?.status === 'error'">
-                            <div class="py-4">
-                                <dt class="text-md font-medium text-gray-500 mb-2">Dettagli Errori CSV</dt>
+                        <template x-if="currentInfoUpload?.status === 'error' || (currentInfoUpload?.processing_stats?.validation_failed) || (currentInfoUpload?.processing_stats?.error_count > 0)">
+                            <div class="py-4 border-t border-gray-200">
+                                <dt class="text-md font-medium text-red-600 mb-3">Dettagli Errori di Validazione</dt>
                                 <dd class="mt-2">
-                                    <div class="bg-red-50 p-4 rounded-xl">
-                                        <div class="text-md text-red-700">
-                                            <!-- Messaggio di Errore -->
-                                            <div class="mb-4">
-                                                <p class="whitespace-pre-line"
-                                                    x-text="currentInfoUpload.error_message || 'Nessun dettaglio errore disponibile'">
+                                    <div class="bg-red-50 border border-red-200 p-4 rounded-xl">
+                                        <!-- Messaggio di Errore Generale -->
+                                        <div class="mb-4" x-show="currentInfoUpload?.error_message">
+                                            <p class="text-md font-semibold text-red-800 mb-2">Errore:</p>
+                                            <p class="text-sm text-red-700 whitespace-pre-line"
+                                                x-text="currentInfoUpload.error_message">
+                                            </p>
+                                        </div>
+
+                                        <!-- Dettagli Errori per Riga -->
+                                        <template x-if="currentInfoUpload?.processing_stats?.error_details && currentInfoUpload.processing_stats.error_details.length > 0">
+                                            <div class="mt-4">
+                                                <p class="text-md font-semibold text-red-800 mb-3">
+                                                    Errori trovati: <span x-text="currentInfoUpload.processing_stats.error_details.length"></span>
                                                 </p>
+                                                <div class="max-h-64 overflow-y-auto space-y-2">
+                                                    <template x-for="(error, index) in currentInfoUpload.processing_stats.error_details" :key="index">
+                                                        <div class="bg-white p-3 rounded-lg border border-red-200">
+                                                            <div class="flex items-start">
+                                                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 mr-3">
+                                                                    Riga <span x-text="error.line"></span>
+                                                                </span>
+                                                                <p class="text-sm text-red-700 flex-1" x-text="error.error"></p>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </div>
                                             </div>
+                                        </template>
+
+                                        <!-- Messaggio se non ci sono dettagli -->
+                                        <div x-show="!currentInfoUpload?.processing_stats?.error_details || currentInfoUpload.processing_stats.error_details.length === 0" 
+                                             class="text-sm text-red-600">
+                                            <p x-text="currentInfoUpload?.error_message || 'Nessun dettaglio errore disponibile'"></p>
                                         </div>
                                     </div>
                                 </dd>

@@ -164,47 +164,104 @@ class ProcessCsvUpload implements ShouldQueue
                 ]);
                 $this->upload->update([
                     'status' => FileUpload::STATUS_ERROR,
-                    'error_message' => 'Il file CSV non contiene record da processare'
+                    'error_message' => 'Il file CSV non contiene record da processare',
+                    'processing_stats' => [
+                        'completed_at' => now()->toDateTimeString(),
+                        'error_details' => [['line' => 0, 'error' => 'Il file CSV non contiene record da processare']]
+                    ]
                 ]);
+                event(new FileUploadProcessed($this->upload));
                 return;
             }
-
-            $processed = 0;
-            $batch = [];
-
-            Log::channel('upload')->info('Updating upload status to processing', [
-                'upload_id' => $this->upload->id,
-                'total_records' => $totalRecords
-            ]);
 
             $this->upload->update([
                 'total_records' => $totalRecords,
                 'status' => FileUpload::STATUS_PROCESSING
             ]);
 
+            // FASE 1: Validazione completa di tutti i record prima di salvare
+            $errors = [];
+            $validRecords = [];
+
+            Log::channel('upload')->info('Starting validation phase for all records', [
+                'upload_id' => $this->upload->id,
+                'total_records' => $totalRecords
+            ]);
+
+            foreach ($records as $index => $record) {
+                $lineNumber = $index + 2; // +2 perché l'header è la riga 1 e gli indici partono da 0
+                
+                try {
+                    $validatedData = $this->validateRecord($record, $lineNumber);
+                    $transformedData = $this->transformRecord($validatedData);
+                    $validRecords[] = $transformedData;
+                } catch (\Exception $e) {
+                    $errors[] = [
+                        'line' => $lineNumber,
+                        'error' => $e->getMessage()
+                    ];
+                    
+                    Log::channel('upload')->warning('Error validating record', [
+                        'upload_id' => $this->upload->id,
+                        'line' => $lineNumber,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            // Se ci sono errori, bloccare il processo e restituire tutti gli errori
+            if (!empty($errors)) {
+                Log::channel('upload')->error('Validation errors found, blocking upload', [
+                    'upload_id' => $this->upload->id,
+                    'total_errors' => count($errors),
+                    'errors' => $errors
+                ]);
+
+                $errorLines = array_column($errors, 'line');
+                $errorMessage = sprintf(
+                    'Trovati %d errori di validazione. Il file non può essere processato. Errori alle righe: %s',
+                    count($errors),
+                    implode(', ', array_unique($errorLines))
+                );
+
+                $this->upload->update([
+                    'status' => FileUpload::STATUS_ERROR,
+                    'error_message' => $errorMessage,
+                    'processing_stats' => [
+                        'completed_at' => now()->toDateTimeString(),
+                        'total_records' => $totalRecords,
+                        'valid_records' => count($validRecords),
+                        'error_count' => count($errors),
+                        'error_details' => $errors,
+                        'validation_failed' => true
+                    ]
+                ]);
+
+                event(new FileUploadProcessed($this->upload));
+                return;
+            }
+
+            // FASE 2: Se non ci sono errori, procedere con il salvataggio
+            Log::channel('upload')->info('All records validated successfully, starting save phase', [
+                'upload_id' => $this->upload->id,
+                'total_records' => count($validRecords)
+            ]);
+
             DB::beginTransaction();
             try {
-                foreach ($records as $index => $record) {
-                    try {
-                        $validatedData = $this->validateRecord($record, $index + 2);
-                        $transformedData = $this->transformRecord($validatedData);
-                        $batch[] = $transformedData;
+                $processed = 0;
+                $batch = [];
 
-                        if (count($batch) >= $this->batchSize) {
-                            $this->saveBatch($batch);
-                            $batch = [];
-                        }
+                foreach ($validRecords as $index => $transformedData) {
+                    $batch[] = $transformedData;
 
-                        $processed++;
-                        $this->updateProgress($processed, $totalRecords);
-
-                    } catch (\Exception $e) {
-                        Log::channel('upload')->warning('Error processing record', [
-                            'upload_id' => $this->upload->id,
-                            'line' => $index + 2,
-                            'error' => $e->getMessage()
-                        ]);
+                    if (count($batch) >= $this->batchSize) {
+                        $this->saveBatch($batch);
+                        $batch = [];
                     }
+
+                    $processed++;
+                    $this->updateProgress($processed, $totalRecords);
                 }
 
                 // Salva gli ultimi record rimanenti
@@ -227,7 +284,13 @@ class ProcessCsvUpload implements ShouldQueue
                 $this->upload->update([
                     'status' => FileUpload::STATUS_COMPLETED,
                     'processed_records' => $processed,
-                    'progress_percentage' => 100
+                    'progress_percentage' => 100,
+                    'processing_stats' => [
+                        'completed_at' => now()->toDateTimeString(),
+                        'total_records' => $totalRecords,
+                        'processed_records' => $processed,
+                        'success' => true
+                    ]
                 ]);
 
                 event(new FileUploadProcessed($this->upload));

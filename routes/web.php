@@ -161,6 +161,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [UploadController::class, 'index'])->name('uploads.index');
             Route::post('/', [UploadController::class, 'store'])->name('uploads.store');
             Route::get('/list', [UploadController::class, 'list'])->name('uploads.list');
+            Route::get('/{upload}', [UploadController::class, 'show'])->name('uploads.show')
+                ->whereNumber('upload');
             Route::post('/{id}/unpublish', [UploadController::class, 'unpublish'])
                 ->name('uploads.unpublish')
                 ->where('id', '[0-9]+');

@@ -31,17 +31,38 @@ class UploadController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('view-uploads')) {
+        // Carica il ruolo una volta sola per evitare query aggiuntive nel Gate
+        $user = auth()->user()->load('role');
+        
+        if (!Gate::forUser($user)->allows('view-uploads')) {
             abort(403, 'Non autorizzato ad accedere a questa sezione.');
         }
 
-        // Carica il ruolo una volta sola per evitare query aggiuntive
-        $user = auth()->user()->load('role');
         $isPublisher = $user->role->code === 'publisher';
 
-        // Rimuoviamo il caricamento eager di 'user' e 'statements' 
-        // perché non vengono utilizzati nella view principale
+        // Selezioniamo solo i campi necessari per migliorare le performance
+        // Questo evita di caricare dati non necessari e velocizza la query
         $uploads = FileUpload::query()
+            ->select([
+                'id',
+                'user_id',
+                'status',
+                'process_date',
+                'progress_percentage',
+                'processed_records',
+                'total_records',
+                'ax_export_status',
+                'ax_export_path',
+                'sftp_status',
+                'sftp_error_message',
+                'sftp_uploaded_at',
+                'published_at',
+                'notification_sent_at',
+                'error_message',
+                'processing_stats',
+                'created_at',
+                'updated_at'
+            ])
             ->when($isPublisher, function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })

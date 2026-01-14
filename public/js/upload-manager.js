@@ -108,9 +108,9 @@ function uploadManager() {
                         if (statusCell) {
                             const statusBadge = statusCell.querySelector('.status-badge');
                             if (statusBadge) {
-                                statusBadge.textContent = this.getStatusText(processingUpload.status);
+                                statusBadge.textContent = this.getStatusText(processingUpload.status, processingUpload);
                                 statusBadge.className = 'status-badge px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-xl';
-                                const newClasses = this.getStatusClass(processingUpload.status);
+                                const newClasses = this.getStatusClass(processingUpload.status, processingUpload);
                                 Object.keys(newClasses).forEach(className => {
                                     if (newClasses[className]) {
                                         statusBadge.classList.add(className);
@@ -243,8 +243,31 @@ function uploadManager() {
             this.showExportModal = true;
         },
 
-        showInfo(upload) {
-            this.currentInfoUpload = upload;
+        async showInfo(upload) {
+            try {
+                // Carica i dettagli completi dell'upload inclusi processing_stats
+                const response = await fetch(`/uploads/${upload.id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Merge con i dati esistenti per mantenere compatibilità
+                    this.currentInfoUpload = { ...upload, ...data };
+                } else {
+                    // Fallback: usa i dati disponibili
+                    this.currentInfoUpload = upload;
+                }
+            } catch (error) {
+                console.error('Errore nel caricamento dettagli upload:', error);
+                // Fallback: usa i dati disponibili
+                this.currentInfoUpload = upload;
+            }
+            
             this.showInfoModal = true;
         },
 
@@ -503,7 +526,15 @@ function uploadManager() {
         },
 
         // Utility functions
-        getStatusClass(status) {
+        getStatusClass(status, upload = null) {
+            // Se ci sono errori di validazione, mostrare sempre rosso
+            if (upload && upload.processing_stats && upload.processing_stats.validation_failed) {
+                return 'bg-red-100 text-red-800';
+            }
+            if (upload && upload.processing_stats && upload.processing_stats.error_count > 0) {
+                return 'bg-red-100 text-red-800';
+            }
+            
             return {
                 'bg-yellow-100 text-yellow-800': status === 'processing',
                 'bg-green-100 text-green-800': status === 'completed',
@@ -568,7 +599,15 @@ function uploadManager() {
             return upload.ax_export_path && upload.status === 'completed';
         },
 
-        getStatusText(status) {
+        getStatusText(status, upload = null) {
+            // Se ci sono errori di validazione, mostrare sempre "Errore"
+            if (upload && upload.processing_stats && upload.processing_stats.validation_failed) {
+                return 'Errore';
+            }
+            if (upload && upload.processing_stats && upload.processing_stats.error_count > 0) {
+                return 'Errore';
+            }
+            
             const statusMap = {
                 'pending': 'In validazione',
                 'processing': 'In elaborazione',

@@ -3,17 +3,17 @@
 A Laravel-based platform for revenue management and statement processing. The platform enables publishers to manage their revenue data, upload billing information, and provides administrators with advanced tools for monitoring and processing financial information.
 
 ## Requirements
-- PHP 8.2+
+- PHP 8.4+
 - MySQL 8.0+
 - Node.js & NPM
 - Redis 6.0+ (for queues and cache)
 - PHP Extensions:
-  - php8.0-mysql
-  - php8.0-redis
-  - php8.0-xml
-  - php8.0-zip
-  - php8.0-mbstring
-  - php8.0-gd
+  - php8.4-mysql
+  - php8.4-redis
+  - php8.4-xml
+  - php8.4-zip
+  - php8.4-mbstring
+  - php8.4-gd
 
 ## Tech Stack
 - Laravel Framework
@@ -113,7 +113,40 @@ Located in `app/Services/AxExportService.php`
 
 ## Development Setup
 
-### Local Environment Setup
+### Docker Setup (Raccomandato)
+
+Per testare le modifiche in un ambiente locale isolato prima di metterle in produzione:
+
+1. **Avvia i container:**
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Esegui lo script di setup:**
+   ```bash
+   ./docker/setup.sh
+   ```
+
+3. **Accedi all'applicazione:**
+   - Web: http://localhost:8080
+   - MySQL: localhost:3306
+   - Redis: localhost:6379
+
+**Comandi utili:**
+```bash
+# Usa il Makefile per comandi rapidi
+make help          # Mostra tutti i comandi disponibili
+make up            # Avvia i container
+make down          # Ferma i container
+make logs          # Mostra i log
+make shell         # Accedi al container
+make artisan CMD="migrate"  # Esegue comandi Artisan
+make queue          # Avvia il queue worker
+```
+
+Per maggiori dettagli, consulta `docker/README.md`.
+
+### Local Environment Setup (Senza Docker)
 1. Clone the repository
 2. Install PHP dependencies via Composer
 3. Install Node.js dependencies
