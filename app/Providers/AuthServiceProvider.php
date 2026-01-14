@@ -45,7 +45,12 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         // Gate per gli upload
+        // Ottimizzato: il ruolo viene già caricato nel controller per evitare query aggiuntive
         Gate::define('view-uploads', function (User $user) {
+            // Se il ruolo non è già caricato, lo carichiamo una volta sola
+            if (!$user->relationLoaded('role')) {
+                $user->load('role');
+            }
             return in_array($user->role?->code, ['admin', 'operator']);
         });
 
