@@ -45,6 +45,7 @@ phases:
 artifacts:
   files:
     - '**/*'
+    - 'appspec.yml'
 #  name: artifact-name
 #  discard-paths: no | yes
 #  base-directory: location
