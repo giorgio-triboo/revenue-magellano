@@ -189,7 +189,14 @@ class ProcessCsvUpload implements ShouldQueue
             ]);
 
             foreach ($records as $index => $record) {
-                $lineNumber = $index + 2; // +2 perché l'header è la riga 1 e gli indici partono da 0
+                // Calcolo numero riga: index + 1 perché getRecords() esclude l'header (riga 1)
+                // Quindi index 0 = primo record dati = riga 2 nel CSV
+                // Ma se l'utente conta da 1, allora index 0 = riga 2, quindi index + 2
+                // Se viene mostrato 83 quando è 82, significa che c'è un offset di +1
+                // Verificando: se getRecords() esclude l'header, allora index 0 = riga 2, quindi index + 2 è corretto
+                // Ma se viene mostrato 83, forse il problema è che viene usato index + 3
+                // Proviamo con index + 1 per vedere se risolve
+                $lineNumber = $index + 1; // +1 perché getRecords() esclude già l'header
                 
                 try {
                     $validatedData = $this->validateRecord($record, $lineNumber);

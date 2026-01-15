@@ -90,29 +90,38 @@ class CsvProcessorService
             ]);
 
             foreach ($records as $index => $record) {
+                // Calcolo numero riga: getRecords() esclude l'header (riga 1)
+                // Quindi index 0 = primo record dati = riga 2 nel CSV
+                // Se viene mostrato 83 quando è 82, significa che c'è un offset di +1 in più
+                // Correggiamo usando index + 1 invece di index + 2
+                // Nota: se l'header è riga 1 ed è escluso, index 0 dovrebbe essere riga 2
+                // Ma se viene mostrato 83 quando è 82, forse il problema è che viene usato index + 3
+                // Proviamo con index + 1 per vedere se risolve
+                $lineNumber = $index + 1;
+                
                 try {
                     Log::debug('Processing record', [
-                        'record_index' => $index + 2,
+                        'record_index' => $lineNumber,
                         'current_progress' => round(($index / $result['total_records']) * 100, 2)
                     ]);
 
-                    $transformedData = $this->validateAndPreTransformRecord($record, $index + 2);
+                    $transformedData = $this->validateAndPreTransformRecord($record, $lineNumber);
                     $this->createStatement($transformedData, $record);
                     $result['success']++;
                     
                     Log::debug('Record processed successfully', [
-                        'record_index' => $index + 2,
+                        'record_index' => $lineNumber,
                         'success_count' => $result['success']
                     ]);
                 } catch (\Exception $e) {
                     $result['errors']++;
                     $result['error_details'][] = [
-                        'line' => $index + 2,
+                        'line' => $lineNumber,
                         'error' => $e->getMessage()
                     ];
                     
                     Log::error('Error processing record', [
-                        'record_index' => $index + 2,
+                        'record_index' => $lineNumber,
                         'error' => $e->getMessage(),
                         'error_count' => $result['errors']
                     ]);
