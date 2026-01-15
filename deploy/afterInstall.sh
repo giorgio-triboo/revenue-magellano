@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 RELEASE="/var/www/revenue.magellano.ai"
 
