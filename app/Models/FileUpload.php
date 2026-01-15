@@ -50,14 +50,12 @@ class FileUpload extends Model
         'notification_sent_at'
     ];
 
-    protected $dates = [
-        'notification_sent_at'
-    ];    
-
     protected $casts = [
         'process_date' => 'date',
         'processed_at' => 'datetime',
         'published_at' => 'datetime',
+        'sftp_uploaded_at' => 'datetime',
+        'notification_sent_at' => 'datetime',
         'processing_stats' => 'array',
         'progress_percentage' => 'float',
         'total_records' => 'integer',
