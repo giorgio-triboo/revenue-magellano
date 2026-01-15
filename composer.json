@@ -16,7 +16,8 @@
         "symfony/css-selector": "^7.0",
         "symfony/event-dispatcher": "^7.0",
         "symfony/string": "^7.0",
-        "symfony/translation": "^7.0"
+        "symfony/translation": "^7.0",
+        "maennchen/zipstream-php": "^3.1.2 <3.2.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",
