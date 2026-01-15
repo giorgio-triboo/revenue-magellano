@@ -32,7 +32,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      php: 8.4
+      php: 8.2
     commands:
       - composer install --no-dev
       - npm install

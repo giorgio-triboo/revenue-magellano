@@ -5,13 +5,18 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.4",
+        "php": "^8.2",
         "laravel/framework": "^11.44",
         "laravel/tinker": "^2.10",
         "laravel/ui": "^4.5",
         "league/csv": "^9.18",
         "maatwebsite/excel": "^3.1",
-        "mews/purifier": "^3.4"
+        "mews/purifier": "^3.4",
+        "symfony/clock": "^7.0",
+        "symfony/css-selector": "^7.0",
+        "symfony/event-dispatcher": "^7.0",
+        "symfony/string": "^7.0",
+        "symfony/translation": "^7.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",
