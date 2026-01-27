@@ -376,6 +376,7 @@ class PublisherController extends Controller
                 'payment' => 'nullable|string|max:255',
                 'payment_mode' => 'nullable|string|max:255',
                 'currency_code' => 'nullable|string|max:255',
+                'tax_item_group' => 'nullable|string|max:255',
                 'sales_tax_group' => 'nullable|string|max:255',
                 'number_sequence_group_id' => 'nullable|string|max:255'
             ]);
