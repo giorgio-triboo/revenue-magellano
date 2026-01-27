@@ -26,12 +26,13 @@ class AxData extends Model
         'payment',
         'payment_mode',
         'currency_code',
+        'tax_item_group',
         'sales_tax_group',
         'number_sequence_group_id'
     ];
 
     // Relazione con Publisher
-    public function Publisher()
+    public function publisher()
     {
         return $this->belongsTo(Publisher::class);
     }
