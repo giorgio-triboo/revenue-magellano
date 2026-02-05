@@ -36,9 +36,8 @@ function uploadManager() {
         ],
 
 
-        // Initialization (riferimento globale per chiamate da modali/Alpine)
+        // Initialization
         init() {
-            window.__uploadManager = this;
             this.startPolling();
         },
 
@@ -391,30 +390,6 @@ function uploadManager() {
             }
         },
 
-        async regenerateAxExport(upload) {
-            if (!upload || upload.status !== 'completed') return;
-            if (upload.ax_export_status === 'processing') return;
-
-            try {
-                const response = await fetch(`/uploads/${upload.id}/regenerate-ax-export`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message || 'Errore durante la rigenerazione');
-
-                this.showNotification('success', data.message || 'Rigenerazione avviata');
-                window.location.reload();
-            } catch (error) {
-                this.showNotification('error', error.message);
-            }
-        },
-
         // async uploadToSftp(uploadId) {
         //     if (!uploadId) return;
         
@@ -671,67 +646,3 @@ function uploadManager() {
         }
     };
 }
-
-// Funzione globale per il pulsante Rigenera: chiama il backend che mette il job in coda (worker)
-window.regenerateAxExportForUpload = async function (upload) {
-    function show(msg) {
-        if (window.__uploadManager && typeof window.__uploadManager.showNotification === 'function') {
-            window.__uploadManager.showNotification('success', msg);
-        }
-        alert(msg);
-    }
-    function showError(msg) {
-        if (window.__uploadManager && typeof window.__uploadManager.showNotification === 'function') {
-            window.__uploadManager.showNotification('error', msg);
-        }
-        alert(msg);
-    }
-
-    if (!upload) {
-        showError('Dati upload non disponibili.');
-        return;
-    }
-    if (upload.status !== 'completed') {
-        showError('Rigenerazione possibile solo per upload completati.');
-        return;
-    }
-    if (upload.ax_export_status === 'processing') {
-        showError('Export AX già in elaborazione.');
-        return;
-    }
-    var id = upload.id;
-    if (!id) {
-        showError('ID upload non disponibile.');
-        return;
-    }
-
-    show('Avvio rigenerazione file AX...');
-
-    try {
-        var csrf = document.querySelector('meta[name="csrf-token"]');
-        var response = await fetch('/uploads/' + id + '/regenerate-ax-export', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': (csrf && csrf.content) || '',
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
-        var text = await response.text();
-        var data = null;
-        try {
-            data = text ? JSON.parse(text) : {};
-        } catch (_) {
-            showError(response.ok ? 'Risposta non valida dal server.' : ('Errore ' + response.status + ': ' + text.substring(0, 200)));
-            return;
-        }
-        if (!response.ok) {
-            showError((data && data.message) || 'Errore durante la rigenerazione.');
-            return;
-        }
-        show((data && data.message) || 'Rigenerazione avviata.');
-        window.location.reload();
-    } catch (err) {
-        showError(err && err.message ? err.message : 'Errore di connessione.');
-    }
-};

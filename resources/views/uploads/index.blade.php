@@ -511,13 +511,6 @@
 
                     <!-- Bottoni -->
                     <div class="mt-6 space-y-3">
-                        <button x-show="currentInfoUpload?.status === 'completed' && currentInfoUpload?.ax_export_status !== 'processing'"
-                            @click="window.regenerateAxExportForUpload(currentInfoUpload)"
-                            class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-xl shadow-sm text-md font-medium text-gray-700 bg-white hover:bg-gray-50">
-                            <i data-lucide="refresh-cw" class="h-5 w-5 mr-2"></i>
-                            Rigenera file AX
-                        </button>
-
                         <button x-show="currentInfoUpload?.status === 'published'" @click="unpublishUpload"
                             class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-xl shadow-sm text-md font-medium text-white bg-yellow-600 hover:bg-yellow-700">
                             <i data-lucide="archive" class="h-5 w-5 mr-2"></i>
