@@ -172,6 +172,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{upload}/export', [UploadController::class, 'export'])
                 ->name('uploads.export')
                 ->where('id', '[0-9]+');
+            Route::post('/{upload}/regenerate-ax-export', [UploadController::class, 'regenerateAxExport'])
+                ->name('uploads.regenerate-ax-export')
+                ->whereNumber('upload');
             Route::delete('/{id}', [UploadController::class, 'destroy'])
                 ->name('uploads.destroy')
                 ->where('id', '[0-9]+');

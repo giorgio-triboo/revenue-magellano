@@ -244,6 +244,13 @@
                                                             class="inline-flex items-center px-3 py-1 border border-transparent rounded-xl shadow-sm text-md font-medium text-white bg-custom-activeItem hover:bg-custom-activeItem/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem disabled:opacity-50">
                                                             AX
                                                         </button>
+                                                        <!-- Pulsante Rigenera AX -->
+                                                        <button type="button" @click="regenerateAxExport(@js($upload->toFrontendArray()))"
+                                                            @if ($upload->status !== 'completed' || $upload->ax_export_status === 'processing') disabled @endif
+                                                            class="inline-flex items-center px-3 py-1 border border-gray-300 rounded-xl shadow-sm text-md font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-activeItem disabled:opacity-50"
+                                                            title="Forza rigenerazione file AX">
+                                                            Rigenera
+                                                        </button>
                                                         <!-- Pulsante Pubblica -->
                                                         <button type="button" @click="confirmPublish(@js($upload->toFrontendArray()))"
                                                             @if ($upload->status !== 'completed') disabled @endif

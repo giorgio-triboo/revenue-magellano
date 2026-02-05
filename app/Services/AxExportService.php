@@ -24,6 +24,15 @@ class AxExportService
         $path = storage_path('app/private/exports/' . $fileName);
         Log::channel('ax_export')->debug('AxExportService: Path generazione file TSV.', ['path' => $path]);
 
+        // Crea la directory exports se non esiste (fopen non crea le directory padre)
+        $exportDir = storage_path('app/private/exports');
+        if (!is_dir($exportDir)) {
+            if (!mkdir($exportDir, 0755, true)) {
+                Log::channel('ax_export')->error('AxExportService: Impossibile creare la directory exports.', ['path' => $exportDir]);
+                throw new \Exception('Impossibile creare la directory di export');
+            }
+        }
+
         if (!$handle = fopen($path, 'w')) {
             Log::channel('ax_export')->error('AxExportService: Impossibile aprire il file per scrittura.', ['path' => $path]);
             throw new \Exception('Impossibile creare il file di export');

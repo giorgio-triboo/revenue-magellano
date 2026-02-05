@@ -19,6 +19,7 @@ use App\Events\FileUploadProcessed;
 use app\Models\User;
 use App\Mail\StatementPublishedTest;
 use App\Services\FtpUploadService;
+use App\Jobs\GenerateAxExport;
 
 class UploadController extends Controller
 {
@@ -386,6 +387,55 @@ class UploadController extends Controller
 
             return response()->json([
                 'message' => 'Errore durante il download del file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Forza la rigenerazione del file AX per un upload completato.
+     */
+    public function regenerateAxExport(FileUpload $upload)
+    {
+        if (!Gate::allows('download-files')) {
+            abort(403, 'Non autorizzato.');
+        }
+
+        if ($upload->status !== 'completed') {
+            return response()->json([
+                'message' => 'Rigenerazione consentita solo per upload completati.'
+            ], 422);
+        }
+
+        if ($upload->ax_export_status === 'processing') {
+            return response()->json([
+                'message' => 'Export AX già in elaborazione.'
+            ], 422);
+        }
+
+        try {
+            $upload->ax_export_status = 'processing';
+            $upload->ax_export_path = null;
+            $upload->save();
+
+            GenerateAxExport::dispatch($upload)->onQueue('ax-export');
+
+            Log::channel('ax_export')->info('UploadController: Rigenerazione AX richiesta.', [
+                'upload_id' => $upload->id,
+            ]);
+
+            return response()->json([
+                'message' => 'Rigenerazione file AX avviata. Lo stato si aggiornerà a breve.',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Errore avvio rigenerazione AX', [
+                'upload_id' => $upload->id,
+                'error' => $e->getMessage(),
+            ]);
+            $upload->ax_export_status = 'error';
+            $upload->save();
+
+            return response()->json([
+                'message' => 'Errore durante l\'avvio della rigenerazione: ' . $e->getMessage(),
             ], 500);
         }
     }

@@ -390,6 +390,30 @@ function uploadManager() {
             }
         },
 
+        async regenerateAxExport(upload) {
+            if (!upload || upload.status !== 'completed') return;
+            if (upload.ax_export_status === 'processing') return;
+
+            try {
+                const response = await fetch(`/uploads/${upload.id}/regenerate-ax-export`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Errore durante la rigenerazione');
+
+                this.showNotification('success', data.message || 'Rigenerazione avviata');
+                window.location.reload();
+            } catch (error) {
+                this.showNotification('error', error.message);
+            }
+        },
+
         // async uploadToSftp(uploadId) {
         //     if (!uploadId) return;
         
