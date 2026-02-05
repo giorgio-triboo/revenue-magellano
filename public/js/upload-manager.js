@@ -36,8 +36,9 @@ function uploadManager() {
         ],
 
 
-        // Initialization
+        // Initialization (riferimento globale per chiamate da modali/Alpine)
         init() {
+            window.__uploadManager = this;
             this.startPolling();
         },
 
