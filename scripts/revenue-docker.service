@@ -6,7 +6,7 @@ After=docker.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-WorkingDirectory=/var/www/revenue.magellano.ai
+WorkingDirectory=/home/ec2-user/revenue.magellano.ai
 ExecStart=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.bluegreen.yml up -d
 ExecStop=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.bluegreen.yml down
 TimeoutStartSec=0

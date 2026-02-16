@@ -1,7 +1,7 @@
 #!/bin/bash
 # Punta il traffico nginx sull'istanza green (app-green:9000)
 set -e
-APP_DIR="${APP_DIR:-/var/www/revenue.magellano.ai}"
+APP_DIR="${APP_DIR:-/home/ec2-user/revenue.magellano.ai}"
 UPSTREAM_CONF="$APP_DIR/docker/nginx/upstream.conf"
 cat > "$UPSTREAM_CONF" <<'EOF'
 upstream backend {

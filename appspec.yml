@@ -4,13 +4,16 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/revenue.magellano.ai
+    destination: /home/ec2-user/revenue.magellano.ai
 
 file_exists_behavior: OVERWRITE
 
 # Nessun chown apache: sul server con Docker l'utente apache non esiste; i container leggono i file.
 
 hooks:
+  BeforeInstall:
+    - location: deploy/beforeInstall.sh
+      timeout: 60
   AfterInstall:
-    - location: /deploy/afterInstall.sh
+    - location: deploy/afterInstall.sh
       timeout: 3000
