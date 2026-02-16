@@ -1,0 +1,102 @@
+# Blue-green deploy: due istanze app (blue/green), nginx sulla porta 3000
+# Uso: docker compose -f docker-compose.yml -f docker-compose.bluegreen.yml up -d
+# Switch: ./scripts/switch-to-green.sh oppure ./scripts/switch-to-blue.sh
+
+services:
+  app:
+    # Sostituito da app-blue e app-green; il servizio "app" non viene usato
+    profiles:
+      - disabled
+  app-blue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: magellano-app:latest
+    container_name: magellano-ai-blue
+    # Nessuna porta host: solo nginx espone 3000
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://magellano:${POSTGRES_PASSWORD}@postgres:5432/magellano
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - GOOGLE_SERVICE_ACCOUNT_PATH=${GOOGLE_SERVICE_ACCOUNT_PATH:-/app/.secrets/direct-performance-478808-ae9542ecea36.json}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GOOGLE_SHEETS_API_KEY=${GOOGLE_SHEETS_API_KEY}
+    volumes:
+      - ./logs:/app/logs
+      - ./.secrets:/app/.secrets:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 1536m
+    cpus: 1.5
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
+
+  app-green:
+    # Usa la stessa immagine di app-blue (build solo su app-blue per evitare conflitto)
+    image: magellano-app:latest
+    container_name: magellano-ai-green
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://magellano:${POSTGRES_PASSWORD}@postgres:5432/magellano
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - GOOGLE_SERVICE_ACCOUNT_PATH=${GOOGLE_SERVICE_ACCOUNT_PATH:-/app/.secrets/direct-performance-478808-ae9542ecea36.json}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GOOGLE_SHEETS_API_KEY=${GOOGLE_SHEETS_API_KEY}
+    volumes:
+      - ./logs:/app/logs
+      - ./.secrets:/app/.secrets:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 1536m
+    cpus: 1.5
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
+
+  nginx:
+    image: nginx:alpine
+    container_name: magellano-nginx
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/upstream.conf:/etc/nginx/upstream.conf
+    depends_on:
+      - app-blue
+      - app-green
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

@@ -77,6 +77,9 @@ class FtpUploadService
             $upload->sftp_status = 'processing';
             $upload->save();
 
+            // Evita che max_execution_time interrompa l'upload (errore 115 / timeout)
+            set_time_limit(300);
+
             // Test della risoluzione DNS
             $dnsResult = gethostbyname($this->config['host']);
             Log::channel('sftp')->debug('FtpUploadService: DNS lookup', [
@@ -121,6 +124,11 @@ class FtpUploadService
                 'enabled' => $pasv_result
             ]);
 
+            // Timeout lungo per connessione dati (evita errore 115 "Operation now in progress")
+            if (function_exists('ftp_set_option')) {
+                @ftp_set_option($this->connection, FTP_TIMEOUT_SEC, 120);
+            }
+
             // Verifica dello spazio disponibile (se supportato)
             if (function_exists('ftp_raw')) {
                 $raw = ftp_raw($this->connection, 'SITE QUOTA');
@@ -147,13 +155,32 @@ class FtpUploadService
                 'max_execution_time' => ini_get('max_execution_time')
             ]);
 
-            // Upload del file con progress tracking
-            $upload_result = ftp_put($this->connection, $remotePath, $localPath, FTP_BINARY);
-            
+            // Upload con retry (errore 115 "Operation now in progress" può essere transiente)
+            $maxAttempts = 3;
+            $upload_result = false;
+            $lastError = null;
+
+            for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+                $upload_result = @ftp_put($this->connection, $remotePath, $localPath, FTP_BINARY);
+                if ($upload_result) {
+                    break;
+                }
+                $lastError = error_get_last();
+                if ($attempt < $maxAttempts) {
+                    Log::channel('sftp')->warning('FtpUploadService: Retry upload', [
+                        'attempt' => $attempt,
+                        'max_attempts' => $maxAttempts,
+                        'error' => $lastError['message'] ?? null
+                    ]);
+                    sleep(2);
+                }
+            }
+
             if (!$upload_result) {
-                $error = error_get_last();
+                $error = $lastError ?? error_get_last();
                 Log::channel('sftp')->error('FtpUploadService: Errore upload', [
-                    'error_message' => $error['message'] ?? 'Nessun messaggio di errore'
+                    'error_message' => $error['message'] ?? 'Nessun messaggio di errore',
+                    'attempts' => $maxAttempts
                 ]);
                 throw new \Exception('Errore durante l\'upload del file su FTP: ' . ($error['message'] ?? ''));
             }

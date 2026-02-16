@@ -8,7 +8,11 @@ files:
 
 file_exists_behavior: OVERWRITE
 
-# Nessun chown apache: sul server con Docker l'utente apache non esiste; i container leggono i file.
+# Proprietario ec2-user (sul server Docker non esiste apache)
+permissions:
+  - object: /home/ec2-user/revenue.magellano.ai
+    owner: ec2-user
+    group: ec2-user
 
 hooks:
   BeforeInstall:
