@@ -66,9 +66,9 @@ $DOCKER_CMD container prune -f 2>/dev/null || true
 $DOCKER_CMD image prune -af 2>/dev/null || true
 $DOCKER_CMD builder prune -f 2>/dev/null || true
 
-# --- Build immagine app (solo app-blue): PHP/Composer sono nel Docker ---
-echo "Building Docker image (app-blue)..."
-$DCOMPOSE $COMPOSE_FILES build app-blue
+# --- Build immagine app (docker build evita richiesta buildx 0.17+ di compose build) ---
+echo "Building Docker image (revenue-app:latest)..."
+$DOCKER_CMD build -t revenue-app:latest -f Dockerfile .
 
 # --- Composer e frontend via Docker (stesso ambiente del runtime) ---
 echo "Running composer install..."
