@@ -14,6 +14,9 @@ phases:
       - echo "Validating deployment files..."
       - test -f Dockerfile && echo "✓ Dockerfile found" || (echo "✗ Dockerfile missing"; exit 1)
       - test -f docker-compose.yml && echo "✓ docker-compose.yml found" || (echo "✗ docker-compose.yml missing"; exit 1)
+      # Normalizza ownership: evita che l'artifact contenga "apache" (o altri user
+      # non presenti sul server) e che l'Install di CodeDeploy fallisca con "can't find user for apache"
+      - chown -R root:root .
       - echo "Build completed on `date`"
       - test "$CODEBUILD_BUILD_SUCCEEDING" = "1" || exit 1
 
