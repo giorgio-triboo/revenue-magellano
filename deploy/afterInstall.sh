@@ -1,10 +1,11 @@
 #!/bin/bash
 #
 # After install per revenue.magellano.ai: deploy con Docker e blue-green (zero downtime).
+# Come deploy_exemple: composer e npm sono nel Dockerfile, afterInstall solo build + up + switch + migrate.
 # - CodeDeploy copia i file in RELEASE
 # - .env da AWS Secrets Manager
+# - docker build (immagine con codice, vendor, frontend) → copia public/ su host per nginx
 # - Docker Compose: mysql, redis, app-blue, app-green, nginx sulla porta 80
-# - Deploy sul lato inattivo, switch traffico, migrazioni sul lato attivo
 #
 # Esecuzione locale (test): APP_DIR=$(pwd) LOCAL_DEPLOY=1 ./deploy/afterInstall.sh
 
@@ -84,31 +85,14 @@ $DOCKER_CMD volume prune -f 2>/dev/null || true
 $DOCKER_CMD image prune -f 2>/dev/null || true
 $DOCKER_CMD builder prune -f 2>/dev/null || true
 
-# --- Build immagine app: --network=host per usare DNS/rete dell'host (evita "Temporary failure resolving") ---
+# --- Build immagine app (composer + npm già nel Dockerfile, niente step separati sul server) ---
 echo "Building Docker image (revenue-app:latest)..."
 $DOCKER_CMD build --network=host -t revenue-app:latest -f Dockerfile .
 
-# --- Composer e frontend via Docker (stesso ambiente del runtime) ---
-# Timeout evita hang indefinito su connection timeout verso Packagist/npm (script esce con errore).
-COMPOSER_TIMEOUT=600
-NPM_TIMEOUT=900
-echo "Running composer install (timeout ${COMPOSER_TIMEOUT}s)..."
-timeout "$COMPOSER_TIMEOUT" $DOCKER_CMD run --rm -v "${RELEASE}:/var/www/html" -w /var/www/html revenue-app:latest sh -c "git config --global --add safe.directory /var/www/html && composer install --no-dev --no-interaction" || {
-    code=$?
-    if [ "$code" = 124 ]; then
-        echo "ERROR: composer install timed out after ${COMPOSER_TIMEOUT}s (rete lenta o Packagist irraggiungibile)"
-    fi
-    exit $code
-}
-echo "Running npm install and build (timeout ${NPM_TIMEOUT}s)..."
-# npm ci + più memoria per Node (evita "Exit handler never called" / vite not found)
-timeout "$NPM_TIMEOUT" $DOCKER_CMD run --rm -v "${RELEASE}:/app" -w /app -e NODE_OPTIONS="--max-old-space-size=4096" node:20-alpine sh -c "rm -rf node_modules && npm ci && npm run build" || {
-    code=$?
-    if [ "$code" = 124 ]; then
-        echo "ERROR: npm install/build timed out after ${NPM_TIMEOUT}s (rete lenta o registry irraggiungibile)"
-    fi
-    exit $code
-}
+# --- Copia public/ dall'immagine all'host così nginx può servire statici (css, js, build) ---
+mkdir -p "${RELEASE}/public"
+echo "Copying public/ from image to host for nginx..."
+$DOCKER_CMD run --rm -v "${RELEASE}:/out" revenue-app:latest sh -c "cp -a /var/www/html/public/. /out/public/"
 
 # --- Avvio stack (mysql, redis, app-blue, app-green, nginx) ---
 echo "Starting containers..."

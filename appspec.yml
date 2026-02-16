@@ -14,10 +14,11 @@ permissions:
     owner: ec2-user
     group: ec2-user
 
+# Timeout AfterInstall 600s come deploy_exemple: evita deploy "in progress" a oltranza; se supera 10 min CodeDeploy segna Failed.
 hooks:
   BeforeInstall:
     - location: deploy/beforeInstall.sh
       timeout: 60
   AfterInstall:
     - location: deploy/afterInstall.sh
-      timeout: 3000
+      timeout: 600

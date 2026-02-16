@@ -8,16 +8,14 @@ services:
       - disabled
 
   app-blue:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: revenue-app:latest
     container_name: revenue_app_blue
     restart: unless-stopped
     working_dir: /var/www/html
     env_file: .env
     volumes:
-      - .:/var/www/html
+      - ./storage:/var/www/html/storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - revenue_network
@@ -38,7 +36,8 @@ services:
     working_dir: /var/www/html
     env_file: .env
     volumes:
-      - .:/var/www/html
+      - ./storage:/var/www/html/storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - revenue_network
