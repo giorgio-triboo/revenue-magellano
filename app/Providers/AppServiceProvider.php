@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Database\Events\QueryExecuted;
 use App\Models\Publisher;
 use App\Observers\PublisherObserver;
@@ -24,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         Publisher::observe(PublisherObserver::class);
         User::observe(UserObserver::class);
 

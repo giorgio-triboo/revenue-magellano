@@ -1,6 +1,7 @@
 import colors from './resources/js/config/colors.js';
+import forms from '@tailwindcss/forms';
 
-module.exports = {
+export default {
     content: [
         "./resources/**/*.blade.php",
         "./resources/**/*.js",
@@ -15,6 +16,6 @@ module.exports = {
         },
     },
     plugins: [
-        require('@tailwindcss/forms'),
+        forms,
     ],
 };

@@ -11,7 +11,6 @@ export default defineConfig({
     build: {
         outDir: 'public/build', // Output nella directory pubblica
         emptyOutDir: true, // Pulisce la directory di output prima di ogni build
-        manifest: true, // Genera il file manifest.json per Laravel
         rollupOptions: {
             output: {
                 manualChunks: {

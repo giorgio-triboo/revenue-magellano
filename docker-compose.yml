@@ -31,7 +31,7 @@ services:
   # DB MySQL esterno: .env con DB_HOST punta al server DB; nessun container mysql nello stack.
 
   redis:
-    image: redis:7-alpine
+    image: redis:7.4-alpine
     container_name: revenue_redis
     restart: unless-stopped
     ports:

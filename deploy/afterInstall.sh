@@ -55,9 +55,11 @@ if [ "$LOCAL_DEPLOY" != "1" ] && [ "$LOCAL_DEPLOY" != "true" ]; then
         }
 fi
 
-# --- Directory e permessi Laravel; proprietà a ec2-user (agent può aver lasciato file root) ---
+# --- Directory e permessi Laravel ---
+# ec2-user per il resto; storage e bootstrap/cache a uid 33 (www-data nel container) così PHP può scrivere view/cache
 mkdir -p "${RELEASE}/storage/logs" "${RELEASE}/storage/framework/cache" "${RELEASE}/storage/framework/sessions" "${RELEASE}/storage/framework/views" "${RELEASE}/bootstrap/cache"
 chown -R ec2-user:ec2-user "$RELEASE" 2>/dev/null || true
+chown -R 33:33 "${RELEASE}/storage" "${RELEASE}/bootstrap/cache" 2>/dev/null || true
 chmod -R 775 "${RELEASE}/storage" "${RELEASE}/bootstrap/cache" 2>/dev/null || true
 
 # --- Docker Compose ---
