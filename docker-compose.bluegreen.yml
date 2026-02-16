@@ -1,0 +1,74 @@
+# Blue-green deploy: due istanze app (blue/green), nginx sulla porta 80
+# Uso: docker compose -f docker-compose.yml -f docker-compose.bluegreen.yml up -d
+# Switch: ./scripts/switch-to-green.sh oppure ./scripts/switch-to-blue.sh
+
+services:
+  app:
+    profiles:
+      - disabled
+
+  app-blue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: revenue-app:latest
+    container_name: revenue_app_blue
+    restart: unless-stopped
+    working_dir: /var/www/html
+    env_file: .env
+    volumes:
+      - .:/var/www/html
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - revenue_network
+    depends_on:
+      - mysql
+      - redis
+    healthcheck:
+      test: ["CMD", "php-fpm", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  app-green:
+    image: revenue-app:latest
+    container_name: revenue_app_green
+    restart: unless-stopped
+    working_dir: /var/www/html
+    env_file: .env
+    volumes:
+      - .:/var/www/html
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - revenue_network
+    depends_on:
+      - mysql
+      - redis
+    healthcheck:
+      test: ["CMD", "php-fpm", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  nginx:
+    image: nginx:alpine
+    container_name: revenue_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/upstream.conf:/etc/nginx/conf.d/0-upstream.conf
+      - ./docker/nginx/default-bluegreen.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - revenue_network
+    depends_on:
+      - app-blue
+      - app-green
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

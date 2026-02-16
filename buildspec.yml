@@ -1,62 +1,25 @@
 ---
-
 version: 0.2
 
-# run-as: Linux-user-name
-
-# env:
-#  shell: shell-tag
-#  variables:
-#    key1: "value"
-#    key2: "value"
-#  parameter-store:
-#    key3: "value"
-#    key4: "value"
-#  exported-variables:
-#    - variable
-#    - variable
-#  secrets-manager:
-#    key: secret-id:json-key:version-stage:version-id
-#  git-credential-helper: no | yes
-
-# proxy:
-#  upload-artifacts: no | yes
-#  logs: no | yes
-
-# batch:
-#  fast-fail: false | true
-# build-list:
-# build-matrix:
-# build-graph:
+# CodeBuild: solo validazione e upload sorgente.
+# Composer, npm e build Docker sono gestiti sul server in afterInstall.sh (via Docker).
 
 phases:
-  install:
-    runtime-versions:
-      php: 8.2
+  pre_build:
     commands:
-      - composer install --no-dev
-      - npm install
+      - echo "Build started on `date`"
 
   build:
     commands:
-      - echo Build started on `date`
-      - npm run build
+      - echo "Validating deployment files..."
+      - test -f Dockerfile && echo "✓ Dockerfile found" || (echo "✗ Dockerfile missing"; exit 1)
+      - test -f docker-compose.yml && echo "✓ docker-compose.yml found" || (echo "✗ docker-compose.yml missing"; exit 1)
+      - echo "Build completed on `date`"
+      - test "$CODEBUILD_BUILD_SUCCEEDING" = "1" || exit 1
 
 artifacts:
   files:
     - '**/*'
-    - 'appspec.yml'
-#  name: artifact-name
-#  discard-paths: no | yes
-#  base-directory: location
-#  exclude-paths: excluded paths
-#  enable-symlinks: no | yes
-#  s3-prefix: prefix
-#  secondary-artifacts:
-#    artifactIdentifier:
-#      files:
-#        - location
-#        - location
-#      name: secondary-artifact-name
-#      discard-paths: no | yes
-#      base-directory: location
+  exclude-paths:
+    - node_modules/**
+    - .git/**

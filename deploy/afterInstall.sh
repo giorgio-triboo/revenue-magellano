@@ -1,39 +1,153 @@
 #!/bin/bash
+#
+# After install per revenue.magellano.ai: deploy con Docker e blue-green (zero downtime).
+# - CodeDeploy copia i file in RELEASE
+# - .env da AWS Secrets Manager
+# - Docker Compose: mysql, redis, app-blue, app-green, nginx sulla porta 80
+# - Deploy sul lato inattivo, switch traffico, migrazioni sul lato attivo
+#
+# Esecuzione locale (test): APP_DIR=$(pwd) LOCAL_DEPLOY=1 ./deploy/afterInstall.sh
 
-RELEASE="/var/www/revenue.magellano.ai"
+set -e
 
-# copy .env
-echo -e "Copying the ENV file"
-aws secretsmanager get-secret-value \
-	--secret-id "revenue/prod" \
-	--query SecretString \
-	--version-stage AWSCURRENT \
-	--region eu-west-1 \
-	--output text | \
-	jq -r 'to_entries|map("\(.key)=\"\(.value|tostring)\"")|.[]' > "${RELEASE}/.env" || {
-	    echo -e "ERROR creating .env from secret"
-	    exit 1
-	}
+RELEASE="${APP_DIR:-/var/www/revenue.magellano.ai}"
+cd "$RELEASE"
 
-chown apache:apache "${RELEASE}/.env"
+LOCAL_DEPLOY="${LOCAL_DEPLOY:-false}"
+if [ "$LOCAL_DEPLOY" = "1" ] || [ "$LOCAL_DEPLOY" = "true" ]; then
+    DOCKER_CMD="docker"
+    COMPOSE_CMD="docker compose"
+else
+    DOCKER_CMD="docker"
+    COMPOSE_CMD="docker compose"
+fi
 
-sudo -u apache mkdir "${RELEASE}/storage/logs" || true
+COMPOSE_FILES="-f docker-compose.yml -f docker-compose.bluegreen.yml"
 
-echo -e "Artisan: migrate"
-sudo -u apache /usr/bin/php ${RELEASE}/artisan migrate --force
-echo -e "Artisan: clear cache"
-sudo -u apache /usr/bin/php ${RELEASE}/artisan cache:clear
-sudo -u apache /usr/bin/php ${RELEASE}/artisan auth:clear-resets
-echo -e "Artisan: config"
-sudo -u apache /usr/bin/php ${RELEASE}/artisan config:clear
-echo -e "Artisan: config:clear"
-sudo -u apache /usr/bin/php ${RELEASE}/artisan optimize
+echo "=========================================="
+echo "DEPLOYMENT (Docker + Blue-Green)"
+echo "=========================================="
+echo "APP_DIR=$RELEASE"
+echo ""
 
-#Remove the .git folder
-echo -e "Removing the .git folder"
+# --- .env da Secrets Manager (solo su server, non in LOCAL_DEPLOY) ---
+if [ "$LOCAL_DEPLOY" != "1" ] && [ "$LOCAL_DEPLOY" != "true" ]; then
+    echo "Copying .env from Secrets Manager..."
+    aws secretsmanager get-secret-value \
+        --secret-id "revenue/prod" \
+        --query SecretString \
+        --version-stage AWSCURRENT \
+        --region eu-west-1 \
+        --output text | \
+        jq -r 'to_entries|map("\(.key)=\"\(.value|tostring)\"")|.[]' > "${RELEASE}/.env" || {
+            echo "ERROR creating .env from secret"
+            exit 1
+        }
+fi
+
+# --- Directory e permessi Laravel ---
+mkdir -p "${RELEASE}/storage/logs" "${RELEASE}/storage/framework/cache" "${RELEASE}/storage/framework/sessions" "${RELEASE}/storage/framework/views" "${RELEASE}/bootstrap/cache"
+chmod -R 775 "${RELEASE}/storage" "${RELEASE}/bootstrap/cache" 2>/dev/null || true
+
+# --- Docker Compose ---
+if command -v docker-compose &> /dev/null; then
+    DCOMPOSE="docker-compose"
+elif docker compose version &> /dev/null; then
+    DCOMPOSE="docker compose"
+else
+    echo "ERROR: Docker Compose not found"
+    exit 1
+fi
+
+# --- Pulizia risorse Docker non usate ---
+echo "Cleaning up Docker resources..."
+$DOCKER_CMD container prune -f 2>/dev/null || true
+$DOCKER_CMD image prune -af 2>/dev/null || true
+$DOCKER_CMD builder prune -f 2>/dev/null || true
+
+# --- Build immagine app (solo app-blue): PHP/Composer sono nel Docker ---
+echo "Building Docker image (app-blue)..."
+$DCOMPOSE $COMPOSE_FILES build app-blue
+
+# --- Composer e frontend via Docker (stesso ambiente del runtime) ---
+echo "Running composer install..."
+$DOCKER_CMD run --rm -v "${RELEASE}:/var/www/html" -w /var/www/html revenue-app:latest composer install --no-dev --no-interaction
+echo "Running npm install and build..."
+$DOCKER_CMD run --rm -v "${RELEASE}:/app" -w /app node:20-alpine sh -c "npm install && npm run build"
+
+# --- Avvio stack (mysql, redis, app-blue, app-green, nginx) ---
+echo "Starting containers..."
+$DCOMPOSE $COMPOSE_FILES up -d
+
+# --- Chi è attivo ora? (default: blue) ---
+if [ -f "${RELEASE}/docker/nginx/upstream.conf" ] && grep -q "app-green:9000" "${RELEASE}/docker/nginx/upstream.conf"; then
+    CURRENT_COLOR="green"
+    INACTIVE_COLOR="blue"
+else
+    CURRENT_COLOR="blue"
+    INACTIVE_COLOR="green"
+fi
+echo "  Current traffic: $CURRENT_COLOR → deploying to $INACTIVE_COLOR"
+
+# --- Riavvia il lato inattivo con il nuovo codice ---
+$DCOMPOSE $COMPOSE_FILES up -d --force-recreate "app-$INACTIVE_COLOR"
+TARGET_CONTAINER="revenue_app_$INACTIVE_COLOR"
+
+# --- Attendi che il container sia healthy ---
+echo "Waiting for container $TARGET_CONTAINER..."
+MAX_WAIT=90
+WAIT_COUNT=0
+HEALTH_STATUS="starting"
+while [ $WAIT_COUNT -lt $MAX_WAIT ]; do
+    HEALTH_STATUS=$($DOCKER_CMD inspect --format='{{.State.Health.Status}}' "$TARGET_CONTAINER" 2>/dev/null || echo "starting")
+    if [ "$HEALTH_STATUS" = "healthy" ]; then
+        echo "  ✓ Container is healthy"
+        break
+    fi
+    echo "  Waiting... ($WAIT_COUNT/$MAX_WAIT s)"
+    sleep 5
+    WAIT_COUNT=$((WAIT_COUNT + 5))
+done
+
+if [ "$HEALTH_STATUS" != "healthy" ]; then
+    echo "ERROR: Container did not become healthy"
+    $DCOMPOSE $COMPOSE_FILES ps
+    exit 1
+fi
+
+# --- Switch traffico sul lato appena deployato ---
+echo "Switching traffic to $INACTIVE_COLOR..."
+APP_DIR="$RELEASE" "${RELEASE}/scripts/switch-to-${INACTIVE_COLOR}.sh"
+
+# --- Migrazioni e artisan sul container che ora riceve il traffico ---
+MIGRATE_CONTAINER="$TARGET_CONTAINER"
+echo "Running migrations and artisan on $MIGRATE_CONTAINER..."
+$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan migrate --force
+$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan cache:clear
+$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan auth:clear-resets
+$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan config:clear
+$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan config:cache
+$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan optimize
+
+# --- Pulizia ---
+echo "Removing .git folder..."
 rm -rf "${RELEASE}/.git"
 
-echo -e "Restart HTTPD & PHP-FPM"
-systemctl restart httpd php-fpm || true
+# --- Systemd: avvio stack al boot (solo su server) ---
+if [ "$LOCAL_DEPLOY" != "1" ] && [ "$LOCAL_DEPLOY" != "true" ] && [ -f "${RELEASE}/scripts/revenue-docker.service" ]; then
+    echo "Installing systemd service..."
+    cp "${RELEASE}/scripts/revenue-docker.service" /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl enable revenue-docker.service
+    echo "  ✓ revenue-docker.service enabled"
+fi
 
-echo -e "All Done"
+echo ""
+echo "=========================================="
+echo "✓ DEPLOYMENT COMPLETED (Blue-Green)"
+echo "=========================================="
+echo "  • Traffic on: $INACTIVE_COLOR"
+echo "  • Nginx listening on port 80"
+echo "  • Containers: mysql, redis, app-blue, app-green, nginx"
+$DCOMPOSE $COMPOSE_FILES ps
+echo ""

@@ -1,0 +1,15 @@
+[Unit]
+Description=Revenue Docker Compose (blue-green)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/var/www/revenue.magellano.ai
+ExecStart=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.bluegreen.yml up -d
+ExecStop=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.bluegreen.yml down
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
