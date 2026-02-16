@@ -89,11 +89,26 @@ echo "Building Docker image (revenue-app:latest)..."
 $DOCKER_CMD build --network=host -t revenue-app:latest -f Dockerfile .
 
 # --- Composer e frontend via Docker (stesso ambiente del runtime) ---
-echo "Running composer install..."
-$DOCKER_CMD run --rm -v "${RELEASE}:/var/www/html" -w /var/www/html revenue-app:latest sh -c "git config --global --add safe.directory /var/www/html && composer install --no-dev --no-interaction"
-echo "Running npm install and build..."
+# Timeout evita hang indefinito su connection timeout verso Packagist/npm (script esce con errore).
+COMPOSER_TIMEOUT=600
+NPM_TIMEOUT=900
+echo "Running composer install (timeout ${COMPOSER_TIMEOUT}s)..."
+timeout "$COMPOSER_TIMEOUT" $DOCKER_CMD run --rm -v "${RELEASE}:/var/www/html" -w /var/www/html revenue-app:latest sh -c "git config --global --add safe.directory /var/www/html && composer install --no-dev --no-interaction" || {
+    code=$?
+    if [ "$code" = 124 ]; then
+        echo "ERROR: composer install timed out after ${COMPOSER_TIMEOUT}s (rete lenta o Packagist irraggiungibile)"
+    fi
+    exit $code
+}
+echo "Running npm install and build (timeout ${NPM_TIMEOUT}s)..."
 # npm ci + più memoria per Node (evita "Exit handler never called" / vite not found)
-$DOCKER_CMD run --rm -v "${RELEASE}:/app" -w /app -e NODE_OPTIONS="--max-old-space-size=4096" node:20-alpine sh -c "rm -rf node_modules && npm ci && npm run build"
+timeout "$NPM_TIMEOUT" $DOCKER_CMD run --rm -v "${RELEASE}:/app" -w /app -e NODE_OPTIONS="--max-old-space-size=4096" node:20-alpine sh -c "rm -rf node_modules && npm ci && npm run build" || {
+    code=$?
+    if [ "$code" = 124 ]; then
+        echo "ERROR: npm install/build timed out after ${NPM_TIMEOUT}s (rete lenta o registry irraggiungibile)"
+    fi
+    exit $code
+}
 
 # --- Avvio stack (mysql, redis, app-blue, app-green, nginx) ---
 echo "Starting containers..."
