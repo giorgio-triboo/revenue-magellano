@@ -41,7 +41,8 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-revenue}
       MYSQL_USER: ${DB_USERNAME:-revenue}
     volumes:
-      - mysql_data:/var/lib/mysql
+      # Bind mount esterno: nessun volume Docker, dati su host (es. EBS) in /data/revenue-mysql
+      - /data/revenue-mysql:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
     networks:
       - revenue_network
@@ -62,7 +63,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
-    driver: local
   redis_data:
     driver: local

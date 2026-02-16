@@ -145,14 +145,14 @@ SESSION_DRIVER=redis
 
 ## Volumi
 
-I dati vengono persistiti in volumi Docker:
-- `mysql_data`: Database MySQL
-- `redis_data`: Dati Redis
+- **MySQL**: bind mount su host `/data/revenue-mysql` (nessun volume Docker; in deploy la directory viene creata da afterInstall.sh).
+- **Redis**: volume Docker `redis_data`.
 
-Per eliminare tutti i dati:
+Per eliminare i dati Redis:
 ```bash
 docker-compose down -v
 ```
+Per eliminare i dati MySQL (attenzione: cancella il DB) svuotare la directory sul server: `/data/revenue-mysql`.
 
 ## Troubleshooting
 

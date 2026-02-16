@@ -59,6 +59,12 @@ mkdir -p "${RELEASE}/storage/logs" "${RELEASE}/storage/framework/cache" "${RELEA
 chown -R ec2-user:ec2-user "$RELEASE" 2>/dev/null || true
 chmod -R 775 "${RELEASE}/storage" "${RELEASE}/bootstrap/cache" 2>/dev/null || true
 
+# --- Directory MySQL esterna (bind mount, nessun volume Docker): uid 999 = utente mysql nel container ---
+if [ "$LOCAL_DEPLOY" != "1" ] && [ "$LOCAL_DEPLOY" != "true" ]; then
+    mkdir -p /data/revenue-mysql
+    chown 999:999 /data/revenue-mysql 2>/dev/null || true
+fi
+
 # --- Docker Compose ---
 if command -v docker-compose &> /dev/null; then
     DCOMPOSE="docker-compose"
@@ -69,10 +75,13 @@ else
     exit 1
 fi
 
-# --- Pulizia risorse Docker non usate ---
-echo "Cleaning up Docker resources..."
+# --- Pulizia container, volumi orfani e risorse dangling (NON image prune -af: azzererebbe
+#     la cache e ogni deploy rifarebbe build + node + composer/npm da zero, +10min).
+#     volume prune rimuove solo volumi non usati (redis_data e dati MySQL su host restano al sicuro). ---
+echo "Cleaning up Docker containers, unused volumes and dangling resources..."
 $DOCKER_CMD container prune -f 2>/dev/null || true
-$DOCKER_CMD image prune -af 2>/dev/null || true
+$DOCKER_CMD volume prune -f 2>/dev/null || true
+$DOCKER_CMD image prune -f 2>/dev/null || true
 $DOCKER_CMD builder prune -f 2>/dev/null || true
 
 # --- Build immagine app: --network=host per usare DNS/rete dell'host (evita "Temporary failure resolving") ---
@@ -130,15 +139,10 @@ fi
 echo "Switching traffic to $INACTIVE_COLOR..."
 APP_DIR="$RELEASE" "${RELEASE}/scripts/switch-to-${INACTIVE_COLOR}.sh"
 
-# --- Migrazioni e artisan sul container che ora riceve il traffico ---
+# --- Migrazioni e artisan sul container che ora riceve il traffico (un solo exec) ---
 MIGRATE_CONTAINER="$TARGET_CONTAINER"
 echo "Running migrations and artisan on $MIGRATE_CONTAINER..."
-$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan migrate --force
-$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan cache:clear
-$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan auth:clear-resets
-$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan config:clear
-$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan config:cache
-$DOCKER_CMD exec "$MIGRATE_CONTAINER" php artisan optimize
+$DOCKER_CMD exec "$MIGRATE_CONTAINER" sh -c "php artisan migrate --force && php artisan cache:clear && php artisan auth:clear-resets && php artisan config:clear && php artisan config:cache && php artisan optimize"
 
 # --- Pulizia ---
 echo "Removing .git folder..."
