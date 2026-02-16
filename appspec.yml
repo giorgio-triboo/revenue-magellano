@@ -1,5 +1,5 @@
 ---
-
+# Deploy in HOME (non /var/www). Pipeline deve usare questo appspec senza override della destination.
 version: 0.0
 os: linux
 files:

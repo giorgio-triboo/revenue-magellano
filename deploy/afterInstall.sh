@@ -75,15 +75,16 @@ $DOCKER_CMD container prune -f 2>/dev/null || true
 $DOCKER_CMD image prune -af 2>/dev/null || true
 $DOCKER_CMD builder prune -f 2>/dev/null || true
 
-# --- Build immagine app (docker build evita richiesta buildx 0.17+ di compose build) ---
+# --- Build immagine app: --network=host per usare DNS/rete dell'host (evita "Temporary failure resolving") ---
 echo "Building Docker image (revenue-app:latest)..."
-$DOCKER_CMD build -t revenue-app:latest -f Dockerfile .
+$DOCKER_CMD build --network=host -t revenue-app:latest -f Dockerfile .
 
 # --- Composer e frontend via Docker (stesso ambiente del runtime) ---
 echo "Running composer install..."
-$DOCKER_CMD run --rm -v "${RELEASE}:/var/www/html" -w /var/www/html revenue-app:latest composer install --no-dev --no-interaction
+$DOCKER_CMD run --rm -v "${RELEASE}:/var/www/html" -w /var/www/html revenue-app:latest sh -c "git config --global --add safe.directory /var/www/html && composer install --no-dev --no-interaction"
 echo "Running npm install and build..."
-$DOCKER_CMD run --rm -v "${RELEASE}:/app" -w /app node:20-alpine sh -c "npm install && npm run build"
+# npm ci + più memoria per Node (evita "Exit handler never called" / vite not found)
+$DOCKER_CMD run --rm -v "${RELEASE}:/app" -w /app -e NODE_OPTIONS="--max-old-space-size=4096" node:20-alpine sh -c "rm -rf node_modules && npm ci && npm run build"
 
 # --- Avvio stack (mysql, redis, app-blue, app-green, nginx) ---
 echo "Starting containers..."
