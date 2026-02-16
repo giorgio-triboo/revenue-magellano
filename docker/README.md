@@ -6,8 +6,10 @@ Questo setup Docker fornisce un ambiente di sviluppo locale completo per testare
 
 - **app**: Container PHP 8.4-FPM con tutte le estensioni necessarie
 - **nginx**: Server web Nginx
-- **mysql**: Database MySQL 8.0
 - **redis**: Cache Redis
+
+**Produzione**: il DB MySQL è esterno (`.env` con `DB_HOST` punta al server). Nessun container mysql nello stack.
+**Locale**: per avere MySQL in Docker usa un override o un DB esterno.
 
 **Nota**: Il queue worker può essere avviato manualmente quando necessario nel container app.
 
@@ -140,19 +142,11 @@ SESSION_DRIVER=redis
 ## Porte
 
 - **8080**: Applicazione web (http://localhost:8080)
-- **3306**: MySQL
 - **6379**: Redis
 
 ## Volumi
 
-- **MySQL**: bind mount su host `/data/revenue-mysql` (nessun volume Docker; in deploy la directory viene creata da afterInstall.sh).
-- **Redis**: volume Docker `redis_data`.
-
-Per eliminare i dati Redis:
-```bash
-docker-compose down -v
-```
-Per eliminare i dati MySQL (attenzione: cancella il DB) svuotare la directory sul server: `/data/revenue-mysql`.
+- **Redis**: volume Docker `redis_data`. Per eliminare: `docker-compose down -v`.
 
 ## Troubleshooting
 

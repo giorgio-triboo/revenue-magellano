@@ -12,7 +12,6 @@ services:
     networks:
       - revenue_network
     depends_on:
-      - mysql
       - redis
 
   nginx:
@@ -29,23 +28,7 @@ services:
     # depends_on solo in docker-compose.bluegreen.yml (app-blue, app-green).
     # Qui omesso: con merge il base "app" (profile disabled) darebbe "undefined service app".
 
-  mysql:
-    image: mysql:8.0
-    container_name: revenue_mysql
-    restart: unless-stopped
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-revenue}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-revenue}
-      MYSQL_USER: ${DB_USERNAME:-revenue}
-    volumes:
-      # Bind mount esterno: nessun volume Docker, dati su host (es. EBS) in /data/revenue-mysql
-      - /data/revenue-mysql:/var/lib/mysql
-      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
-    networks:
-      - revenue_network
+  # DB MySQL esterno: .env con DB_HOST punta al server DB; nessun container mysql nello stack.
 
   redis:
     image: redis:7-alpine

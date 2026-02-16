@@ -5,7 +5,7 @@
 # - CodeDeploy copia i file in RELEASE
 # - .env da AWS Secrets Manager
 # - docker build (immagine con codice, vendor, frontend) → copia public/ su host per nginx
-# - Docker Compose: mysql, redis, app-blue, app-green, nginx sulla porta 80
+# - Docker Compose: redis, app-blue, app-green, nginx (DB MySQL esterno via .env)
 #
 # Esecuzione locale (test): APP_DIR=$(pwd) LOCAL_DEPLOY=1 ./deploy/afterInstall.sh
 
@@ -60,12 +60,6 @@ mkdir -p "${RELEASE}/storage/logs" "${RELEASE}/storage/framework/cache" "${RELEA
 chown -R ec2-user:ec2-user "$RELEASE" 2>/dev/null || true
 chmod -R 775 "${RELEASE}/storage" "${RELEASE}/bootstrap/cache" 2>/dev/null || true
 
-# --- Directory MySQL esterna (bind mount, nessun volume Docker): uid 999 = utente mysql nel container ---
-if [ "$LOCAL_DEPLOY" != "1" ] && [ "$LOCAL_DEPLOY" != "true" ]; then
-    mkdir -p /data/revenue-mysql
-    chown 999:999 /data/revenue-mysql 2>/dev/null || true
-fi
-
 # --- Docker Compose ---
 if command -v docker-compose &> /dev/null; then
     DCOMPOSE="docker-compose"
@@ -78,9 +72,17 @@ fi
 
 # --- Pulizia container, volumi orfani e risorse dangling (NON image prune -af: azzererebbe
 #     la cache e ogni deploy rifarebbe build + node + composer/npm da zero, +10min).
-#     volume prune rimuove solo volumi non usati (redis_data e dati MySQL su host restano al sicuro). ---
+#     volume prune rimuove solo volumi non usati (redis_data resta al sicuro). ---
 echo "Cleaning up Docker containers, unused volumes and dangling resources..."
 $DOCKER_CMD container prune -f 2>/dev/null || true
+# Rimuovi container orfani con immagine revenue-app che non sono blue/green (es. vecchi run o deploy falliti)
+for cid in $($DOCKER_CMD ps -q --filter "ancestor=revenue-app:latest" 2>/dev/null); do
+    name="$($DOCKER_CMD inspect --format '{{.Name}}' "$cid" 2>/dev/null)"
+    if [ "$name" != "/revenue_app_blue" ] && [ "$name" != "/revenue_app_green" ]; then
+        echo "  Removing orphan container $cid ($name)"
+        $DOCKER_CMD rm -f "$cid" 2>/dev/null || true
+    fi
+done
 $DOCKER_CMD volume prune -f 2>/dev/null || true
 $DOCKER_CMD image prune -f 2>/dev/null || true
 $DOCKER_CMD builder prune -f 2>/dev/null || true
@@ -94,7 +96,7 @@ mkdir -p "${RELEASE}/public"
 echo "Copying public/ from image to host for nginx..."
 $DOCKER_CMD run --rm -v "${RELEASE}:/out" revenue-app:latest sh -c "cp -a /var/www/html/public/. /out/public/"
 
-# --- Avvio stack (mysql, redis, app-blue, app-green, nginx) ---
+# --- Avvio stack (redis, app-blue, app-green, nginx; DB esterno) ---
 echo "Starting containers..."
 $DCOMPOSE $COMPOSE_FILES up -d
 
@@ -162,6 +164,6 @@ echo "✓ DEPLOYMENT COMPLETED (Blue-Green)"
 echo "=========================================="
 echo "  • Traffic on: $INACTIVE_COLOR"
 echo "  • Nginx listening on port 80"
-echo "  • Containers: mysql, redis, app-blue, app-green, nginx"
+echo "  • Containers: redis, app-blue, app-green, nginx (DB esterno)"
 $DCOMPOSE $COMPOSE_FILES ps
 echo ""
