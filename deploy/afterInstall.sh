@@ -13,6 +13,15 @@ set -e
 RELEASE="${APP_DIR:-/home/ec2-user/revenue.magellano.ai}"
 cd "$RELEASE"
 
+# Verifica che CodeDeploy abbia copiato i file (fase Install). Se la dir è vuota, Install è fallita.
+if [ ! -f "composer.json" ] || [ ! -f "Dockerfile" ]; then
+    echo "ERROR: $RELEASE is empty or incomplete (missing composer.json/Dockerfile)."
+    echo "CodeDeploy Install phase may have failed. Check deployment logs for the Install step."
+    echo "Contents of $RELEASE:"
+    ls -la "$RELEASE" 2>/dev/null || true
+    exit 1
+fi
+
 LOCAL_DEPLOY="${LOCAL_DEPLOY:-false}"
 if [ "$LOCAL_DEPLOY" = "1" ] || [ "$LOCAL_DEPLOY" = "true" ]; then
     DOCKER_CMD="docker"

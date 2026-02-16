@@ -4,12 +4,13 @@ FROM php:8.4-fpm-alpine3.19
 # Set working directory
 WORKDIR /var/www/html
 
-# Abilita repo community (libzip-dev, zip, unzip) e aggiorna indice
+# Abilita repo community (libzip-dev, zip, unzip) e aggiorna indice (retry per errori di rete)
 RUN sed -i '/community/s/^# *//' /etc/apk/repositories 2>/dev/null || true \
-    && (grep -q community /etc/apk/repositories || \
+    && (grep -q community /etc/apk/repositories || ( \
         MAIN=$(grep -oE 'v[0-9]+\.[0-9]+' /etc/apk/repositories | head -1) && \
-        echo "https://dl-cdn.alpinelinux.org/alpine/${MAIN}/community" >> /etc/apk/repositories) \
-    && apk update
+        MAIN=${MAIN:-v3.19} && \
+        echo "https://dl-cdn.alpinelinux.org/alpine/${MAIN}/community" >> /etc/apk/repositories )) \
+    && for i in 1 2 3; do apk update && break || sleep 10; done
 
 # Install system dependencies (Alpine: apk)
 RUN apk add --no-cache \
