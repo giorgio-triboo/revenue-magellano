@@ -49,6 +49,22 @@ services:
       retries: 3
       start_period: 10s
 
+  queue-worker:
+    image: revenue-app:latest
+    container_name: revenue_queue_worker
+    restart: unless-stopped
+    working_dir: /var/www/html
+    env_file: .env
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - revenue_network
+    depends_on:
+      - redis
+    command: php artisan queue:work redis --sleep=1 --tries=3
+
   nginx:
     image: nginx:alpine
     container_name: revenue_nginx
