@@ -40,19 +40,17 @@ echo "=========================================="
 echo "APP_DIR=$RELEASE"
 echo ""
 
-# --- .env da Secrets Manager (solo su server, non in LOCAL_DEPLOY) ---
+# --- .env ---
+# Usiamo SOLO il `.env` incluso nel bundle (repo) copiato da CodeDeploy nel RELEASE.
+# Nessun fetch/fallback/override da Secrets Manager.
 if [ "$LOCAL_DEPLOY" != "1" ] && [ "$LOCAL_DEPLOY" != "true" ]; then
-    echo "Copying .env from Secrets Manager..."
-    aws secretsmanager get-secret-value \
-        --secret-id "revenue/prod" \
-        --query SecretString \
-        --version-stage AWSCURRENT \
-        --region eu-west-1 \
-        --output text | \
-        jq -r 'to_entries|map("\(.key)=\"\(.value|tostring)\"")|.[]' > "${RELEASE}/.env" || {
-            echo "ERROR creating .env from secret"
-            exit 1
-        }
+    if [ -f "${RELEASE}/.env" ]; then
+        echo "Using repo .env"
+    else
+        echo "ERROR: .env not found in release folder ($RELEASE/.env)."
+        echo "Include .env in the deployment bundle (repo) to proceed."
+        exit 1
+    fi
 fi
 
 # --- Directory e permessi Laravel ---
