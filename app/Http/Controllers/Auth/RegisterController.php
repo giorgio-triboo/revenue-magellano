@@ -163,7 +163,9 @@ class RegisterController extends Controller
                 ], 422);
             }
 
-            $fullVatNumber = $request->country_code . $validation['cleanNumber'];
+            $fullVatNumber = $request->country_code === 'AA'
+                ? $validation['cleanNumber']
+                : $request->country_code . $validation['cleanNumber'];
             $publisher = Publisher::where('vat_number', $fullVatNumber)->first();
 
             Log::info('Verifica partita IVA', [
@@ -261,7 +263,9 @@ class RegisterController extends Controller
                     throw new \Exception("Ruolo 'publisher' non trovato");
                 }
 
-                $fullVatNumber = $validatedData['country_code'] . $vatValidation['cleanNumber'];
+                $fullVatNumber = $validatedData['country_code'] === 'AA'
+                    ? $vatValidation['cleanNumber']
+                    : $validatedData['country_code'] . $vatValidation['cleanNumber'];
 
                 $publisher = Publisher::where('vat_number', $fullVatNumber)->first();
 

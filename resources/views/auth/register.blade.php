@@ -148,7 +148,7 @@
                                     <input id="vat_number" 
                                            type="text" 
                                            x-model="formData.vat_number"
-                                           @input="$event.target.value = $event.target.value.replace(/[^\dA-Z]/g, '')"
+                                           @input="$event.target.value = $event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')"
                                            class="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-200 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-custom-activeItem focus:border-custom-activeItem sm:text-sm uppercase"
                                            :class="{
                                                'border-red-300': errors.vat_number,

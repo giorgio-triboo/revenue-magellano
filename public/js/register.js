@@ -143,6 +143,7 @@ document.addEventListener("alpine:init", () => {
                         this.isLoading = true;
                         const response = await fetch("/api/check-vat", {
                             method: "POST",
+                            credentials: "same-origin",
                             headers: {
                                 "Content-Type": "application/json",
                                 Accept: "application/json",
@@ -154,11 +155,20 @@ document.addEventListener("alpine:init", () => {
                             }),
                         });
 
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
+                        const contentType = response.headers.get("content-type") || "";
+                        const data = contentType.includes("application/json")
+                            ? await response.json()
+                            : {};
 
-                        const data = await response.json();
+                        if (!response.ok) {
+                            if (response.status === 419) {
+                                this.errors.vat_number = "Sessione scaduta. Ricarica la pagina e riprova.";
+                                return false;
+                            }
+
+                            this.errors.vat_number = data.message || data.error || "Errore durante la verifica della partita IVA";
+                            return false;
+                        }
                         this.publisherExists = false;
 
                         if (data.exists) {
