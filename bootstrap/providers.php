@@ -1,6 +1,7 @@
 <?php
 
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\RouteServiceProvider::class,
+    // AppServiceProvider and AuthServiceProvider are registered via config/app.php.
+    // Event discovery mapping for FileUploadProcessed -> DispatchAxExport.
+    App\Providers\EventServiceProvider::class,
 ];

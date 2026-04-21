@@ -17,7 +17,7 @@ class EventServiceProvider extends ServiceProvider
     
     
 
-    public function boot()
+    public function boot(): void
     {
         Log::debug('EventServiceProvider: Registrazione eventi completata.');
         parent::boot();

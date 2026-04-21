@@ -5,6 +5,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/publishers/{publisher}', [PublisherController::class, 'show'])
-         ->name('publishers.show')
+         ->name('api.publishers.show')
          ->middleware('can:view,publisher');
 });
