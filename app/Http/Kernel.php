@@ -18,6 +18,7 @@ class Kernel extends HttpKernel
 
     protected $middlewareGroups = [
         'web' => [
+            \App\Http\Middleware\ForceHttps::class,
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
@@ -26,7 +27,6 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\LogRequests::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\SessionSecurityMiddleware::class,
-            \App\Http\Middleware\ForceHttps::class, // Nuovo middleware per forzare HTTPS
             \App\Http\Middleware\LogRequests::class,
         ],
 

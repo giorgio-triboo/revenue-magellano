@@ -63,7 +63,9 @@ services:
       - revenue_network
     depends_on:
       - redis
-    command: php artisan queue:work redis --sleep=1 --tries=3
+    # Deve includere le stesse code usate da dispatch (csv-processing, ax-export); senza --queue
+    # Laravel consuma solo REDIS_QUEUE (default), lasciando i job sulle code nominate in pending.
+    command: php artisan queue:work redis --queue=csv-processing,ax-export --sleep=1 --tries=3 --timeout=3600
 
   nginx:
     image: nginx:alpine
