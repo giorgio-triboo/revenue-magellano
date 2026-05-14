@@ -74,7 +74,7 @@
                                         value="{{ request('search') }}">
                                     <div class="absolute inset-y-0 right-0 flex items-center">
                                         @if (request('search'))
-                                            <a href="{{ request()->url() }}" class="pr-2">
+                                            <a href="{{ route('statements.details') }}" class="pr-2">
                                                 <i data-lucide="x-circle"
                                                     class="h-5 w-5 text-gray-400 hover:text-gray-500"></i>
                                             </a>

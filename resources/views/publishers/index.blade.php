@@ -26,7 +26,7 @@
         <!-- Search Bar e Filtri -->
         <div class="mt-4">
             <div class="max-w-xl">
-                <form action="{{ request()->url() }}" method="GET" class="space-y-4">
+                <form action="{{ route('publishers.index') }}" method="GET" class="space-y-4">
                     <!-- Search input -->
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -37,7 +37,7 @@
                             placeholder="Cerca per nome del publisher.." value="{{ request('search') }}">
                         <div class="absolute inset-y-0 right-0 flex items-center">
                             @if (request('search'))
-                                <a href="{{ request()->url() }}" class="pr-2">
+                                <a href="{{ route('publishers.index') }}" class="pr-2">
                                     <i data-lucide="x-circle" class="h-5 w-5 text-gray-400 hover:text-gray-500"></i>
                                 </a>
                             @endif
