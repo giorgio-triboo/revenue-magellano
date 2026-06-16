@@ -32,7 +32,7 @@
             <div class="flex min-h-0 flex-1 flex-col bg-custom-sidebar overflow-hidden">
                 <!-- Logo -->
                 <div class="flex h-16 flex-shrink-0 items-center px-4 border-b border-custom-textMain/30">
-                    <a href="/dashboard" class="text-xl font-bold text-text_main">
+                    <a href="/dashboard" class="text-xl font-bold text-custom-textMain">
                         {{ config('app.name') }}
                     </a>
                 </div>

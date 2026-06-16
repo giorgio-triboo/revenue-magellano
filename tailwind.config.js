@@ -1,5 +1,4 @@
 import colors from './resources/js/config/colors.js';
-import forms from '@tailwindcss/forms';
 
 export default {
     content: [
@@ -15,7 +14,4 @@ export default {
             },
         },
     },
-    plugins: [
-        forms,
-    ],
 };

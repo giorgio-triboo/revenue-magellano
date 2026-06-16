@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it" class="h-full bg-custom-platform-background">
+<html lang="it" class="h-full bg-custom-platform">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

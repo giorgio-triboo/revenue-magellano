@@ -19,6 +19,7 @@ yarn-error.log
 /.vscode
 .DS_Store
 .vite
+/docs
 
 # Laravel specific
 /bootstrap/cache/*

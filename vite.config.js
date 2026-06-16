@@ -1,20 +1,22 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     plugins: [
+        tailwindcss(),
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
         }),
     ],
     build: {
-        outDir: 'public/build', // Output nella directory pubblica
-        emptyOutDir: true, // Pulisce la directory di output prima di ogni build
+        outDir: 'public/build',
+        emptyOutDir: true,
         rollupOptions: {
             output: {
                 manualChunks: {
-                    alpine: ['alpinejs'], // Separazione dei moduli per l'ottimizzazione
+                    alpine: ['alpinejs'],
                 },
             },
         },
