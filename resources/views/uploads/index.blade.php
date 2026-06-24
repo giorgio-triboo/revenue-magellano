@@ -327,7 +327,7 @@
         <div x-show="showEmailModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title"
             role="dialog" aria-modal="true">
             <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showEmailModal = false"
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="if (!isSendingEmail && !isSendingTestEmail) showEmailModal = false"
                     aria-hidden="true"></div>
 
                 <div
@@ -345,18 +345,26 @@
                         </div>
                     </div>
                     <div class="mt-5 sm:mt-4 sm:flex sm:flex-col space-y-3">
-                        <button type="button" @click="sendTestEmail()"
-                            class="inline-flex w-full justify-center items-center rounded-xl bg-blue-100 px-3 py-2 text-md font-semibold text-blue-600 shadow-sm hover:bg-blue-200">
-                            <i data-lucide="send-test" class="h-5 w-5 mr-2"></i>
-                            Invia Email di Test agli Admin
+                        <button type="button" @click="sendTestEmail()" :disabled="isSendingEmail || isSendingTestEmail"
+                            class="inline-flex w-full justify-center items-center rounded-xl bg-blue-100 px-3 py-2 text-md font-semibold text-blue-600 shadow-sm hover:bg-blue-200 disabled:cursor-not-allowed disabled:opacity-60">
+                            <svg x-show="isSendingTestEmail" class="mr-2 h-5 w-5 animate-spin text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                            </svg>
+                            <i x-show="!isSendingTestEmail" data-lucide="send-test" class="h-5 w-5 mr-2"></i>
+                            <span x-text="isSendingTestEmail ? 'Invio email di test...' : 'Invia Email di Test agli Admin'"></span>
                         </button>
-                        <button type="button" @click="sendEmail()"
-                            class="inline-flex w-full justify-center rounded-xl bg-custom-activeItem px-3 py-2 text-md font-semibold text-white shadow-sm hover:bg-custom-activeItem/90">
-                            <i data-lucide="send" class="h-5 w-5 mr-2"></i>
-                            Invia Email ai Publisher
+                        <button type="button" @click="sendEmail()" :disabled="isSendingEmail || isSendingTestEmail"
+                            class="inline-flex w-full justify-center items-center rounded-xl bg-custom-activeItem px-3 py-2 text-md font-semibold text-white shadow-sm hover:bg-custom-activeItem/90 disabled:cursor-not-allowed disabled:opacity-60">
+                            <svg x-show="isSendingEmail" class="mr-2 h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                            </svg>
+                            <i x-show="!isSendingEmail" data-lucide="send" class="h-5 w-5 mr-2"></i>
+                            <span x-text="isSendingEmail ? 'Invio email ai publisher...' : 'Invia Email ai Publisher'"></span>
                         </button>
-                        <button type="button" @click="showEmailModal = false"
-                            class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                        <button type="button" @click="showEmailModal = false" :disabled="isSendingEmail || isSendingTestEmail"
+                            class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-md font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60">
                             Annulla
                         </button>
                     </div>

@@ -7,6 +7,8 @@ function uploadManager() {
         showExportModal: false,
         showErrorModal: false,
         showInfoModal: false,
+        isSendingEmail: false,
+        isSendingTestEmail: false,
         errorDetails: '',
         currentErrorUpload: null,
         currentInfoUpload: null,
@@ -234,6 +236,7 @@ function uploadManager() {
         },
 
         confirmSendEmail(upload) {
+            if (this.isSendingEmail || this.isSendingTestEmail) return;
             this.selectedUpload = upload;
             this.showEmailModal = true;
         },
@@ -479,7 +482,9 @@ function uploadManager() {
         },
                 
         async sendTestEmail() {
-            if (!this.selectedUpload) return;
+            if (!this.selectedUpload || this.isSendingEmail || this.isSendingTestEmail) return;
+
+            this.isSendingTestEmail = true;
 
             try {
                 const response = await fetch(`/uploads/${this.selectedUpload.id}/send-test-email`, {
@@ -498,11 +503,15 @@ function uploadManager() {
                 this.showNotification('success', data.message || 'Email di test inviata con successo');
             } catch (error) {
                 this.showNotification('error', error.message);
+            } finally {
+                this.isSendingTestEmail = false;
             }
         },
 
         async sendEmail() {
-            if (!this.selectedUpload) return;
+            if (!this.selectedUpload || this.isSendingEmail || this.isSendingTestEmail) return;
+
+            this.isSendingEmail = true;
 
             try {
                 const response = await fetch(`/uploads/${this.selectedUpload.id}/send-email`, {
@@ -518,10 +527,13 @@ function uploadManager() {
                 if (!response.ok) throw new Error(data.message);
 
                 this.showEmailModal = false;
+                this.selectedUpload.notification_sent_at = new Date().toISOString();
                 this.selectedUpload = null;
                 this.showNotification('success', data.message || 'Email inviata con successo');
             } catch (error) {
                 this.showNotification('error', error.message);
+            } finally {
+                this.isSendingEmail = false;
             }
         },
 
